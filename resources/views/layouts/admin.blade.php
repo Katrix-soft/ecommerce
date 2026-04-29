@@ -43,7 +43,7 @@
             @include('layouts.partials.admin.breadcrumb')
 
 
-            @isset($record)
+            @isset($action)
             
                 <div>
                  {{ $action }}

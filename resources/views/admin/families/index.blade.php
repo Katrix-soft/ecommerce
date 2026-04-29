@@ -6,9 +6,9 @@
 ]">
 
     <x-slot name="action">
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        <a class="btn btn-blue" href="{{ route('admin.families.create') }}">
             Nuevo
-        </button>
+        </a>
     </x-slot>
 
     @if ($families->count())
