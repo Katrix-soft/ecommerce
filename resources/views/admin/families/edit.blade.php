@@ -25,12 +25,41 @@
                      value="{{ old('name', $family->name) }}" />
         </div>
 
-        <div class="flex justify-end">
-            <a href="{{ route('admin.families.index') }}" class="btn btn-blue">
+        <div class="flex justify-end space-x-2">
+            <x-danger-button onclick="confirmDelete()">
+                Eliminar
+            </x-danger-button>
+            <x-button>
                 Actualizar
-            </a>
+            </x-button>
         </div>
     </form>
 </div>
+<form action="{{ route('admin.families.destroy',$family) }}" 
+    method="POST"
+    id="delete-form">
+    @csrf
+    @method('DELETE')
 
+</form>
+@push('js')
+<script>
+    function confirmDelete(){
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "No podrás revertir esto!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sí, eliminar!",
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-form').submit(); // 👈 solo submit, sin Swal de éxito
+            }
+        });
+    }
+</script>
+@endpush
 </x-admin-layout>
