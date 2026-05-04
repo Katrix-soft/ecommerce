@@ -1,5 +1,5 @@
  <div>
-    <form>
+    <form wire:submit="save">
 
             <div class="card">
 
@@ -10,8 +10,9 @@
                         Familias
                     </x-label>
 
-                    <x-select wire:model.live="family_id" class="w-full">
-                        <option value="">Seleccione una familia</option>
+                    <x-select wire:model.live="subcategories.family_id" class="w-full">
+                        <option value="">
+                            Seleccione una familia</option>
                         @foreach ($families as $family)
                             <option value="{{ $family->id }}">
                                 {{ $family->name }}
@@ -26,9 +27,13 @@
                 <x-label class="mb-2">
                     Categorias
                 </x-label>
-                <x-select name="category_id" class="w-full">
+                <x-select name="category_id" class="w-full" wire:model.live="subcategories.category_id">
 
-                    @foreach ($categories as $category)
+                    <option value="">
+                        Seleccione una categoria
+                    </option>
+
+                    @foreach ($this->categories as $category)
                         <option value="{{ $category->id }}">
                             @selected(old('category_id')== $category->id)
                             {{ $category->name }}
@@ -40,7 +45,7 @@
                 <x-label class="mb-2">
                     Nombre
                 </x-label>
-                <x-input class="w-full" placeholder="Ingrese el nombre de la subcategoria"  />
+                <x-input class="w-full" placeholder="Ingrese el nombre de la subcategoria" wire:model="subcategories.name" />
             </div>
             <div class="flex justify-end">
                 <x-button>
@@ -51,5 +56,5 @@
         </div>
     </form>
 
-    @dump($subcategories)
+ 
 </div>
