@@ -2,8 +2,9 @@
 
 namespace App\Livewire\Admin\Subcategories;
 
-use App\Models\Family;
 use App\Models\Category;
+use App\Models\Family;
+use App\Models\Subcategory;
 use Livewire\Component;
 use Livewire\Attributes\Computed;
 
@@ -11,50 +12,58 @@ class SubcategoryCreate extends Component
 {
 
     public $families;
+    public $family_id = '';
+    public $category_id = '';
+    public $name = '';
 
-    public $subcategories = [
-        'family_id' => '',
-        'category_id' => '',
-        'name' => ''
-    ];
+
 
     public function mount()
     {
         $this->families = Family::all();
     }
 
-    public function updatedSubcategoriesFamilyId()
+    public function updatedFamilyId($value)
     {
-        $this->subcategories['category_id'] = '';
+        $this->category_id = '';
+        unset($this->categories);
     }
 
-    #[Computed () ]
-    public function categories()
-    {
-
-        return Category::where('family_id', $this->subcategories['family_id'])->get();
+    #[Computed]
+    public function categories(){
+        return Category::where('family_id', $this->family_id)->get();
     }
+
     public function save()
     {
-        $this->validate([
-            'subcategories.family_id' => 'required|exists:families,id',
-            'subcategories.category_id' => 'required|exists:categories,id',
-            'subcategories.name' => 'required',
-        ],[], [
-            'subcategories.family_id' => 'familia',
-            'subcategories.category_id' => 'categoria',
-            'subcategories.name' => 'nombre',
+        try {
+            $this->validate([
+                'family_id' => 'required|exists:families,id',
+                'category_id' => 'required|exists:categories,id',
+                'name' => 'required|string|max:255',
+            ], [], [
+                'family_id' => 'familia',
+                'category_id' => 'categoría',
+                'name' => 'nombre',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Error',
+                'text' => 'El formulario contiene errores',
+            ]);
+            throw $e;
+        }
+
+        Subcategory::create([
+            'category_id' => $this->category_id,
+            'name' => $this->name,
         ]);
 
-        Subcategory::create($this->subcategories);
-        session()->flash('swal',[
-            'icon' => 'success',
-            'title' => 'Subcategoria creada',
-            'text' => 'Subcategoria creada exitosamente',
-        ]);
-
-        return redirect()->route('admin.subcategories.index');
+        $this->reset(['family_id', 'category_id', 'name']);
+        $this->dispatch('alert', 'Subcategoría creada exitosamente');
     }
+
     public function render()
     {
         return view('livewire.admin.subcategories.subcategory-create');

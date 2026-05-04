@@ -19,8 +19,7 @@
     {{-- iconos --}}
     <script src="https://kit.fontawesome.com/02148a3edd.js" crossorigin="anonymous"></script>
 
-    <!-- Styles -->
-    @livewireStyles
+
 </head>
 
 <body class="font-sans antialiased" x-data="{ sidebarOpen: false }" :class="{ 'overflow-y-hidden': sidebarOpen }">
@@ -62,8 +61,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
-    @livewireScripts
-
     @stack('js')
 
     @if (session('swal'))
@@ -73,6 +70,23 @@
     });
 </script>
 @endif
+
+<script>
+    document.addEventListener('livewire:init', function() {
+        Livewire.on('swal', (data) => {
+            Swal.fire(data[0]);
+        });
+
+        Livewire.on('alert', (message) => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Bien hecho!',
+                text: message,
+                confirmButtonColor: '#3085d6',
+            });
+        });
+    });
+</script>
 </body>
 
 </html>

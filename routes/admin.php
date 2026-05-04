@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\FamilyController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SubcategoryController;
+use App\Http\Controllers\Admin\ProductController;
 
 
 Route::get('/', function () {
@@ -15,3 +16,5 @@ Route::resource('families', FamilyController::class);
 Route::resource('categories',CategoryController::Class);
 
 Route::resource('subcategories',SubcategoryController::Class);
+
+Route::resource('products',ProductController::Class);

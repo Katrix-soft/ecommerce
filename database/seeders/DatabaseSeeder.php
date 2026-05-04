@@ -5,6 +5,11 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Product;
+use App\Models\Family;
+use App\Models\Subcategory;
+
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,14 +20,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+
+        Storage::deleteDirectory('products');
+        Storage::makeDirectory('products');
         // User::factory(10)->create();
 
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+        ]);
+
         $this->call([
             FamilySeeder::class,
         ]);
+        Product::factory(10)->create();
     }
 }

@@ -24,6 +24,12 @@
             'route' => route('admin.subcategories.index'),
             'active' => request()->routeIs('admin.subcategories.*'),
         ],
+        [
+            'icon' => 'fa-solid fa-box',
+            'label' => 'Productos',
+            'route' => route('admin.products.index'),
+            'active' => request()->routeIs('admin.products.*'),
+        ],
     ];
 @endphp
 
