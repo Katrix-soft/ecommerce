@@ -28,8 +28,9 @@
                                 <button wire:click="edit({{ $option->id }})" class="p-2 text-gray-300 hover:text-indigo-500 hover:bg-indigo-50 rounded-lg transition" title="Editar">
                                     <i class="fa-solid fa-edit text-xs"></i>
                                 </button>
-                                <button wire:click="delete({{ $option->id }})" class="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition" title="Eliminar"
-                                    wire:confirm="¿Estás seguro de eliminar esta opción?">
+                                <button type="button" 
+                                    @click="Swal.fire({ title: '¿Eliminar opción?', text: 'Se eliminará junto con todos sus valores.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#4f46e5', cancelButtonColor: '#9ca3af', confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar' }).then((result) => { if (result.isConfirmed) { $wire.delete({{ $option->id }}) } })"
+                                    class="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition" title="Eliminar">
                                     <i class="fa-solid fa-trash text-xs"></i>
                                 </button>
                             @endif
@@ -60,17 +61,33 @@
                         @if ($option->type == '2')
                             {{-- Colores --}}
                             @foreach ($option->features as $feature)
-                                <div class="w-7 h-7 rounded-full border border-gray-200 shadow-sm cursor-default transition-transform hover:scale-110"
-                                    style="background-color: {{ $feature->value }};"
+                                <button type="button" 
+                                    @click="Swal.fire({ title: '¿Eliminar color?', text: 'Se quitará este color de la opción.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#4f46e5', cancelButtonColor: '#9ca3af', confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar' }).then((result) => { if (result.isConfirmed) { $wire.deleteFeature({{ $feature->id }}) } })"
+                                    class="relative w-7 h-7 rounded-full border border-gray-200 shadow-sm group overflow-hidden ring-1 ring-transparent hover:ring-red-500 hover:border-red-500 transition-all"
                                     title="{{ $feature->description }}">
-                                </div>
+                                    
+                                    {{-- Color original --}}
+                                    <div class="absolute inset-0 transition-transform group-hover:scale-110" style="background-color: {{ $feature->value }};"></div>
+                                    
+                                    {{-- Capa roja con icono al pasar el mouse --}}
+                                    <div class="absolute inset-0 bg-red-500/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <i class="fa-solid fa-xmark text-white text-[10px] font-bold"></i>
+                                    </div>
+                                </button>
                             @endforeach
                         @else
                             {{-- Textos --}}
                             @foreach ($option->features as $feature)
-                                <span class="px-3.5 py-1 text-sm font-medium border border-gray-300 rounded-lg bg-white text-gray-600">
-                                    {{ strtolower($feature->description) }}
-                                </span>
+                                <button type="button" 
+                                    @click="Swal.fire({ title: '¿Eliminar valor?', text: 'Se quitará este valor de la opción.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#4f46e5', cancelButtonColor: '#9ca3af', confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar' }).then((result) => { if (result.isConfirmed) { $wire.deleteFeature({{ $feature->id }}) } })"
+                                    class="relative group px-3.5 py-1 text-sm font-medium border border-gray-300 rounded-lg bg-white text-gray-600 hover:bg-red-500 hover:text-white hover:border-red-500 transition-colors shadow-sm">
+                                    
+                                    <span class="group-hover:opacity-0 transition-opacity">{{ strtolower($feature->description) }}</span>
+                                    
+                                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-1.5">
+                                        <i class="fa-solid fa-trash text-xs"></i>
+                                    </div>
+                                </button>
                             @endforeach
                         @endif
                     </div>

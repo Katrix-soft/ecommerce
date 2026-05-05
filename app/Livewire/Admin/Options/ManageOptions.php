@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Options;
 
 use Livewire\Component;
 use App\Models\Option;
+use App\Models\Feature;
 use App\Livewire\Forms\Admin\Options\NewOptionForm;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
@@ -111,6 +112,7 @@ class ManageOptions extends Component
     public function delete($optionId)
     {
         $option = Option::findOrFail($optionId);
+        $option->features()->delete();
         $option->delete();
 
         $this->dispatch('swal', [
@@ -118,6 +120,19 @@ class ManageOptions extends Component
             'title' => 'Bien hecho',
             'text' => 'Opción eliminada correctamente',
         ]);
+    }
+
+    public function deleteFeature($featureId)
+    {
+        $feature = Feature::find($featureId);
+        if ($feature) {
+            $feature->delete();
+            $this->dispatch('swal', [
+                'icon' => 'success',
+                'title' => 'Eliminado',
+                'text' => 'Valor eliminado correctamente',
+            ]);
+        }
     }
 
     public function render()
