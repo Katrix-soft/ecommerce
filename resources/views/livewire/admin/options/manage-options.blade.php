@@ -1,48 +1,52 @@
 <div>
-    <section class="rounded-lg bg-white shadow-lg p-6">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-semibold">Opciones</h2>
-            <button wire:click="create" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded">
-                <i class="fa-solid fa-plus mr-2"></i> Nuevo
+    <section class="rounded-xl bg-white dark:bg-gray-900 shadow-sm border border-gray-100 dark:border-gray-800 p-8">
+        <div class="flex justify-between items-center mb-10">
+            <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">Opciones</h2>
+            <button wire:click="create" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-100 transition-all active:scale-95">
+                <i class="fa-solid fa-plus mr-2"></i>
+                Nuevo
             </button>
         </div>
 
-        <div class="space-y-6">
+        <div class="space-y-12">
             @foreach ($options as $option)
-                <div class="border-l-4 border-gray-300 pl-4">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-lg font-semibold">{{ $option->name }}</h3>
+                <div class="relative pb-10 border-b border-gray-100 dark:border-gray-800 last:border-0 last:pb-0">
+                    {{-- Título de la Opción --}}
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-medium text-gray-800 dark:text-gray-200">{{ $option->name }}</h3>
+                        
+                        {{-- Botones de Control (Sutiles) --}}
                         <div class="flex items-center gap-2">
                             @if ($editing === $option->id)
-                                <button wire:click="update" class="text-green-600" title="Guardar">
-                                    <i class="fa-solid fa-check"></i>
+                                <button wire:click="update" class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition" title="Guardar">
+                                    <i class="fa-solid fa-check text-sm"></i>
                                 </button>
-                                <button wire:click="cancelEdit" class="text-gray-600" title="Cancelar">
-                                    <i class="fa-solid fa-xmark"></i>
+                                <button wire:click="cancelEdit" class="p-2 text-gray-400 hover:bg-gray-100 rounded-lg transition" title="Cancelar">
+                                    <i class="fa-solid fa-xmark text-sm"></i>
                                 </button>
                             @else
-                                <button wire:click="edit({{ $option->id }})" class="text-gray-500 hover:text-gray-700" title="Editar">
-                                    <i class="fa-solid fa-edit"></i>
+                                <button wire:click="edit({{ $option->id }})" class="p-2 text-gray-300 hover:text-indigo-500 hover:bg-indigo-50 rounded-lg transition" title="Editar">
+                                    <i class="fa-solid fa-edit text-xs"></i>
                                 </button>
-                                <button wire:click="delete({{ $option->id }})" class="text-red-500 hover:text-red-700" title="Eliminar"
+                                <button wire:click="delete({{ $option->id }})" class="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition" title="Eliminar"
                                     wire:confirm="¿Estás seguro de eliminar esta opción?">
-                                    <i class="fa-solid fa-trash"></i>
+                                    <i class="fa-solid fa-trash text-xs"></i>
                                 </button>
                             @endif
                         </div>
                     </div>
 
+                    {{-- Formulario de Edición Rápida --}}
                     @if ($editing === $option->id)
-                        <div class="flex gap-4 mb-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                             <div>
-                                <x-label class="mb-1">Nombre</x-label>
-                                <x-input wire:model="name" />
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Nombre</label>
+                                <input type="text" wire:model="name" class="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm focus:ring-1 focus:ring-indigo-400 focus:border-indigo-400 outline-none" />
                                 <x-input-error for="name" />
                             </div>
                             <div>
-                                <x-label class="mb-1">Tipo</x-label>
-                                <select wire:model="type"
-                                    class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Tipo</label>
+                                <select wire:model="type" class="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm focus:ring-1 focus:ring-indigo-400 focus:border-indigo-400 outline-none">
                                     <option value="1">Texto</option>
                                     <option value="2">Color</option>
                                 </select>
@@ -51,29 +55,33 @@
                         </div>
                     @endif
 
-                    <div class="flex flex-wrap items-center gap-2">
+                    {{-- Lista de Valores (Badges/Círculos) --}}
+                    <div class="flex flex-wrap items-center gap-3 mb-4">
                         @if ($option->type == '2')
-                            {{-- Tipo Color: mostrar círculos de color --}}
+                            {{-- Colores --}}
                             @foreach ($option->features as $feature)
-                                <div class="w-8 h-8 rounded-full border-2 border-gray-300 shadow-sm cursor-default"
+                                <div class="w-7 h-7 rounded-full border border-gray-200 shadow-sm cursor-default transition-transform hover:scale-110"
                                     style="background-color: {{ $feature->value }};"
                                     title="{{ $feature->description }}">
                                 </div>
                             @endforeach
                         @else
-                            {{-- Tipo Texto: mostrar badges --}}
+                            {{-- Textos --}}
                             @foreach ($option->features as $feature)
-                                <span class="px-3 py-1 text-sm border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-gray-300">
-                                    {{ $feature->description }}
+                                <span class="px-3.5 py-1 text-sm font-medium border border-gray-300 rounded-lg bg-white text-gray-600">
+                                    {{ strtolower($feature->description) }}
                                 </span>
                             @endforeach
                         @endif
                     </div>
+
+                    {{-- Componente para agregar nuevos valores --}}
+                    @livewire('admin.options.add-new-feature', ['option' => $option], key('add-feature-' . $option->id))
                 </div>
             @endforeach
         </div>
 
-        <div class="mt-6">
+        <div class="mt-12">
             {{ $options->links() }}
         </div>
     </section>
@@ -81,91 +89,80 @@
     {{-- Modal Crear Opción --}}
     <x-dialog-modal wire:model.live="openModal">
         <x-slot name="title">
-            Crear Opción
+            <span class="text-xl font-bold">Crear Nueva Opción</span>
         </x-slot>
         <x-slot name="content">
-            {{-- Nombre y Tipo --}}
-            <div class="grid grid-cols-2 gap-6 mb-4">
+            <div class="grid grid-cols-2 gap-6 mb-8">
                 <div>
-                    <x-label class="mb-1">Nombre</x-label>
-                    <x-input wire:model="form.name" class="w-full" placeholder="Ej: Talle, Color, Sexo" />
-                    <x-input-error for="form.name" class="mt-1" />
+                    <x-label class="mb-1.5 font-medium text-gray-700">Nombre</x-label>
+                    <x-input wire:model="form.name" class="w-full" placeholder="Ej: Talle, Color" />
+                    <x-input-error for="form.name" />
                 </div>
                 <div>
-                    <x-label class="mb-1">Tipo</x-label>
-                    <select wire:model.live="form.type"
-                        class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                    <x-label class="mb-1.5 font-medium text-gray-700">Tipo</x-label>
+                    <select wire:model.live="form.type" class="w-full border-gray-300 rounded-lg focus:ring-indigo-500">
                         <option value="1">Texto</option>
                         <option value="2">Color</option>
                     </select>
-                    <x-input-error for="form.type" class="mt-1" />
+                    <x-input-error for="form.type" />
                 </div>
             </div>
 
-            {{-- Separador Valores --}}
-            <div class="flex items-center mb-4">
-                <hr class="flex-1 border-gray-300 dark:border-gray-700">
-                <span class="px-3 text-sm text-gray-500 dark:text-gray-400 font-medium">Valores</span>
-                <hr class="flex-1 border-gray-300 dark:border-gray-700">
+            <div class="relative flex items-center py-4 mb-4">
+                <div class="flex-grow border-t border-gray-100"></div>
+                <span class="flex-shrink mx-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Valores</span>
+                <div class="flex-grow border-t border-gray-100"></div>
             </div>
 
-            {{-- Lista de features agregados --}}
+            {{-- Lista temporal en Modal --}}
             @if (count($form->features) > 0)
-                <div class="mb-4 space-y-2">
+                <div class="mb-6 space-y-2">
                     @foreach ($form->features as $index => $feature)
-                        <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-lg px-4 py-2 border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-2.5 border border-gray-100">
                             <div class="flex items-center gap-3">
                                 @if ($form->type == '2')
-                                    <div class="w-6 h-6 rounded-full border-2 border-gray-300 shadow-sm"
-                                        style="background-color: {{ $feature['value'] }};"></div>
+                                    <div class="w-6 h-6 rounded-full border border-gray-200" style="background-color: {{ $feature['value'] }};"></div>
                                 @else
-                                    <span class="px-2 py-0.5 text-xs bg-indigo-100 text-indigo-700 rounded font-mono">{{ $feature['value'] }}</span>
+                                    <span class="px-2 py-0.5 text-[10px] font-bold bg-indigo-600 text-white rounded">{{ $feature['value'] }}</span>
                                 @endif
-                                <span class="text-sm text-gray-700 dark:text-gray-300">{{ $feature['description'] }}</span>
+                                <span class="text-sm font-medium text-gray-600">{{ $feature['description'] }}</span>
                             </div>
-                            <button wire:click="removeFeature({{ $index }})" class="text-red-400 hover:text-red-600 transition" title="Quitar">
+                            <button wire:click="removeFeature({{ $index }})" class="text-gray-400 hover:text-red-500">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
                     @endforeach
                 </div>
-            @else
-                <x-input-error for="form.features" class="mb-4" />
             @endif
 
-            {{-- Formulario para agregar feature --}}
-            <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-                <div class="grid grid-cols-2 gap-4 mb-3">
+            <div class="bg-gray-50/50 rounded-xl p-5 border border-gray-100">
+                <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                        <x-label class="mb-1">Valor</x-label>
+                        <x-label class="mb-1 text-xs font-bold text-gray-400 uppercase tracking-widest">Valor</x-label>
                         @if ($form->type == '2')
-                            <input type="color" wire:model="value"
-                                class="w-full h-10 rounded-md border border-gray-300 cursor-pointer" />
+                            <div class="relative" onclick="document.getElementById('modal-picker').click()">
+                                <input type="text" readonly value="{{ $value ?: 'Seleccione un color' }}" class="w-full bg-white border border-gray-200 rounded-lg p-2.5 text-sm cursor-pointer" />
+                                <div class="absolute right-3 top-2.5 w-6 h-5 rounded border border-gray-100" style="background-color: {{ $value ?: '#000000' }}"></div>
+                                <input type="color" id="modal-picker" wire:model.live="value" class="absolute opacity-0 w-0 h-0">
+                            </div>
                         @else
-                            <x-input wire:model="value" class="w-full" placeholder="Ej: S, M, L, XL" />
+                            <x-input wire:model="value" class="w-full" placeholder="Valor" />
                         @endif
-                        <x-input-error for="value" class="mt-1" />
                     </div>
                     <div>
-                        <x-label class="mb-1">Descripción</x-label>
-                        <x-input wire:model="description" class="w-full" placeholder="Ej: Pequeño, Mediano" />
-                        <x-input-error for="description" class="mt-1" />
+                        <x-label class="mb-1 text-xs font-bold text-gray-400 uppercase tracking-widest">Descripción</x-label>
+                        <x-input wire:model="description" class="w-full" placeholder="Descripción" />
                     </div>
                 </div>
-                <button wire:click="addFeature" type="button"
-                    class="w-full px-4 py-2 border-2 border-dashed border-indigo-300 text-indigo-600 rounded-lg hover:bg-indigo-50 hover:border-indigo-400 transition font-medium text-sm">
-                    <i class="fa-solid fa-plus mr-1"></i> Agregar valor
+                <button wire:click="addFeature" type="button" class="w-full py-2.5 border-2 border-dashed border-indigo-100 text-indigo-500 rounded-xl hover:bg-white hover:border-indigo-300 transition-all text-xs font-bold uppercase tracking-widest">
+                    + Agregar valor
                 </button>
             </div>
         </x-slot>
         <x-slot name="footer">
             <div class="flex items-center gap-3">
-                <button wire:click="$set('openModal', false)" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded transition">
-                    Cancelar
-                </button>
-                <button wire:click="save" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded transition">
-                    <i class="fa-solid fa-check mr-1"></i> Crear Opción
-                </button>
+                <button wire:click="$set('openModal', false)" class="px-6 py-2 text-sm font-bold text-gray-400 hover:text-gray-600">Cancelar</button>
+                <button wire:click="save" class="px-8 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg active:scale-95 transition-all">Crear Opción</button>
             </div>
         </x-slot>
     </x-dialog-modal>

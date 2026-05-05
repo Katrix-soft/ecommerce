@@ -6,10 +6,14 @@ use Livewire\Component;
 use App\Models\Option;
 use App\Livewire\Forms\Admin\Options\NewOptionForm;
 use Livewire\WithPagination;
+use Livewire\Attributes\On;
 
 class ManageOptions extends Component
 {
     use WithPagination;
+
+    #[On('featureAdded')]
+    public function refresh() {}
 
     public NewOptionForm $form;
 
