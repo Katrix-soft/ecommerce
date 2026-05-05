@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Product;
 use App\Models\Family;
 use App\Models\Subcategory;
+use App\Models\Option;
 
 
 class DatabaseSeeder extends Seeder
@@ -32,7 +33,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             FamilySeeder::class,
+            OptionSeeder::class,
         ]);
-        Product::factory(10)->create();
+        Product::factory(50)->create();
     }
 }

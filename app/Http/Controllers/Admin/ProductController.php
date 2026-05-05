@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Storage; 
 
 class ProductController extends Controller
 {
@@ -17,7 +17,6 @@ class ProductController extends Controller
         $products = Product::with('subcategory.category.family')
             ->orderBy('id', 'desc')
             ->paginate(10);
-
         return view('admin.products.index', compact('products'));
     }
 
@@ -76,7 +75,6 @@ class ProductController extends Controller
             'title' => 'Bien hecho',
             'text' => 'Producto eliminado correctamente',
         ]);
-
         return redirect()->route('admin.products.index');
     }
 }
