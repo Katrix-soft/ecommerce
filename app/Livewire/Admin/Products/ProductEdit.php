@@ -4,73 +4,51 @@ namespace App\Livewire\Admin\Products;
 
 use Livewire\Component;
 use Livewire\Attributes\Computed;
-use Livewire\WithFileUploads;
 use App\Models\Family;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Subcategory;
+use Livewire\WithFileUploads;
 
 class ProductEdit extends Component
 {
     use WithFileUploads;
 
     public $product;
-    public $families;
+    public $productEdit;
 
+    public $families;
     public $family_id = '';
     public $category_id = '';
-    public $subcategory_id = '';
-
-    public $sku = '';
-    public $name = '';
-    public $description = '';
-    public $price = '';
 
     public $image;
 
-    public function mount(Product $product)
+    public function mount($product)
     {
-        $this->product = $product;
+        $this->productEdit = $product->only('sku','name','description','image_path','price','subcategory_id');
         $this->families = Family::all();
-
-        $this->sku = $product->sku;
-        $this->name = $product->name;
-        $this->description = $product->description;
-        $this->price = $product->price;
-        $this->subcategory_id = $product->subcategory_id;
-
-        // Cargar familia y categoría a partir de la subcategoría
-        $subcategory = $product->subcategory;
-        if ($subcategory) {
-            $this->category_id = $subcategory->category_id;
-            $category = $subcategory->category;
-            if ($category) {
-                $this->family_id = $category->family_id;
-            }
-        }
+        $this->category_id = $product->subcategory->category->id;
+        $this->family_id = $product->subcategory->category->family_id;
     }
 
     public function updatedFamilyId($value)
     {
         $this->category_id = '';
-        $this->subcategory_id = '';
-        unset($this->categories);
-        unset($this->subcategories);
+        $this->productEdit['subcategory_id'] = '';
     }
 
     public function updatedCategoryId($value)
     {
-        $this->subcategory_id = '';
-        unset($this->subcategories);
+        $this->productEdit['subcategory_id'] = '';
     }
 
-    #[Computed]
+    #[Computed()]
     public function categories()
     {
         return Category::where('family_id', $this->family_id)->get();
     }
 
-    #[Computed]
+    #[Computed()]
     public function subcategories()
     {
         return Subcategory::where('category_id', $this->category_id)->get();
@@ -81,22 +59,22 @@ class ProductEdit extends Component
         try {
             $this->validate([
                 'image' => 'nullable|image|max:10240',
-                'sku' => 'required|unique:products,sku,' . $this->product->id,
-                'name' => 'required|min:3|max:100',
-                'description' => 'required|max:200',
-                'price' => 'required|numeric',
+                'productEdit.sku' => 'required|unique:products,sku,' . $this->product->id,
+                'productEdit.name' => 'required|min:3|max:100',
+                'productEdit.description' => 'required|max:200',
+                'productEdit.price' => 'required|numeric',
                 'family_id' => 'required|exists:families,id',
                 'category_id' => 'required|exists:categories,id',
-                'subcategory_id' => 'required|exists:subcategories,id',
+                'productEdit.subcategory_id' => 'required|exists:subcategories,id',
             ], [], [
                 'image' => 'imagen',
-                'sku' => 'código',
-                'name' => 'nombre',
-                'description' => 'descripción',
-                'price' => 'precio',
+                'productEdit.sku' => 'código',
+                'productEdit.name' => 'nombre',
+                'productEdit.description' => 'descripción',
+                'productEdit.price' => 'precio',
                 'family_id' => 'familia',
                 'category_id' => 'categoría',
-                'subcategory_id' => 'subcategoría',
+                'productEdit.subcategory_id' => 'subcategoría',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             $this->dispatch('swal', [
@@ -107,13 +85,7 @@ class ProductEdit extends Component
             throw $e;
         }
 
-        $data = [
-            'sku' => $this->sku,
-            'name' => $this->name,
-            'description' => $this->description,
-            'price' => $this->price,
-            'subcategory_id' => $this->subcategory_id,
-        ];
+        $data = $this->productEdit;
 
         if ($this->image) {
             $data['image_path'] = $this->image->store('products');

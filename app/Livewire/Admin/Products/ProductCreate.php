@@ -16,10 +16,9 @@ class ProductCreate extends Component
     use WithFileUploads;
 
     public $families;
-
     public $family_id = '';
     public $category_id = '';
-    public $subcategory_id = '';
+
 
     public $sku = '';
     public $name = '';
@@ -36,15 +35,12 @@ class ProductCreate extends Component
     public function updatedFamilyId($value)
     {
         $this->category_id = '';
-        $this->subcategory_id = '';
-        unset($this->categories);
-        unset($this->subcategories);
+        $this->product['subcategory_id'] = '';
     }
 
     public function updatedCategoryId($value)
     {
-        $this->subcategory_id = '';
-        unset($this->subcategories);
+        $this->product['subcategory_id'] = '';
     }
 
     #[Computed]
