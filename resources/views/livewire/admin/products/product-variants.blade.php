@@ -28,8 +28,16 @@
                                 @endphp
 
                                 @foreach ($features as $feature)
-                                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-600 dark:text-gray-300 shadow-sm">
-                                        <span>{{ $feature['value'] }}</span>
+                                    <div wire:key="option-feature-{{ $feature['id'] }}" class="inline-flex items-center gap-2 px-3 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-600 dark:text-gray-300 shadow-sm">
+                                        @switch($option->type)
+                                            @case(1) {{-- Texto --}}
+                                                <span>{{ $feature['value'] }}</span>
+                                                @break
+                                            @case(2) {{-- Color --}}
+                                                <div class="w-4 h-4 rounded-full border border-gray-200" style="background-color: {{ $feature['value'] }}"></div>
+                                                <span class="ml-1">{{ $feature['description'] }}</span>
+                                                @break
+                                        @endswitch
                                         <button class="text-gray-400 hover:text-gray-600">
                                             <i class="fa-solid fa-xmark"></i>
                                         </button>
@@ -51,6 +59,44 @@
                 </div>
             @endif
         </div>
+    </section>
+
+    {{-- Sección de Variantes --}}
+    <section class="mt-12 rounded-xl bg-white dark:bg-gray-900 shadow-sm border border-gray-100 dark:border-gray-800 p-8">
+        <header class="border-b border-gray-200 px-6 py-2 mb-6">
+            <h1 class="text-xl font-bold text-gray-800 dark:text-white">Variantes</h1>
+        </header>
+
+        @if ($product->variants->count())
+            <ul class="divide-y -my-4">
+                @foreach ($product->variants as $item)
+                    <li class="py-4 flex items-center">
+                        <img src="{{ $item->image }}" class="w-12 h-12 object-cover rounded">
+
+                        <div class="ml-4 flex-1">
+                            <p class="divide-x text-sm text-gray-600">
+                                @foreach ($item->features as $feature)
+                                    <span class="px-3">
+                                        {{ $feature->description }}
+                                    </span>
+                                @endforeach
+                            </p>
+                        </div>
+
+                        <a href="" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-900 focus:outline-none focus:border-blue-900 focus:ring ring-blue-300 disabled:opacity-25 transition ease-in-out duration-150">
+                            Editar
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        @else
+            <div class="flex items-center p-4 text-sm text-gray-800 rounded-lg bg-gray-50 dark:bg-gray-800 dark:text-gray-300" role="alert">
+                <i class="fa-solid fa-circle-info me-3 text-lg"></i>
+                <div>
+                    No se han generado variantes para este producto todavía. Haz clic en <span class="font-bold">"Generar Variantes"</span> arriba.
+                </div>
+            </div>
+        @endif
     </section>
 
     <x-dialog-modal wire:model="showModal">
@@ -156,6 +202,14 @@
                 text: 'La opción se ha guardado correctamente.',
                 showConfirmButton: false,
                 timer: 1500
+            })
+        window.addEventListener('variant-generated', event => {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Variantes Generadas!',
+                text: 'Se han generado todas las combinaciones posibles correctamente.',
+                showConfirmButton: false,
+                timer: 2000
             })
         })
     </script>

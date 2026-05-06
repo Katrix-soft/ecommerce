@@ -79,6 +79,47 @@ class ProductVariants extends Component
         $this->product->options()->detach($optionId);
         $this->product->load('options'); // Recargar las opciones para refrescar la UI
     }
+    public function generarCombinaciones($arrays)
+    {
+        $resultado = [[]];
+
+        foreach ($arrays as $array) {
+            $nuevaCombinacion = [];
+            foreach ($resultado as $combinacion) {
+                foreach ($array as $valor) {
+                    // Extraemos solo el ID si el valor es un array/objeto de feature
+                    $id = is_array($valor) ? $valor['id'] : $valor;
+                    $nuevaCombinacion[] = array_merge($combinacion, [$id]);
+                }
+            }
+            $resultado = $nuevaCombinacion;
+        }
+
+        return $resultado;
+    }
+    public function generarVariantes()
+    {
+        // 1. Borrar variantes existentes
+        $this->product->variants()->delete();
+
+        // 2. Obtener las características de cada opción
+        $features = $this->product->options->pluck('pivot.feature_id');
+
+        // 3. Generar combinaciones de IDs
+        $combinaciones = $this->generarCombinaciones($features);
+
+        // 4. Crear variantes y asociar características
+        foreach ($combinaciones as $combinacion) {
+            $variant = \App\Models\Variant::create([
+                'product_id' => $this->product->id,
+            ]);
+
+            // attach espera un array de IDs
+            $variant->features()->attach($combinacion);
+        }
+
+        $this->dispatch('variant-generated');
+    }
 
     public function render()
     {
@@ -97,6 +138,8 @@ class ProductVariants extends Component
         $this->product->options()->attach($this->variant['option_id'], [
             'feature_id' => $this->variant['features']
         ]);
+
+        $this->generarVariantes(); // Generar automáticamente al guardar una opción
 
         $this->reset(['variant', 'showModal']);
         

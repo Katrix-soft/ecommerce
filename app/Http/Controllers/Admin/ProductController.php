@@ -77,4 +77,28 @@ class ProductController extends Controller
         ]);
         return redirect()->route('admin.products.index');
     }
+
+    public function Variants(Request $request, Product $product)
+    {
+        $data = $request->validate([
+            'variants.*.sku' => 'nullable|string',
+            'variants.*.price' => 'nullable|numeric',
+            'variants.*.stock' => 'nullable|integer',
+        ]);
+
+        foreach ($request->variants as $variantId => $variantData) {
+            $variant = $product->variants()->find($variantId);
+            if ($variant) {
+                $variant->update($variantData);
+            }
+        }
+
+        session()->flash('swal', [
+            'icon' => 'success',
+            'title' => '¡Guardado!',
+            'text' => 'Las variantes se han actualizado correctamente',
+        ]);
+
+        return redirect()->route('admin.products.edit', $product);
+    }
 }

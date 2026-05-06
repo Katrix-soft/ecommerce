@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Models\Product;
 use App\Models\Option;
+use App\Models\Variant;
 
 Route::get('/', function () {
     return view('welcome');
@@ -18,31 +19,17 @@ Route::middleware([
     })->name('dashboard');
 });
 Route::get('prueba', function(){
-//     $array1 = ['a','b'];
-//     $array2 = ['a','b'];
-//     $array3 = ['a','b'];
-//     $arrays = [$array1 , $array2, $array3];
 
-//     $combinaciones = generarCombinaciones($arrays);
-// return $combinaciones;
-    $features = Product::find(10)->options-pluck('pivot.features');
+    $product->variants()->delete();
+
+    $product = Product::find(10);
+    $features = $product->options-pluck('pivot.features');
     $combinaciones = generarCombinaciones($features);
     foreach($combinaciones as $combinacion){
-        $variant=
+        $variant=Variant::create([
+            'product_id'=>$product->id,
+        ]);
+        $variant->features()->attach($combinacion);
     }
 });
 
-function generarCombinaciones($arrays)
-{
-    $resultado = [[]];
-    foreach ($arrays as $array) {
-        $nuevaCombinacion = [];
-        foreach ($resultado as $combinacion) {
-            foreach ($array as $valor) {
-                $nuevaCombinacion[] = array_merge($combinacion, [$valor]);
-            }
-        }
-        $resultado = $nuevaCombinacion;
-    }
-    return $resultado;
-}
