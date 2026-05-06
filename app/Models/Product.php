@@ -17,6 +17,7 @@ class Product extends Model
         'price',
         'subcategory_id'
     ];
+
     // relacion uno a muchos inversa
     public function subcategory()
     {
@@ -32,7 +33,8 @@ class Product extends Model
     public function options()
     {
         return $this->belongsToMany(Option::class)
-                    ->withPivot('value')
+                    ->using(OptionProduct::class)
+                    ->withPivot('feature_id')
                     ->withTimestamps();
     }
 }
