@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use App\Observers\CoverObserver;
+
+#[ObservedBy([CoverObserver::class])]
 class Cover extends Model
 {
     use HasFactory;
@@ -27,7 +31,7 @@ class Cover extends Model
     protected function image(): Attribute
     {
         return Attribute::make(
-            get: fn() => Storage::url($this->image_path),
+            get: fn() => asset('storage/' . $this->image_path),
         );
     }
         

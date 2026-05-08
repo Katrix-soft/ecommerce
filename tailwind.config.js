@@ -29,6 +29,8 @@ export default {
                 'danger-soft': '#fef2f2',
                 'danger-subtle': '#fecaca',
                 'fg-danger-strong': '#991b1b',
+                'success-soft': '#f0fdf4', // green-50
+                'fg-success-strong': '#166534', // green-800
                 'default': '#e5e7eb', // border-default
                 'default-medium': '#d1d5db',
                 'body': '#6b7280', // text-gray-500
