@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SubcategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OptionController;
+use App\Http\Controllers\Admin\CoverController;
 
 
 
@@ -24,4 +25,6 @@ Route::resource('subcategories',SubcategoryController::Class);
 Route::resource('products',ProductController::Class);
 
 Route::post('products/{product}/variants', [ProductController::class, 'Variants'])->name('products.variants')
-            ->scopeBindings();
+
+  ->scopeBindings();
+Route::resource('covers', CoverController::class);
