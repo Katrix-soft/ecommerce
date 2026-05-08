@@ -17,3 +17,6 @@
 .btn-yellow {
     @apply bg-yellow-500 text-white hover:bg-yellow-700;
 }
+.btn-purple {
+    @apply bg-purple-600 text-white hover:bg-purple-700;
+}
