@@ -146,9 +146,12 @@
                         {{ $this->familyName }}
                      </p>
                        
-                     <a href="{{ route('families.show', $family_id)}}" class="btn btn-purple">
-                       Ver todo
-                     </a>
+                     @if ($family_id)
+                         <a href="{{ route('families.show', $family_id)}}" class="btn btn-purple">
+                            Ver todo
+                         </a>
+                     @endif
+
                         
                      </div>
                                        
