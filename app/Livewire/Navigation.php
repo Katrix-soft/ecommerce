@@ -14,9 +14,9 @@ class Navigation extends Component
 
     public function mount()
     {
-
         $this->families = \App\Models\Family::all();
-        $this->family_id = $this->families->first()->id;
+        $first = $this->families->first();
+        $this->family_id = $first ? $first->id : null;
     }
 
     #[Computed()]
