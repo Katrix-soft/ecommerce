@@ -30,7 +30,7 @@ class Navigation extends Component
     public function familyName()
     {
       
-     return Family::find($this->family_id)->name;
+     return $this->family_id ? Family::find($this->family_id)?->name : null;
     }
     
     public function render()
