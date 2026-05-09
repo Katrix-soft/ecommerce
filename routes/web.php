@@ -4,10 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Product;
 use App\Models\Option;
 use App\Models\Variant;
+use App\Http\Controllers\WelcomeController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [WelcomeController::class, 'index'])->name('welcome.index');
 
 Route::middleware([
     'auth:sanctum',
