@@ -1,7 +1,7 @@
 {
-    "name": "Katrix Ecommerce",
-    "short_name": "Katrix",
-    "description": "Tu tienda online de confianza",
+    "name": "Tienda Shoply",
+    "short_name": "Shoply",
+    "description": "Tu tienda online Shoply",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
