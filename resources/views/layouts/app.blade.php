@@ -18,6 +18,11 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+        <!-- PWA -->
+        <link rel="manifest" href="/manifest.json">
+        <meta name="theme-color" content="#9333ea">
+        <link rel="apple-touch-icon" href="/icon-512.png">
+
 
     </head>
     <body class="font-sans antialiased">
@@ -38,5 +43,15 @@
         @stack('modals')
 
         @stack('js')
+
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(reg => console.log('Service Worker: Registered'))
+                        .catch(err => console.log('Service Worker: Error: ', err));
+                });
+            }
+        </script>
     </body>
 </html>

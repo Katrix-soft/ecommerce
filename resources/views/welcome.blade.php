@@ -39,7 +39,7 @@
             {{ $product->name }}
         </h1>
         <p class="text-gray-600 mb-4">
-            P/ {{ $product->price }}
+            $ {{ $product->price }}
         </p>
         <a href="" class="btn btn-purple block w-full text-center">
              Ver más

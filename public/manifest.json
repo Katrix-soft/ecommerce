@@ -1,0 +1,16 @@
+{
+    "name": "Katrix Ecommerce",
+    "short_name": "Katrix",
+    "description": "Tu tienda online de confianza",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#9333ea",
+    "icons": [
+        {
+            "src": "/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
