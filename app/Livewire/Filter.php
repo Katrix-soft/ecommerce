@@ -40,13 +40,11 @@ class Filter extends Component
             ->when($this->selected_features, function ($query) {
                 $features = \App\Models\Feature::whereIn('id', $this->selected_features)->get();
 
-                $query->whereHas('variants', function ($query) use ($features) {
-                    foreach ($features->groupBy('option_id') as $featureGroup) {
-                        $query->whereHas('features', function ($query) use ($featureGroup) {
-                            $query->whereIn('features.id', $featureGroup->pluck('id'));
-                        });
-                    }
-                });
+                foreach ($features->groupBy('option_id') as $featureGroup) {
+                    $query->whereHas('variants.features', function ($query) use ($featureGroup) {
+                        $query->whereIn('features.id', $featureGroup->pluck('id'));
+                    });
+                }
             })
             ->paginate(12);
 
