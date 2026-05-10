@@ -16,8 +16,8 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Migraciones
-php artisan migrate --force
+# Migraciones y seed
+php artisan migrate --force --seed
 
 # Iniciar PHP-FPM
 php-fpm -D

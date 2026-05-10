@@ -22,8 +22,8 @@ WORKDIR /var/www/html
 # Copiar archivos
 COPY . .
 
-# Instalar dependencias PHP
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Instalar dependencias PHP (con dev para factories/seeders)
+RUN composer install --optimize-autoloader --no-interaction
 
 # Instalar dependencias JS y compilar assets
 RUN npm install && npm run build

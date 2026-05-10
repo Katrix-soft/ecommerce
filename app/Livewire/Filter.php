@@ -16,7 +16,7 @@ class Filter extends Component
 
     public function mount()
     {
-        $this->options = \App\Models\Option::whereHas('products.subcategory.category', function($query) {
+        $this->options = \App\Models\Option::whereHas('features.variants.product.subcategory.category', function($query) {
             $query->where('family_id', $this->family_id);
         })->with([
             'features' => function($query) {
@@ -27,19 +27,26 @@ class Filter extends Component
         ])->get()->toArray();
     }
 
+    public function updatedSelectedFeatures()
+    {
+        $this->resetPage();
+    }
+
     public function render()
     {
         $products = \App\Models\Product::whereHas('subcategory.category', function($query) {
             $query->where('family_id', $this->family_id);
         })
         ->when($this->selected_features, function($query) {
-            $features = \App\Models\Feature::whereIn('id', $this->selected_features)->get();
-            
-            foreach ($features->groupBy('option_id') as $featureGroup) {
-                $query->whereHas('variants.features', function($query) use ($featureGroup) {
-                    $query->whereIn('features.id', $featureGroup->pluck('id'));
-                });
-            }
+            $query->whereHas('variants', function($query) {
+                $features = \App\Models\Feature::whereIn('id', $this->selected_features)->get();
+                
+                foreach ($features->groupBy('option_id') as $featureGroup) {
+                    $query->whereHas('features', function($query) use ($featureGroup) {
+                        $query->whereIn('features.id', $featureGroup->pluck('id'));
+                    });
+                }
+            });
         })
         ->paginate(4);
 

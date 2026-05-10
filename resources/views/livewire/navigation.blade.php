@@ -118,7 +118,7 @@
                       
                       @foreach ( $families as $family )
 
-                          <li wire:mouseover="set('family_id', {{ $family->id }})">
+                          <li wire:mouseover="$set('family_id', {{ $family->id }})">
                               <a href="{{ route('families.show', $family)}}"
                                   class="flex items-center justify-between px-4 py-4 text-gray-700 hover:bg-purple-200">
                                  {{ $family->name }}
