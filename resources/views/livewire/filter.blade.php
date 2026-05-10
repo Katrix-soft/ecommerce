@@ -78,8 +78,11 @@
                       <h1 class="text-lg font-bold text-gray-700 line-clamp-2 min-h-[56px] mb-2">
                          {{ $product->name }}
                       </h1>
-                      <p class="text-gray-600 mb-4">
+                      <p class="text-gray-600">
                          $ {{ $product->price }}
+                      </p>
+                      <p class="text-xs text-gray-500 mb-4">
+                         Stock: {{ $product->variants->sum('stock') }}
                       </p>
                       <a href="" class="btn btn-purple block w-full text-center">
                          Ver más
