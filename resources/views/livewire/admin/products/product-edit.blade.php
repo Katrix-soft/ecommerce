@@ -15,17 +15,17 @@
 
     <div class="mb-4">
         <x-label class="mb-2">Código</x-label>
-        <x-input type="text" wire:model="sku" class="w-full" placeholder="Ingrese el código del producto" />
+        <x-input type="text" wire:model="productEdit.sku" class="w-full" placeholder="Ingrese el código del producto" />
     </div>
 
     <div class="mb-4">
         <x-label class="mb-2">Nombre</x-label>
-        <x-input type="text" wire:model="name" class="w-full" placeholder="Ingrese el nombre del producto" />
+        <x-input type="text" wire:model="productEdit.name" class="w-full" placeholder="Ingrese el nombre del producto" />
     </div>
 
     <div class="mb-4">
         <x-label class="mb-2">Descripción</x-label>
-        <x-textarea wire:model="description" class="w-full" placeholder="Ingrese la descripción del producto"></x-textarea>
+        <x-textarea wire:model="productEdit.description" class="w-full" placeholder="Ingrese la descripción del producto"></x-textarea>
     </div>
 
     <!-- Familias -->
@@ -56,7 +56,7 @@
     <!-- Subcategorias -->
     <div class="mb-4">
         <x-label class="mb-2">Subcategoría</x-label>
-        <select wire:model.live="subcategory_id"
+        <select wire:model.live="productEdit.subcategory_id"
             class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
             wire:key="subcategory-select-{{ $category_id }}">
             <option value="">Seleccione una subcategoría</option>
@@ -68,7 +68,7 @@
 
     <div class="mb-4">
         <x-label class="mb-2">Precio</x-label>
-        <x-input type="number" step="0.01" wire:model="price" class="w-full" placeholder="Ingrese el precio del producto" />
+        <x-input type="number" step="0.01" wire:model="productEdit.price" class="w-full" placeholder="Ingrese el precio del producto" />
     </div>
 
     <div class="flex justify-end">

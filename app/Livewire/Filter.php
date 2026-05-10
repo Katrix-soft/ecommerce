@@ -3,13 +3,16 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Filter extends Component
 {
+    use WithPagination;
 
 
     public $family_id;
     public $options;
+    public $selected_features = [];
 
     public function mount()
     {
@@ -21,14 +24,24 @@ class Filter extends Component
                     $query->where('family_id', $this->family_id);
                 });
             }
-        ])->get();
+        ])->get()->toArray();
     }
 
     public function render()
     {
         $products = \App\Models\Product::whereHas('subcategory.category', function($query) {
             $query->where('family_id', $this->family_id);
-        })->paginate(12);
+        })
+        ->when($this->selected_features, function($query) {
+            $features = \App\Models\Feature::whereIn('id', $this->selected_features)->get();
+            
+            foreach ($features->groupBy('option_id') as $featureGroup) {
+                $query->whereHas('variants.features', function($query) use ($featureGroup) {
+                    $query->whereIn('features.id', $featureGroup->pluck('id'));
+                });
+            }
+        })
+        ->paginate(4);
 
         return view('livewire.filter', compact('products'));
     }
