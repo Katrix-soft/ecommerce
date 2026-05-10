@@ -1,32 +1,61 @@
 <div class="bg-white py-12">
   <x-container class="px-4 md:flex">
-       @if (count($options))
-          <aside class="md:w-52 md:flex-shrink-0 md:mr-8 mb-8 md:mb-0">
-          <ul class="space-y-4">
-               @foreach($options as $option)
-                    <li x-data="{open: false}" wire:key="option-{{ $option['id'] }}">
-                        <button class="px-4 py-2 bg-gray-200 w-full flex justify-between items-center text-gray-700" x-on:click="open = !open">
-                            {{ $option['name'] }}
-                            <i class="fa-solid" x-bind:class="{'fa-angle-down': !open, 'fa-angle-up': open}"></i>
+        @if (count($options))
+            <aside class="md:w-52 md:flex-shrink-0 md:mr-8 mb-8 md:mb-0">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold text-gray-700">Filtros</h2>
+                    @if (count($selected_features))
+                        <button wire:click="$set('selected_features', [])" class="text-xs text-purple-600 hover:underline">
+                            Limpiar
                         </button>
-                        <ul class="mt-2 space-y-2" x-show="open">
-                            @foreach ($option['features'] as $feature)
-                                <li wire:key="feature-{{ $feature['id'] }}">
-                                    <label class="inline-flex items-center">
-                                        <x-checkbox class="mr-2"
-                                            value="{{ $feature['id'] }}"
-                                            wire:model.live="selected_features" />
-                                        {{ $feature['description'] }}
-                                    </label>
-                                </li>
-                            @endforeach
-                        </ul>
+                    @endif
+                </div>
 
-                    </li>
-               @endforeach
-           </ul>
-         </aside>
-       @endif
+                <ul class="space-y-4">
+                    @foreach ($options as $option)
+                        <li x-data="{ open: true }" wire:key="option-{{ $option['id'] }}" class="border-b border-gray-100 pb-4 last:border-0">
+                            <button class="py-2 w-full flex justify-between items-center text-gray-700 font-medium hover:text-purple-600 transition-colors"
+                                x-on:click="open = !open">
+                                {{ $option['name'] }}
+                                <i class="fa-solid text-xs transition-transform" :class="{ 'rotate-180': open, '': !open }">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </i>
+                            </button>
+                            <ul class="mt-2 space-y-3" x-show="open" x-collapse>
+                                @foreach ($option['features'] as $feature)
+                                    <li wire:key="feature-{{ $feature['id'] }}">
+                                        @if ($option['type'] == 2)
+                                            <label class="relative flex items-center cursor-pointer group">
+                                                <input type="checkbox" value="{{ $feature['id'] }}"
+                                                    wire:model.live="selected_features" class="sr-only peer">
+
+                                                <div class="w-6 h-6 rounded-full border border-gray-200 shadow-sm peer-checked:ring-2 peer-checked:ring-purple-500 peer-checked:ring-offset-2 transition-all group-hover:scale-110"
+                                                    style="background-color: {{ $feature['value'] }}"
+                                                    title="{{ $feature['description'] }}">
+                                                </div>
+
+                                                <span class="ml-3 text-sm text-gray-600 group-hover:text-purple-600 transition-colors">
+                                                    {{ $feature['description'] }}
+                                                </span>
+                                            </label>
+                                        @else
+                                            <label class="inline-flex items-center cursor-pointer group">
+                                                <x-checkbox class="mr-2 !text-purple-600 !focus:ring-purple-500" value="{{ $feature['id'] }}"
+                                                    wire:model.live="selected_features" />
+                                                <span class="text-sm text-gray-600 group-hover:text-purple-600 transition-colors">
+                                                    {{ $feature['description'] }}
+                                                </span>
+                                            </label>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ul>
+
+                        </li>
+                    @endforeach
+                </ul>
+            </aside>
+        @endif
        <div class="md:flex-1">
               <div class="flex items-center">
                  <span class="mr-2">
