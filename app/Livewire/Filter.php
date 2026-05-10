@@ -34,7 +34,7 @@ class Filter extends Component
 
     public function render()
     {
-        $products = \App\Models\Product::whereHas('subcategory.category', function ($query) {
+        $products = \App\Models\Product::with('variants')->whereHas('subcategory.category', function ($query) {
             $query->where('family_id', $this->family_id);
         })
             ->when($this->selected_features, function ($query) {
