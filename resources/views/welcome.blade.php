@@ -31,23 +31,25 @@
  </h1>
  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
   @foreach($lastProducts as $product)
-    <article class="bg-white shadow rounded overflow-hidden">
-      <img src="{{ $product->image }}" class="w-full h-48 object-cover object-center">
-
-      <div class="p-4">
-        <h1 class="text-lg font-bold text-gray-700 line-clamp-2 min-h-[56px] mb-2">
-            {{ $product->name }}
-        </h1>
-        <p class="text-gray-600 mb-4">
-            $ {{ $product->price }}
-        </p>
-        <a href="" class="btn btn-purple block w-full text-center">
-             Ver más
-        </a>
-       
+    <article class="bg-white shadow-md hover:shadow-xl transition-shadow duration-300 rounded-xl overflow-hidden border border-gray-100 flex flex-col">
+      <div class="relative aspect-square overflow-hidden group">
+        <img src="{{ $product->image }}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
+        <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity"></div>
       </div>
-        
-      
+
+      <div class="p-5 flex-1 flex flex-col">
+        <h2 class="text-base font-bold text-gray-800 line-clamp-2 min-h-[48px] mb-2 hover:text-indigo-600 transition-colors">
+            <a href="#">{{ $product->name }}</a>
+        </h2>
+        <div class="mt-auto">
+            <p class="text-xl font-black text-indigo-600 mb-4">
+                $ {{ number_format($product->price, 0, ',', '.') }}
+            </p>
+            <a href="#" class="btn btn-indigo block w-full text-center transition-all hover:scale-[1.02] active:scale-[0.98]">
+                 Ver detalles
+            </a>
+        </div>
+      </div>
     </article>
   @endforeach
 

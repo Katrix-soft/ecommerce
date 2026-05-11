@@ -150,14 +150,25 @@
                                 @foreach ($option['features'] as $feature)
                                     <div class="flex items-center">
                                         @if ($option['type'] == 2)
-                                            <input type="checkbox" value="{{ $feature['id'] }}"
-                                                wire:model.live="selected_features" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                                            <div class="w-5 h-5 rounded-full ml-3 border border-gray-200" style="background-color: {{ $feature['value'] }}"></div>
-                                            <label class="ml-2 text-sm text-gray-600">{{ $feature['description'] }}</label>
+                                            <label class="flex items-center cursor-pointer group">
+                                                <input type="checkbox" value="{{ $feature['id'] }}"
+                                                    wire:model.live="selected_features" class="sr-only peer">
+                                                <div class="w-7 h-7 rounded-full border border-gray-200 shadow-sm peer-checked:ring-2 peer-checked:ring-indigo-600 peer-checked:ring-offset-2 transition-all group-hover:scale-110"
+                                                    style="background-color: {{ $feature['value'] }}"
+                                                    title="{{ $feature['description'] }}">
+                                                </div>
+                                                <span class="ml-3 text-sm text-gray-600 group-hover:text-indigo-600 transition-colors">
+                                                    {{ $feature['description'] }}
+                                                </span>
+                                            </label>
                                         @else
-                                            <input type="checkbox" value="{{ $feature['id'] }}"
-                                                wire:model.live="selected_features" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                                            <label class="ml-3 text-sm text-gray-600">{{ $feature['description'] }}</label>
+                                            <label class="flex items-center cursor-pointer group">
+                                                <x-checkbox class="mr-3" value="{{ $feature['id'] }}"
+                                                    wire:model.live="selected_features" />
+                                                <span class="text-sm text-gray-600 group-hover:text-indigo-600 transition-colors">
+                                                    {{ $feature['description'] }}
+                                                </span>
+                                            </label>
                                         @endif
                                     </div>
                                 @endforeach

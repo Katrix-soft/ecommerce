@@ -1,5 +1,5 @@
 <div x-data="{ open: false }">
-    <header class="bg-purple-600">
+    <header class="bg-indigo-600">
         <x-container class="px-4 py-4">
           <div class="flex justify-between items-center space-x-8">
 
@@ -9,8 +9,8 @@
           </button>
          <h1 class="text-white">
             <a href="/" class="inline-flex flex-col items-end">
-             <span class="text-xl md:text-3xl leading-4 md:leading-6 font-semibold">
-                Ecommerce
+              <span class="text-xl md:text-3xl leading-4 md:leading-6 font-semibold">
+                Shoply
                </span>
                <span class="text-xs">
                 Tienda online
@@ -47,14 +47,14 @@
                    @guest 
                      <div class="px-4 py-2">
                       <div class="flex justify-center">
-                         <a href="{{ route('login')}}" class="btn btn-purple">
+                         <a href="{{ route('login')}}" class="btn btn-indigo">
                            Iniciar Sesión 
                          </a>
                       </div>
 
                       <p class="text-sm text-center mt-4">
                       ¿No tienes cuenta? 
-                         <a href="{{ route('register')}}" class="text-purple-600 hover:underline">
+                         <a href="{{ route('register')}}" class="text-indigo-600 hover:underline transition-colors">
                           Registrate
                          </a>
                       </p>
@@ -100,7 +100,7 @@
 
            <div class="w-screen md:w-80 h-screen bg-white">
             
-               <div class="bg-purple-600 px-4 py-3 text-white font-semibold">
+               <div class="bg-indigo-600 px-4 py-3 text-white font-semibold">
                   <div class="flex justify-between items-center">
                       <span class="text-lg"> 
                            ¡Hola!
@@ -120,7 +120,7 @@
 
                           <li wire:mouseover="$set('family_id', {{ $family->id }})">
                               <a href="{{ route('families.show', $family)}}"
-                                  class="flex items-center justify-between px-4 py-4 text-gray-700 hover:bg-purple-200">
+                                  class="flex items-center justify-between px-4 py-4 text-gray-700 hover:bg-indigo-100 transition-colors">
                                  {{ $family->name }}
 
                                  <i class="fa-solid fa-angle-right">
@@ -147,7 +147,7 @@
                      </p>
                        
                      @if ($family_id)
-                         <a href="{{ route('families.show', $family_id)}}" class="btn btn-purple">
+                         <a href="{{ route('families.show', $family_id)}}" class="btn btn-indigo">
                             Ver todo
                          </a>
                      @endif
@@ -159,13 +159,13 @@
                     @foreach ( $this->categories as $category )
                        <li>
 
-                         <a href="" class="text-purple-600 font-semibold text-lg">
+                         <a href="" class="text-indigo-600 font-semibold text-lg">
                          {{ $category->name }}
                          </a>
                          <ul class="mt-4 space-y-2">
                             @foreach ($category->subcategories as $subcategory )
                               <li>
-                                 <a href="" class="text-sm text-gray-700 hover:text-purple-600">
+                                 <a href="" class="text-sm text-gray-700 hover:text-indigo-600 transition-colors">
                                     {{ $subcategory->name }}
                                  </a>
                             </li>
