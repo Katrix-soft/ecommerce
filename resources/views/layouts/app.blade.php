@@ -20,7 +20,7 @@
 
         <!-- PWA -->
         <link rel="manifest" href="/manifest.json">
-        <meta name="theme-color" content="#9333ea">
+        <meta name="theme-color" content="#3b226e">
         <link rel="apple-touch-icon" href="/icon-512.png">
 
 

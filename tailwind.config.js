@@ -18,9 +18,48 @@ export default {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
             colors: {
-                'brand-softer': '#eff6ff', // blue-50
-                'fg-brand-strong': '#1e40af', // blue-800
-                'fg-brand': '#2563eb', // blue-600
+                'brand-softer': '#f5f3ff', // purple-50
+                'fg-brand-strong': '#2d1b5a', // darker brand
+                'fg-brand': '#3b226e', // primary brand
+                'indigo': {
+                    50: '#f5f3ff',
+                    100: '#ede9fe',
+                    200: '#ddd6fe',
+                    300: '#c4b5fd',
+                    400: '#a78bfa',
+                    500: '#8b5cf6',
+                    600: '#3b226e', // Brand
+                    700: '#2d1b5a',
+                    800: '#251645',
+                    900: '#1e1035',
+                    950: '#0f081a',
+                },
+                'purple': {
+                    50: '#f5f3ff',
+                    100: '#ede9fe',
+                    200: '#ddd6fe',
+                    300: '#c4b5fd',
+                    400: '#a78bfa',
+                    500: '#8b5cf6',
+                    600: '#3b226e', // Brand
+                    700: '#2d1b5a',
+                    800: '#251645',
+                    900: '#1e1035',
+                    950: '#0f081a',
+                },
+                'blue': {
+                    50: '#f5f3ff',
+                    100: '#ede9fe',
+                    200: '#ddd6fe',
+                    300: '#c4b5fd',
+                    400: '#a78bfa',
+                    500: '#8b5cf6',
+                    600: '#3b226e', // Brand
+                    700: '#2d1b5a',
+                    800: '#251645',
+                    900: '#1e1035',
+                    950: '#0f081a',
+                },
                 'neutral-primary-soft': '#ffffff',
                 'neutral-secondary-soft': '#f9fafb',
                 'neutral-secondary-medium': '#f3f4f6',

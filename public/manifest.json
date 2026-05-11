@@ -1,11 +1,11 @@
 {
-    "name": "Tienda Shoply",
+    "name": "Shoply - Tu tienda online",
     "short_name": "Shoply",
-    "description": "Tu tienda online Shoply",
+    "description": "Tu tienda online by katrix",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
-    "theme_color": "#9333ea",
+    "theme_color": "#3b226e",
     "icons": [
         {
             "src": "/icon-512.png",
