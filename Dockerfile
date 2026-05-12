@@ -22,23 +22,26 @@ WORKDIR /var/www/html
 # Copiar archivos
 COPY . .
 
-# Instalar dependencias PHP (con dev para factories/seeders)
-RUN composer install --optimize-autoloader --no-interaction
+# Instalar dependencias PHP
+RUN composer install --optimize-autoloader --no-interaction --no-dev
 
 # Instalar dependencias JS y compilar assets
-RUN npm install && npm run build
+RUN npm install && npm run build && npm cache clean --force
 
-# Permisos
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Permisos (ya están en start.sh pero no está de más tenerlos acá también)
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Copiar config de nginx
-COPY docker/nginx.conf /etc/nginx/nginx.conf
+# ── CONFIGS DOCKER ───────────────────────────────────────────────────────────
+# nginx: va en conf.d, NO en nginx.conf (alpine usa include conf.d/*)
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+
+# php-fpm pool config (el que controla workers y memoria)
+COPY docker/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 # Script de inicio
 COPY docker/start.sh /start.sh
 RUN chmod +x /start.sh
 
 EXPOSE 80
-
 CMD ["/start.sh"]
