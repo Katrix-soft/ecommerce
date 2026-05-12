@@ -34,7 +34,7 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 
 # ── CONFIGS DOCKER ───────────────────────────────────────────────────────────
 # nginx: va en conf.d, NO en nginx.conf (alpine usa include conf.d/*)
-COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY docker/nginx.conf /etc/nginx/nginx.conf
 
 # php-fpm pool config (el que controla workers y memoria)
 COPY docker/www.conf /usr/local/etc/php-fpm.d/www.conf
