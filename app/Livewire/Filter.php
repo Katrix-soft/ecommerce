@@ -2,8 +2,10 @@
 
 namespace App\Livewire;
 
+use App\Models\Option;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\On;
 
 class Filter extends Component
 {
@@ -11,20 +13,45 @@ class Filter extends Component
 
 
     public $family_id;
+    public $category_id;
     public $options;
     public $selected_features = [];
+    public $orderBy = 1;
+    public $search;
+    
 
     public function mount()
     {
-        $this->options = \App\Models\Option::whereHas('features.variants.product.subcategory.category', function ($query) {
-            $query->where('family_id', $this->family_id);
-        })->with([
-            'features' => function ($query) {
-                $query->whereHas('variants.product.subcategory.category', function ($query) {
-                    $query->where('family_id', $this->family_id);
-                });
-            }
-        ])->get()->toArray();
+        $this->options = Option::when($this->family_id, function ($query) {
+            $query->whereHas('features.variants.product.subcategory.category', function ($query) {
+                $query->where('family_id', $this->family_id);
+            })->with([
+                'features' => function ($query) {
+                    $query->whereHas('variants.product.subcategory.category', function ($query) {
+                        $query->where('family_id', $this->family_id);
+                    });
+                }
+            ]);
+        })
+        ->when($this->category_id, function ($query) {
+            $query->whereHas('features.variants.product.subcategory', function ($query) {
+                $query->where('category_id', $this->category_id);
+            })->with([
+                'features' => function ($query) {
+                    $query->whereHas('variants.product.subcategory', function ($query) {
+                        $query->where('category_id', $this->category_id);
+                    });
+                }
+            ]);
+        })
+        
+        ->get()->toArray();
+    }
+    #[On('search')]
+    public function search($search)
+    {
+        $this->search = $search;
+        $this->resetPage();
     }
 
     public function updatedSelectedFeatures()
@@ -34,9 +61,25 @@ class Filter extends Component
 
     public function render()
     {
-        $products = \App\Models\Product::with('variants')->whereHas('subcategory.category', function ($query) {
-            $query->where('family_id', $this->family_id);
+        $products = \App\Models\Product::when($this->family_id, function ($query) {
+            $query->whereHas('subcategory.category', function ($query) {
+                $query->where('family_id', $this->family_id);
+            });
         })
+        ->when($this->category_id, function ($query) {
+            $query->whereHas ('subcategory', function ($query){
+                $query->where('category_id', $this->category_id);
+            });
+        })
+         ->when($this->orderBy == 1, function($query){
+            $query->orderBy('created_at', 'desc');
+         })
+         ->when($this->orderBy == 2, function($query){
+            $query->orderBy('price', 'desc');
+         })
+         ->when($this->orderBy == 3, function($query){
+             $query->orderBy('price', 'asc');
+         })
             ->when($this->selected_features, function ($query) {
                 $features = \App\Models\Feature::whereIn('id', $this->selected_features)->get();
 
@@ -47,6 +90,9 @@ class Filter extends Component
                         });
                     }
                 });
+            })
+            ->when($this->search, function ($query) {
+                $query->where('name', 'like', '%' . $this->search . '%');
             })
             ->paginate(12);
 

@@ -76,7 +76,7 @@
                     </h1>
                     <div class="flex items-center space-x-2">
                         <span class="text-sm text-gray-500 font-medium whitespace-nowrap">Ordenar por:</span>
-                        <x-select class="text-sm">
+                        <x-select wire:model.live="orderBy" class="text-sm">
                             <option value="1">Relevancia</option>
                             <option value="2">Precio: Mayor a menor</option>
                             <option value="3">Precio: Menor a mayor</option>
@@ -98,15 +98,15 @@
                                     </a>
                                 </h3>
                                 <div class="mt-2 flex-1 flex flex-col justify-end">
-                                    <p class="text-lg font-extrabold text-indigo-600">
-                                        $ {{ number_format($product->price, 0, ',', '.') }}
+                                    <p class="text-lg font-extrabold text-purple-600">
+                                        S/ {{ number_format($product->price, 2, '.', ',') }}
                                     </p>
                                     <p class="mt-1 text-xs text-gray-500">
                                         Stock disponible: {{ $product->variants->sum('stock') }}
                                     </p>
                                 </div>
-                                <button class="mt-4 w-full bg-indigo-600 border border-transparent rounded-md py-2 px-4 flex items-center justify-center text-sm font-semibold text-white hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    Ver detalles
+                                <button class="mt-4 w-full bg-purple-600 border border-transparent rounded-md py-2 px-4 flex items-center justify-center text-sm font-semibold text-white hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                    Ver más
                                 </button>
                             </div>
                         </article>

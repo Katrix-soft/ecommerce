@@ -18,7 +18,7 @@
             </a>
           </h1>
           <div class="flex-1 hidden md:block">
-              <x-input class="w-full" placeholder="Buscar por producto, tienda o por marca"/>
+              <x-input onchange="search(this.value)" class="w-full" placeholder="Buscar por producto, tienda o por marca"/>
           </div>
           <div class="flex items-center space-x-4 md:space-x-8">
 
@@ -88,7 +88,7 @@
 
         </div>
         <div class="mt-4 md:hidden">
-         <x-input class="w-full" placeholder="Buscar por producto, tienda o por marca"/>
+         <x-input onchange="search(this.value)" class="w-full" placeholder="Buscar por producto, tienda o por marca"/>
         </div> 
         </x-container>
     </header>
@@ -159,7 +159,7 @@
                     @foreach ( $this->categories as $category )
                        <li>
 
-                         <a href="" class="text-indigo-600 font-semibold text-lg">
+                         <a href="{{ route('categories.show', $category)}}" class="text-indigo-600 font-semibold text-lg">
                          {{ $category->name }}
                          </a>
                          <ul class="mt-4 space-y-2">
@@ -181,5 +181,15 @@
            </div>
         </div>
     </div>
+
+   @push('js')
+       <script>
+           function search(value) {
+              Livewire.dispatch('search', {
+                search: value
+              });
+           }
+       </script>
+   @endpush
 
 </div>
