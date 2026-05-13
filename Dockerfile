@@ -28,15 +28,15 @@ RUN composer install --optimize-autoloader --no-interaction --no-dev
 # Instalar dependencias JS y compilar assets
 RUN npm install && npm run build && npm cache clean --force
 
-# Permisos (ya están en start.sh pero no está de más tenerlos acá también)
+# Permisos
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # ── CONFIGS DOCKER ───────────────────────────────────────────────────────────
-# nginx: va en conf.d, NO en nginx.conf (alpine usa include conf.d/*)
-COPY docker/nginx.conf /etc/nginx/nginx.conf
+# nginx.conf va en conf.d/ como bloque server{} (alpine usa include conf.d/*)
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 
-# php-fpm pool config (el que controla workers y memoria)
+# php-fpm pool config
 COPY docker/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 # Script de inicio
