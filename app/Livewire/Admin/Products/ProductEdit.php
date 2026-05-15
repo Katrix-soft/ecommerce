@@ -115,7 +115,7 @@ class ProductEdit extends Component
         ];
 
         if ($this->image) {
-            $data['image_path'] = $this->image->store('products');
+            $data['image_path'] = $this->image->store('products', 'public');
         }
 
         $this->product->update($data);
