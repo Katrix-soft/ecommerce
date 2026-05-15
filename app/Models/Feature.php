@@ -26,4 +26,24 @@ class Feature extends Model
         return $this->belongsToMany(Variant::class)
                     ->withTimestamps();
     }
+    public function scopeVerifyFamily($query, $family_id)
+    {
+        return $query->whereHas('variants.product.subcategory.category', function ($query) use ($family_id) {
+            $query->where('family_id', $family_id);
+        });
+    }
+
+    public function scopeVerifyCategory($query, $category_id)
+    {
+        return $query->whereHas('variants.product.subcategory', function ($query) use ($category_id) {
+            $query->where('category_id', $category_id);
+        });
+    }
+
+    public function scopeVerifySubcategory($query, $subcategory_id)
+    {
+        return $query->whereHas('variants.product', function ($query) use ($subcategory_id) {
+            $query->where('subcategory_id', $subcategory_id);
+        });
+    }
 }

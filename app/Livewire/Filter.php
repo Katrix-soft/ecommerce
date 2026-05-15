@@ -23,28 +23,18 @@ class Filter extends Component
 
     public function mount()
     {
-        $this->options = Option::whereHas('products', function ($query) {
-            if ($this->subcategory_id) {
-                $query->where('subcategory_id', $this->subcategory_id);
-            } elseif ($this->category_id) {
-                $query->whereHas('subcategory', fn($q) => $q->where('category_id', $this->category_id));
-            } elseif ($this->family_id) {
-                $query->whereHas('subcategory.category', fn($q) => $q->where('family_id', $this->family_id));
-            }
-        })->with([
-            'features' => function ($query) {
-                $query->whereHas('variants.product', function ($query) {
-                    if ($this->subcategory_id) {
-                        $query->where('subcategory_id', $this->subcategory_id);
-                    } elseif ($this->category_id) {
-                        $query->whereHas('subcategory', fn($q) => $q->where('category_id', $this->category_id));
-                    } elseif ($this->family_id) {
-                        $query->whereHas('subcategory.category', fn($q) => $q->where('family_id', $this->family_id));
-                    }
-                });
-            }
-        ])
-        ->get()->toArray();
+        $this->options = Option::query()
+            ->when($this->subcategory_id, fn($q) => $q->verifySubcategory($this->subcategory_id))
+            ->when($this->category_id, fn($q) => $q->verifyCategory($this->category_id))
+            ->when($this->family_id, fn($q) => $q->verifyFamily($this->family_id))
+            ->with([
+                'features' => function ($query) {
+                    $query->when($this->subcategory_id, fn($q) => $q->verifySubcategory($this->subcategory_id))
+                          ->when($this->category_id, fn($q) => $q->verifyCategory($this->category_id))
+                          ->when($this->family_id, fn($q) => $q->verifyFamily($this->family_id));
+                }
+            ])
+            ->get()->toArray();
     }
 
     #[On('search')]
