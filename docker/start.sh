@@ -36,7 +36,7 @@ php artisan storage:link --force
 
 # ── 5.2 LIVEWIRE ASSETS ──────────────────────────────────────────────────────
 echo "[start] Publicando assets de Livewire..."
-php artisan livewire:publish --assets --force
+php artisan livewire:publish --assets || true
 
 # ── 6. PHP-FPM con watchdog ───────────────────────────────────────────────────
 echo "[start] Arrancando php-fpm..."
