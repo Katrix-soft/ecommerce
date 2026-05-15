@@ -39,13 +39,13 @@
 
       <div class="p-5 flex-1 flex flex-col">
         <h2 class="text-base font-bold text-gray-800 line-clamp-2 min-h-[48px] mb-2 hover:text-indigo-600 transition-colors">
-            <a href="#">{{ $product->name }}</a>
+            <a href="{{ route('products.show', $product) }}">{{ $product->name }}</a>
         </h2>
         <div class="mt-auto">
             <p class="text-xl font-black text-indigo-600 mb-4">
                 $ {{ number_format($product->price, 0, ',', '.') }}
             </p>
-            <a href="#" class="btn btn-indigo block w-full text-center transition-all hover:scale-[1.02] active:scale-[0.98]">
+            <a href="{{ route('products.show', $product) }}" class="btn btn-indigo block w-full text-center transition-all hover:scale-[1.02] active:scale-[0.98]">
                  Ver detalles
             </a>
         </div>

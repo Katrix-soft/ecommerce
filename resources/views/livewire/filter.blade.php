@@ -94,7 +94,7 @@
                             </div>
                             <div class="flex-1 p-4 flex flex-col">
                                 <h3 class="text-sm font-bold text-gray-900 line-clamp-2 min-h-[40px]">
-                                    <a href="#">
+                                    <a href="{{ route('products.show', $product) }}">
                                         <span aria-hidden="true" class="absolute inset-0"></span>
                                         {{ $product->name }}
                                     </a>
@@ -107,9 +107,9 @@
                                         Stock disponible: {{ $product->variants->sum('stock') }}
                                     </p>
                                 </div>
-                                <button class="mt-4 w-full bg-purple-600 border border-transparent rounded-md py-2 px-4 flex items-center justify-center text-sm font-semibold text-white hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-                                    Ver más
-                                </button>
+                                <a href="{{ route('products.show', $product) }}" class="mt-4 w-full bg-purple-600 border border-transparent rounded-md py-2 px-4 flex items-center justify-center text-sm font-semibold text-white hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                    Ver detalles
+                                </a>
                             </div>
                         </article>
                     @endforeach
