@@ -87,7 +87,7 @@ class ProductCreate extends Component
             throw $e;
         }
 
-        $imagePath = $this->image->store('products');
+        $imagePath = $this->image->store('products', 'public');
 
         $product = Product::create([
             'sku' => $this->sku,
