@@ -30,6 +30,10 @@ php artisan event:cache
 echo "[start] Corriendo migraciones..."
 php artisan migrate --force
 
+# ── 5.1 STORAGE LINK ─────────────────────────────────────────────────────────
+echo "[start] Creando storage link..."
+php artisan storage:link --force
+
 # ── 6. PHP-FPM con watchdog ───────────────────────────────────────────────────
 echo "[start] Arrancando php-fpm..."
 (
