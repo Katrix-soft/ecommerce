@@ -18,9 +18,16 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
    public function boot()
-{
-    if ($this->app->environment('production')) {
-        \URL::forceScheme('https');
-    }
-}
+   {
+       if ($this->app->environment('production')) {
+           \URL::forceScheme('https');
+       }
+
+       \Illuminate\Support\Facades\Event::listen(
+           \Illuminate\Auth\Events\Login::class,
+           function ($event) {
+               \Cart::instance('shopping')->restore($event->user->id);
+           }
+       );
+   }
 }
