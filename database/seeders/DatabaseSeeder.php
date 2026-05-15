@@ -38,7 +38,7 @@ class DatabaseSeeder extends Seeder
             OptionSeeder::class,
         ]);
 
-        Product::factory(50)->create()->each(function ($product) {
+        Product::factory(1550)->create()->each(function ($product) {
             // Crear variantes con características aleatorias para probar filtros
             $features = \App\Models\Feature::all()->random(rand(1, 3));
             $variant = $product->variants()->create([

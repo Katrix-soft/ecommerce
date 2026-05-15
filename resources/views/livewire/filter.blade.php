@@ -55,18 +55,20 @@
             @endif
 
             <!-- Mobile/Tablet Filter Button -->
-            <div class="md:hidden mb-6 flex items-center justify-between">
-                <button @click="mobileFiltersOpen = true" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" /></svg>
-                    Filtrar
-                </button>
-                
-                @if (count($selected_features))
-                    <button wire:click="$set('selected_features', [])" class="text-sm font-semibold text-indigo-600">
-                        Limpiar ({{ count($selected_features) }})
+            @if (count($options))
+                <div class="md:hidden mb-6 flex items-center justify-between">
+                    <button @click="mobileFiltersOpen = true" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" /></svg>
+                        Filtrar
                     </button>
-                @endif
-            </div>
+                    
+                    @if (count($selected_features))
+                        <button wire:click="$set('selected_features', [])" class="text-sm font-semibold text-indigo-600">
+                            Limpiar ({{ count($selected_features) }})
+                        </button>
+                    @endif
+                </div>
+            @endif
 
             <!-- Products Content -->
             <div class="flex-1">
