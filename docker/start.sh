@@ -1,22 +1,73 @@
 #!/bin/sh
+set -e
 
+echo "[start] Iniciando contenedor Laravel..."
+
+# ── 1. ENV ───────────────────────────────────────────────────────────────────
 if [ ! -f /var/www/html/.env ]; then
     touch /var/www/html/.env
 fi
+printenv | grep -E "^(APP_|DB_|SESSION_|CACHE_|QUEUE_|MAIL_|REDIS_|LIVEWIRE_)" \
+    | while IFS='=' read -r key value; do
+        grep -q "^${key}=" /var/www/html/.env || echo "${key}=${value}" >> /var/www/html/.env
+    done
 
-printenv | grep -E "^(APP_|DB_|SESSION_|CACHE_|QUEUE_|MAIL_|REDIS_)" >> /var/www/html/.env
+# ── 2. APP KEY ────────────────────────────────────────────────────────────────
+grep -q "APP_KEY=base64:" /var/www/html/.env || php artisan key:generate --force
 
-grep -q "APP_KEY=." /var/www/html/.env || php artisan key:generate --force
+# ── 3. PERMISOS ───────────────────────────────────────────────────────────────
+chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
+# ── 4. CACHÉ DE LARAVEL ───────────────────────────────────────────────────────
+php artisan config:clear
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
+php artisan event:cache
 
-# Solo migrar, SIN seed en producción
+# ── 5. MIGRACIONES ────────────────────────────────────────────────────────────
+echo "[start] Corriendo migraciones..."
 php artisan migrate --force
 
-# php-fpm en foreground
-php-fpm &
+# ── 5.1 STORAGE LINK ─────────────────────────────────────────────────────────
+echo "[start] Creando storage link..."
+php artisan storage:link --force
 
-# Nginx en foreground (mantiene el contenedor vivo)
+# ── 6. PHP-FPM con watchdog ───────────────────────────────────────────────────
+echo "[start] Arrancando php-fpm..."
+(
+    while true; do
+        php-fpm --nodaemonize || true
+        echo "[watchdog] php-fpm cayó, reiniciando en 2s..."
+        sleep 2
+    done
+) &
+FPM_WATCHDOG_PID=$!
+
+# Esperar a que php-fpm esté listo antes de arrancar nginx
+sleep 2
+
+# ── 7. QUEUE WORKER ───────────────────────────────────────────────────────────
+echo "[start] Arrancando queue worker..."
+(
+    while true; do
+        php artisan queue:work \
+            --sleep=3 \
+            --tries=3 \
+            --max-time=3600 \
+            --memory=128 \
+            --timeout=60 \
+            --queue=default,livewire-uploads \
+            || true
+        echo "[watchdog] queue worker cayó, reiniciando en 3s..."
+        sleep 3
+    done
+) &
+QUEUE_PID=$!
+
+# ── 8. NGINX ──────────────────────────────────────────────────────────────────
+echo "[start] Arrancando nginx..."
+trap "echo '[start] Apagando...'; kill $FPM_WATCHDOG_PID $QUEUE_PID 2>/dev/null; nginx -s quit; exit 0" TERM INT
+
 nginx -g "daemon off;"
