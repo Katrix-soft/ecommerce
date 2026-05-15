@@ -44,6 +44,33 @@
 
         @stack('js')
 
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        @if (session('swal'))
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({!! json_encode(session('swal')) !!});
+                });
+            </script>
+        @endif
+
+        <script>
+            document.addEventListener('livewire:init', function() {
+                Livewire.on('swal', (data) => {
+                    Swal.fire(data[0]);
+                });
+
+                Livewire.on('alert', (message) => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Bien hecho!',
+                        text: message,
+                        confirmButtonColor: '#3085d6',
+                    });
+                });
+            });
+        </script>
+
         <script>
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
