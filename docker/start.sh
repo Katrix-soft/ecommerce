@@ -29,14 +29,21 @@ php artisan event:cache
 # ── 5. MIGRACIONES ────────────────────────────────────────────────────────────
 echo "[start] Corriendo migraciones..."
 
-LOCK_FILE="/var/www/html/storage/app/.migrate_lock"
 CURRENT_HASH=$(find /var/www/html/database/migrations -name "*.php" | sort | xargs md5sum | md5sum | cut -d' ' -f1)
 
-if [ ! -f "$LOCK_FILE" ] || [ "$(cat $LOCK_FILE)" != "$CURRENT_HASH" ]; then
-    echo "[start] Cambios detectados en migraciones, ejecutando..."
+# Buscar el hash guardado en la DB
+SAVED_HASH=$(php artisan tinker --no-interaction --execute="echo \DB::table('migrations_lock')->value('hash') ?? '';" 2>/dev/null || echo "")
+
+if [ "$SAVED_HASH" != "$CURRENT_HASH" ]; then
+    echo "[start] Cambios detectados, ejecutando migraciones..."
     php artisan migrate --force
-    echo "$CURRENT_HASH" > "$LOCK_FILE"
-    echo "[start] Lock actualizado: $CURRENT_HASH"
+    # Guardar el nuevo hash en DB
+    php artisan tinker --no-interaction --execute="
+        \DB::statement('CREATE TABLE IF NOT EXISTS migrations_lock (hash VARCHAR(255))');
+        \DB::table('migrations_lock')->delete();
+        \DB::table('migrations_lock')->insert(['hash' => '$CURRENT_HASH']);
+    " 2>/dev/null || true
+    echo "[start] Hash actualizado en DB: $CURRENT_HASH"
 else
     echo "[start] Sin cambios en migraciones, saltando."
 fi
