@@ -21,6 +21,15 @@ class Navigation extends Component
         // actualizando así el número de elementos en el carrito
     }
 
+    public function toggleFamily($id)
+    {
+        if ($this->family_id == $id) {
+            $this->family_id = null;
+        } else {
+            $this->family_id = $id;
+        }
+    }
+
     public function mount()
     {
         $this->families = \App\Models\Family::all();

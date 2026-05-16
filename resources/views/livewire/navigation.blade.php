@@ -1,14 +1,16 @@
 <div x-data="{ open: false }">
     <header class="bg-indigo-600">
         <x-container class="px-4 py-4">
-          <div class="flex justify-between items-center space-x-8">
+          <div class="grid grid-cols-3 md:flex md:justify-between items-center md:space-x-8">
 
          
-          <button x-on:click="open = true" class="text-xl md:text-3xl cursor-pointer">
-            <i class="fas fa-bars text-white"></i>
-          </button>
-         <h1 class="text-white">
-            <a href="/" class="inline-flex flex-col items-end">
+          <div class="flex items-center">
+              <button x-on:click="open = true" class="text-xl md:text-3xl cursor-pointer">
+                <i class="fas fa-bars text-white"></i>
+              </button>
+          </div>
+         <h1 class="text-white flex justify-center md:block">
+            <a href="/" class="flex flex-col items-center">
               <span class="text-xl md:text-3xl leading-4 md:leading-6 font-semibold">
                 Shoply
                </span>
@@ -20,7 +22,7 @@
           <div class="flex-1 hidden md:block">
               <x-input onchange="search(this.value)" class="w-full" placeholder="Buscar por producto, tienda o por marca"/>
           </div>
-          <div class="flex items-center space-x-4 md:space-x-8">
+          <div class="flex items-center space-x-4 md:space-x-8 justify-end">
 
                    <x-dropdown>
 
@@ -33,7 +35,7 @@
                       
                     </button>
                     @else
-                    <button class="text-xl md:text-3xl x-on:click="open = true">
+                    <button class="text-xl md:text-3xl" x-on:click="open = true">
                         <i class="fas fa-user text-white "></i>
                      </button>
 
@@ -83,7 +85,7 @@
              
               <a href="{{ route('cart.index')}}" class="relative">
                 <i class="fas fa-shopping-cart text-white text-xl md:text-3xl"></i>
-                <span id="cart-count"  class="absolute -top-2 -end-4 inline-flex items-center justify-center w-6 h-6 bg-red-500 rounded-full text-xs font-bold text-white"> {{Cart::instance('shopping')->count()}} </span>
+                <span id="cart-count"  class="absolute -top-2 -right-2 inline-flex items-center justify-center w-5 h-5 bg-red-500 rounded-full text-[10px] font-bold text-white"> {{Cart::instance('shopping')->count()}} </span>
               </a>
           </div>
 
@@ -119,12 +121,13 @@
                       
                       @foreach ( $families as $family )
 
-                          <li wire:mouseover="$set('family_id', {{ $family->id }})">
+                          <li wire:key="family-{{ $family->id }}" 
+                              x-on:mouseenter="if (window.innerWidth >= 768) $wire.set('family_id', {{ $family->id }})">
                               <div class="flex items-center justify-between px-4 py-4 text-gray-700 hover:bg-indigo-100 transition-colors">
                                   <a href="{{ route('families.show', $family)}}" class="flex-1 font-medium">
                                      {{ $family->name }}
                                   </a>
-                                  <button wire:click.prevent="$set('family_id', {{ $family->id }})" class="px-2 md:hidden">
+                                  <button wire:click.prevent="toggleFamily({{ $family->id }})" class="px-2 md:hidden">
                                       <i class="fa-solid fa-angle-down" x-show="$wire.family_id == {{ $family->id }}"></i>
                                       <i class="fa-solid fa-angle-right" x-show="$wire.family_id != {{ $family->id }}"></i>
                                   </button>
@@ -183,14 +186,14 @@
                                        
                   <ul class="grid  grid-cols-1 xl:grid-cols-3 gap-8">
                     @foreach ( $this->categories as $category )
-                       <li>
+                       <li wire:key="category-{{ $category->id }}">
 
                          <a href="{{ route('categories.show', $category)}}" class="text-indigo-600 font-semibold text-lg">
                          {{ $category->name }}
                          </a>
                          <ul class="mt-4 space-y-2">
                             @foreach ($category->subcategories as $subcategory )
-                              <li>
+                              <li wire:key="subcategory-{{ $subcategory->id }}">
                                  <a href="{{ route('subcategories.show', $subcategory)}}" class="text-sm text-gray-700 hover:text-indigo-600 transition-colors">
                                     {{ $subcategory->name }}
                                  </a>
