@@ -2,13 +2,14 @@
 
 namespace App\Livewire;
 
+use Gloudemans\Shoppingcart\Facades\Cart;
 use Livewire\Component;
 
 class ShoppingCart extends Component
 {
     public function mount()
     {
-        Cart::instance('shopping')
+        Cart::instance('shopping');
     }
     public function render()
     {
