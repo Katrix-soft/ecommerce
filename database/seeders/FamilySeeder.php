@@ -940,18 +940,18 @@ class FamilySeeder extends Seeder
         ],
     ];
         foreach ($families as $familyName => $categories) {
-            $family = Family::create([
+            $family = Family::firstOrCreate([
                 'name' => $familyName,
             ]);
 
             foreach ($categories as $categoryName => $subcategories) {
-                $category = Category::create([
+                $category = Category::firstOrCreate([
                     'name' => $categoryName,
                     'family_id' => $family->id,
                 ]);
 
                 foreach ($subcategories as $subcategoryName) {
-                    Subcategory::create([
+                    Subcategory::firstOrCreate([
                         'name' => $subcategoryName,
                         'category_id' => $category->id,
                     ]);

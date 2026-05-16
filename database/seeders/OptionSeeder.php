@@ -56,12 +56,12 @@ class OptionSeeder extends Seeder
         ];
 
         foreach ($options as $option) {
-           $optionModel = Option::create([
+           $optionModel = Option::firstOrCreate([
             'name'=> $option['name'],
             'type' => $option['type'],
            ]);
            foreach ($option['features'] as $feature) {
-              $optionModel->features()->create([
+              $optionModel->features()->firstOrCreate([
                 'value' => $feature['value'],
                 'description'=> $feature['description'],
               ]);
