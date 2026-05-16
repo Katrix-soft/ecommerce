@@ -1,15 +1,16 @@
 <div x-data="{ open: false }">
     <header class="bg-indigo-600">
         <x-container class="px-4 py-4">
-          <div class="grid grid-cols-3 md:flex md:justify-between items-center md:space-x-8">
+          <div class="flex justify-between items-center md:space-x-8">
 
          
-          <div class="flex items-center">
-              <button x-on:click="open = true" class="text-xl md:text-3xl cursor-pointer">
+          <div class="flex-1 flex items-center">
+              <button x-on:click="open = true" class="text-xl md:text-3xl cursor-pointer relative z-10">
                 <i class="fas fa-bars text-white"></i>
               </button>
           </div>
-         <h1 class="text-white flex justify-center md:block">
+          <div class="flex-shrink-0">
+             <h1 class="text-white">
             <a href="/" class="flex flex-col items-center">
               <span class="text-xl md:text-3xl leading-4 md:leading-6 font-semibold">
                 Shoply
@@ -19,10 +20,11 @@
              </span>
             </a>
           </h1>
+          </div>
           <div class="flex-1 hidden md:block">
               <x-input onchange="search(this.value)" class="w-full" placeholder="Buscar por producto, tienda o por marca"/>
           </div>
-          <div class="flex items-center space-x-4 md:space-x-8 justify-end">
+          <div class="flex-1 flex items-center space-x-4 md:space-x-8 justify-end relative z-10">
 
                    <x-dropdown>
 
@@ -35,7 +37,7 @@
                       
                     </button>
                     @else
-                    <button class="text-xl md:text-3xl" x-on:click="open = true">
+                    <button class="text-xl md:text-3xl">
                         <i class="fas fa-user text-white "></i>
                      </button>
 

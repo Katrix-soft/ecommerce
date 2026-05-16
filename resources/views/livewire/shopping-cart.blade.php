@@ -85,7 +85,7 @@
                         </div>
                     </div>
 
-                    <button class="w-full py-4 bg-purple-600 text-white font-bold rounded-2xl hover:bg-purple-700 transition-all shadow-lg shadow-purple-200 flex items-center justify-center gap-3 active:scale-95">
+                    <button wire:click="checkout" class="w-full py-4 bg-purple-600 text-white font-bold rounded-2xl hover:bg-purple-700 transition-all shadow-lg shadow-purple-200 flex items-center justify-center gap-3 active:scale-95">
                         <span>Continuar con el pago</span>
                         <i class="fa-solid fa-arrow-right text-sm"></i>
                     </button>

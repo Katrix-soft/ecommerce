@@ -10,6 +10,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SubcategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\ShippingController;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome.index');
 
@@ -21,6 +22,7 @@ Route::get('subcategories/{subcategory}', [SubcategoryController::class, 'show']
 
 Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
 Route::get('cart', [CartController::class, 'index'])->name('cart.index');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -29,5 +31,8 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    Route::get('shipping', [ShippingController::class, 'index'])->name('shipping.index');
+    Route::get('shipping/create', [ShippingController::class, 'create'])->name('shipping.create');
 });
 

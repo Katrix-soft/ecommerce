@@ -12,36 +12,56 @@
             </div>
         @endsession
 
-        <form method="POST" action="{{ route('login') }}">
+        <form method="POST" action="{{ route('login') }}" class="space-y-6">
             @csrf
 
             <div>
-                <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+                <x-label for="email" value="Correo Electrónico" />
+                <div class="relative group">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-500">
+                        <i class="fas fa-envelope text-gray-400"></i>
+                    </div>
+                    <x-input id="email" class="block mt-1 w-full pl-10 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" placeholder="tu@correo.com" />
+                </div>
             </div>
 
             <div class="mt-4">
-                <x-label for="password" value="{{ __('Password') }}" />
-                <x-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="current-password" />
+                <div class="flex justify-between items-center">
+                    <x-label for="password" value="Contraseña" />
+                    @if (Route::has('password.request'))
+                        <a class="text-xs text-indigo-600 hover:underline" href="{{ route('password.request') }}">
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                    @endif
+                </div>
+                <div class="relative group">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-500">
+                        <i class="fas fa-lock text-gray-400"></i>
+                    </div>
+                    <x-input id="password" class="block mt-1 w-full pl-10 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg" type="password" name="password" required autocomplete="current-password" placeholder="••••••••" />
+                </div>
             </div>
 
-            <div class="block mt-4">
+            <div class="flex items-center justify-between">
                 <label for="remember_me" class="flex items-center">
                     <x-checkbox id="remember_me" name="remember" />
-                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
+                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">Recordarme</span>
                 </label>
             </div>
 
-            <div class="flex items-center justify-end mt-4">
-                @if (Route::has('password.request'))
-                    <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
-                        {{ __('Forgot your password?') }}
-                    </a>
-                @endif
-
-                <x-button class="ms-4">
-                    {{ __('Log in') }}
+            <div class="flex flex-col space-y-4 pt-4">
+                <x-button class="w-full justify-center py-3 text-sm">
+                    Iniciar Sesión
                 </x-button>
+
+                <div class="text-center">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        ¿Aún no tienes cuenta? 
+                        <a href="{{ route('register') }}" class="font-bold text-indigo-600 hover:underline">
+                            Regístrate aquí
+                        </a>
+                    </p>
+                </div>
             </div>
         </form>
     </x-authentication-card>

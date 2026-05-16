@@ -37,6 +37,15 @@ class ShoppingCart extends Component
         $this->dispatch('cart-updated');
     }
 
+    public function checkout()
+    {
+        if (auth()->check()) {
+            return redirect()->route('shipping.index');
+        } else {
+            return redirect()->route('login');
+        }
+    }
+
     protected function syncCart()
     {
         if (auth()->check()) {
