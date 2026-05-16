@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Family;  
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class Navigation extends Component
@@ -11,6 +12,14 @@ class Navigation extends Component
 
     public $families;
     public $family_id;
+
+    #[On('cartUpdated')]
+    #[On('cart-updated')]
+    public function updateCart()
+    {
+        // Esta función vacía hace que el componente se vuelva a renderizar
+        // actualizando así el número de elementos en el carrito
+    }
 
     public function mount()
     {

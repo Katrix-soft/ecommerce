@@ -9,6 +9,7 @@ use App\Http\Controllers\FamilyController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SubcategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CartController;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome.index');
 
@@ -19,6 +20,7 @@ Route::get('categories/{category}', [CategoryController::class, 'show'])->name('
 Route::get('subcategories/{subcategory}', [SubcategoryController::class, 'show'])->name('subcategories.show');
 
 Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
+Route::get('cart', [CartController::class, 'index'])->name('cart.index');
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),

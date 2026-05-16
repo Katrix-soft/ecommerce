@@ -81,9 +81,10 @@
                     </x-dropdown>
             
              
-              <button class="text-xl md:text-3xl">
-                <i class="fas fa-shopping-cart text-white "></i>
-              </button>
+              <a href="{{ route('cart.index')}}" class="relative">
+                <i class="fas fa-shopping-cart text-white text-xl md:text-3xl"></i>
+                <span id="cart-count"  class="absolute -top-2 -end-4 inline-flex items-center justify-center w-6 h-6 bg-red-500 rounded-full text-xs font-bold text-white"> {{Cart::instance('shopping')->count()}} </span>
+              </a>
           </div>
 
         </div>
@@ -119,14 +120,39 @@
                       @foreach ( $families as $family )
 
                           <li wire:mouseover="$set('family_id', {{ $family->id }})">
-                              <a href="{{ route('families.show', $family)}}"
-                                  class="flex items-center justify-between px-4 py-4 text-gray-700 hover:bg-indigo-100 transition-colors">
-                                 {{ $family->name }}
+                              <div class="flex items-center justify-between px-4 py-4 text-gray-700 hover:bg-indigo-100 transition-colors">
+                                  <a href="{{ route('families.show', $family)}}" class="flex-1 font-medium">
+                                     {{ $family->name }}
+                                  </a>
+                                  <button wire:click.prevent="$set('family_id', {{ $family->id }})" class="px-2 md:hidden">
+                                      <i class="fa-solid fa-angle-down" x-show="$wire.family_id == {{ $family->id }}"></i>
+                                      <i class="fa-solid fa-angle-right" x-show="$wire.family_id != {{ $family->id }}"></i>
+                                  </button>
+                                  <i class="fa-solid fa-angle-right hidden md:block"></i>
+                              </div>
 
-                                 <i class="fa-solid fa-angle-right">
-
-                                  </i>
-                              </a>
+                              <div class="md:hidden">
+                                  @if ($family_id == $family->id)
+                                      <ul class="bg-indigo-50 pb-4">
+                                          @foreach ($this->categories as $category)
+                                              <li>
+                                                  <a href="{{ route('categories.show', $category)}}" class="block px-8 py-2 text-indigo-600 font-semibold text-sm hover:bg-indigo-100">
+                                                      {{ $category->name }}
+                                                  </a>
+                                                  <ul class="pb-2 space-y-1">
+                                                      @foreach ($category->subcategories as $subcategory)
+                                                          <li>
+                                                              <a href="{{ route('subcategories.show', $subcategory)}}" class="block px-12 py-1 text-xs text-gray-700 hover:text-indigo-600 hover:bg-indigo-100 transition-colors">
+                                                                  {{ $subcategory->name }}
+                                                              </a>
+                                                          </li>
+                                                      @endforeach
+                                                  </ul>
+                                              </li>
+                                          @endforeach
+                                      </ul>
+                                  @endif
+                              </div>
                           </li>
                         
                       @endforeach
@@ -184,6 +210,10 @@
 
    @push('js')
        <script>
+           Livewire.on('cartUpdated', (count) => {
+           document.getElementById('cart-count').innerText = count;
+           });
+
            function search(value) {
               Livewire.dispatch('search', {
                 search: value
