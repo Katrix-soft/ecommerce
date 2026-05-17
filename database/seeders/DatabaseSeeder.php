@@ -11,7 +11,6 @@ use App\Models\Family;
 use App\Models\Subcategory;
 use App\Models\Option;
 
-
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
@@ -21,11 +20,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // 🛡️ Si ya existen familias, no correr el seeder
+        if (Family::count() > 0) {
+            $this->command->info('Ya existen datos, saltando seeder.');
+            return;
+        }
 
         Storage::deleteDirectory('products');
         Storage::makeDirectory('products');
-        // User::factory(10)->create();
 
+        // User::factory(10)->create();
         if (!User::where('email', 'test@example.com')->exists()) {
             User::factory()->create([
                 'name' => 'Test User',
