@@ -38,7 +38,7 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->call([
-            FamilySeeder::class,
+            // FamilySeeder::class,
             OptionSeeder::class,
         ]);
 
