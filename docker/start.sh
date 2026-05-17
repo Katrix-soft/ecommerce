@@ -58,10 +58,18 @@ php artisan livewire:publish --assets || true
 
 # ── 6. PHP-FPM con watchdog ───────────────────────────────────────────────────
 echo "[start] Arrancando php-fpm..."
+
+# Matar cualquier instancia previa antes de arrancar
+pkill -9 php-fpm 2>/dev/null || true
+rm -f /var/run/php-fpm.pid
+sleep 1
+
 (
     while true; do
         php-fpm --nodaemonize || true
         echo "[watchdog] php-fpm cayó, reiniciando en 2s..."
+        pkill -9 php-fpm 2>/dev/null || true
+        rm -f /var/run/php-fpm.pid
         sleep 2
     done
 ) &
