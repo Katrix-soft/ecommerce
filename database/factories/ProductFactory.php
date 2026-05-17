@@ -18,7 +18,7 @@ class ProductFactory extends Factory
      */
     public function definition(): array
     {
-        $name = \Faker\Factory::create('en_US')->words(3, true);
+        $name = $this->faker->sentence(2);
 
         // Generar imagen placeholder local con GD
         $dir = public_path('storage/products');
