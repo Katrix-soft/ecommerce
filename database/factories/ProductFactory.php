@@ -28,7 +28,7 @@ class ProductFactory extends Factory
 
         $name = $nombres[array_rand($nombres)] . ' ' . rand(100, 999);
 
-        $dir = public_path('storage/products');
+        $dir = storage_path('app/public/products');
         if (!is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
