@@ -79,23 +79,20 @@ FPM_WATCHDOG_PID=$!
 sleep 2
 
 # ── 7. QUEUE WORKER ───────────────────────────────────────────────────────────
-echo "[start] Arrancando queue worker..."
 (
     while true; do
         php artisan queue:work \
             --sleep=3 \
             --tries=3 \
-            --max-time=3600 \
-            --memory=128 \
-            --timeout=60 \
+            --max-time=600 \
+            --memory=64 \
+            --timeout=30 \
             --queue=default,livewire-uploads \
             || true
         echo "[watchdog] queue worker cayó, reiniciando en 3s..."
         sleep 3
     done
 ) &
-QUEUE_PID=$!
-
 # ── 8. NGINX ──────────────────────────────────────────────────────────────────
 echo "[start] Arrancando nginx..."
 trap "echo '[start] Apagando...'; kill $FPM_WATCHDOG_PID $QUEUE_PID 2>/dev/null; nginx -s quit; exit 0" TERM INT
