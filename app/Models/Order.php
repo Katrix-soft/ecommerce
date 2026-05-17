@@ -38,4 +38,20 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    /**
+     * Get the dispatch ticket for this order.
+     */
+    public function ticket(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Ticket::class);
+    }
+
+    /**
+     * Get the shipment for this order.
+     */
+    public function shipment(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Shipment::class);
+    }
 }

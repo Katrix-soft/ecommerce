@@ -9,7 +9,7 @@
                     </div>
                 </a>
                 <p class="text-indigo-200/70 text-sm leading-relaxed mb-6">
-                    Llevamos lo mejor de la tecnología, moda y hogar a la puerta de tu casa. Calidad garantizada por katrix.
+                    Llevamos lo mejor de la tecnología, moda y hogar a la puerta de tu casa. Calidad garantizada por Shoply.
                 </p>
                 <div class="flex space-x-4">
                     <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-indigo-600 transition-all duration-300">
@@ -61,7 +61,7 @@
 
         <div class="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center">
             <p class="text-xs text-indigo-300/50 mb-4 md:mb-0">
-                &copy; {{ date('Y') }} <span class="text-indigo-300 font-bold">Shoply™</span> by <a href="#" class="hover:text-white transition-colors">katrix</a>. Todos los derechos reservados.
+                &copy; {{ date('Y') }} <span class="text-indigo-300 font-bold">Shoply™</span>. Todos los derechos reservados.
             </p>
             <div class="flex space-x-6 text-xs text-indigo-300/50">
                 <a href="#" class="hover:text-white">Privacidad</a>

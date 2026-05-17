@@ -28,3 +28,9 @@ Route::post('products/{product}/variants', [ProductController::class, 'Variants'
 
   ->scopeBindings();
 Route::resource('covers', CoverController::class);
+
+// Rutas de administración de órdenes, conductores y envíos (Logística)
+Route::get('orders', \App\Livewire\Admin\OrdersIndex::class)->name('orders.index');
+Route::get('orders/{order}/print', [\App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
+Route::get('drivers', \App\Livewire\Admin\DriversIndex::class)->name('drivers.index');
+Route::get('shipments', \App\Livewire\Admin\ShipmentsIndex::class)->name('shipments.index');

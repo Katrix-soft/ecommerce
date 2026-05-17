@@ -1,7 +1,7 @@
 {
     "name": "Shoply - Tu tienda online",
     "short_name": "Shoply",
-    "description": "Tu tienda online by katrix",
+    "description": "Tu tienda online by Shoply",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",

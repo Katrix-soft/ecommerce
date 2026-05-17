@@ -39,11 +39,7 @@ class ShoppingCart extends Component
 
     public function checkout()
     {
-        if (auth()->check()) {
-            return redirect()->route('shipping.index');
-        } else {
-            return redirect()->route('login');
-        }
+        return redirect()->route('checkout');
     }
 
     protected function syncCart()

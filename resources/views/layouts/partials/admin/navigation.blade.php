@@ -10,9 +10,11 @@
   <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M5 7h14M5 12h14M5 17h10"/>
    </svg>
          </button>
-        <a href="https://flowbite.com" class="flex ms-2 md:me-24">
-          <img src="https://flowbite.com/docs/images/logo.svg" class="h-6 me-3" alt="FlowBite Logo" />
-          <span class="self-center text-lg font-semibold whitespace-nowrap dark:text-black">Flowbite</span>
+        <a href="{{ route('admin.dashboard') }}" class="flex items-center ms-2 md:me-24 gap-2">
+          <div class="size-8 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-md shadow-indigo-200">
+            <i class="fa-solid fa-bag-shopping text-sm"></i>
+          </div>
+          <span class="self-center text-xl font-extrabold bg-gradient-to-r from-purple-700 to-indigo-800 bg-clip-text text-transparent">Shoply</span>
         </a>
       </div>
       <div class="flex items-center">

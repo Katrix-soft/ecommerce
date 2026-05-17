@@ -41,6 +41,24 @@
             'icon' => 'fa-solid fa-image',
             'route' => route('admin.covers.index'),
             'active' => request()->routeIs('admin.covers.*'),
+        ],
+        [
+            'label' => 'Órdenes',
+            'icon' => 'fa-solid fa-receipt',
+            'route' => route('admin.orders.index'),
+            'active' => request()->routeIs('admin.orders.*'),
+        ],
+        [
+            'label' => 'Conductores',
+            'icon' => 'fa-solid fa-user-tie',
+            'route' => route('admin.drivers.index'),
+            'active' => request()->routeIs('admin.drivers.*'),
+        ],
+        [
+            'label' => 'Envíos',
+            'icon' => 'fa-solid fa-truck-fast',
+            'route' => route('admin.shipments.index'),
+            'active' => request()->routeIs('admin.shipments.*'),
         ]
     ];
 @endphp

@@ -589,7 +589,7 @@
                                             </div>
                                             <div class="flex justify-between border-b border-purple-100/50 pb-2">
                                                 <span class="font-medium text-gray-500">Alias</span>
-                                                <span class="font-black text-purple-600 select-all cursor-pointer hover:underline" title="Copiar alias">katrix.ecommerce.mp</span>
+                                                <span class="font-black text-purple-600 select-all cursor-pointer hover:underline" title="Copiar alias">shoply.ecommerce.mp</span>
                                             </div>
                                             <div class="flex justify-between border-b border-purple-100/50 pb-2">
                                                 <span class="font-medium text-gray-500">CUIT</span>
@@ -597,14 +597,14 @@
                                             </div>
                                             <div class="flex justify-between pb-1">
                                                 <span class="font-medium text-gray-500">Titular</span>
-                                                <span class="font-black text-gray-800">Katrix Software S.A.</span>
+                                                <span class="font-black text-gray-800">Shoply S.A.</span>
                                             </div>
                                         </div>
 
                                         <div class="bg-white rounded-2xl p-4 border border-purple-100 mt-6 flex gap-3 items-start">
                                             <i class="fas fa-info-circle text-purple-500 mt-1"></i>
                                             <p class="text-xs text-gray-500 leading-relaxed">
-                                                Una vez realizada la transferencia bancaria, por favor envía el comprobante por e-mail a <strong>pagos@katrix.com</strong> indicando tu número de orden en el asunto.
+                                                Una vez realizada la transferencia bancaria, por favor envía el comprobante por e-mail a <strong>pagos@shoply.com</strong> indicando tu número de orden en el asunto.
                                             </p>
                                         </div>
                                     </div>

@@ -29,5 +29,8 @@ class AppServiceProvider extends ServiceProvider
                \Cart::instance('shopping')->restore($event->user->id);
            }
        );
+
+       // Registrar el observador para Order
+       \App\Models\Order::observe(\App\Observers\OrderObserver::class);
    }
 }

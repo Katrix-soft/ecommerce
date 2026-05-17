@@ -68,27 +68,47 @@
         </header>
 
         @if ($product->variants->count())
-            <ul class="divide-y -my-4">
-                @foreach ($product->variants as $item)
-                    <li class="py-4 flex items-center">
-                        <img src="{{ $item->image }}" class="w-12 h-12 object-cover rounded">
+            <form action="{{ route('admin.products.variants', $product) }}" method="POST">
+                @csrf
+                <div class="space-y-4">
+                    @foreach ($product->variants as $item)
+                        <div class="flex flex-col md:flex-row items-center gap-4 p-4 border border-gray-150 dark:border-gray-800 rounded-xl bg-gray-50/50 dark:bg-gray-800/30">
+                            <img src="{{ $item->image }}" class="w-16 h-16 object-cover rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 bg-white">
 
-                        <div class="ml-4 flex-1">
-                            <p class="divide-x text-sm text-gray-600">
-                                @foreach ($item->features as $feature)
-                                    <span class="px-3">
-                                        {{ $feature->description }}
-                                    </span>
-                                @endforeach
-                            </p>
+                            <div class="flex-1">
+                                <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 flex flex-wrap gap-1.5">
+                                    @foreach ($item->features as $feature)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 border border-purple-100 dark:border-purple-900">
+                                            {{ $feature->description }}
+                                        </span>
+                                    @endforeach
+                                </p>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full md:w-auto">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">SKU</label>
+                                    <input type="text" name="variants[{{ $item->id }}][sku]" value="{{ old('variants.'.$item->id.'.sku', $item->sku) }}" class="w-full text-sm font-semibold rounded-lg border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white" placeholder="SKU">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Precio</label>
+                                    <input type="number" step="0.01" name="variants[{{ $item->id }}][price]" value="{{ old('variants.'.$item->id.'.price', $item->price) }}" class="w-full text-sm font-semibold rounded-lg border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white" placeholder="Precio">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Stock</label>
+                                    <input type="number" name="variants[{{ $item->id }}][stock]" value="{{ old('variants.'.$item->id.'.stock', $item->stock) }}" class="w-full text-sm font-semibold rounded-lg border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white" placeholder="Stock">
+                                </div>
+                            </div>
                         </div>
+                    @endforeach
+                </div>
 
-                        <a href="" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-900 focus:outline-none focus:border-blue-900 focus:ring ring-blue-300 disabled:opacity-25 transition ease-in-out duration-150">
-                            Editar
-                        </a>
-                    </li>
-                @endforeach
-            </ul>
+                <div class="mt-6 flex justify-end">
+                    <button type="submit" class="inline-flex items-center px-6 py-2.5 bg-indigo-600 border border-transparent rounded-lg font-bold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:scale-95 transition-all shadow-md shadow-indigo-100 dark:shadow-none">
+                        Guardar Variantes
+                    </button>
+                </div>
+            </form>
         @else
             <div class="flex items-center p-4 text-sm text-gray-800 rounded-lg bg-gray-50 dark:bg-gray-800 dark:text-gray-300" role="alert">
                 <i class="fa-solid fa-circle-info me-3 text-lg"></i>

@@ -45,7 +45,12 @@
                    <div class="mb-6">
                        <p class="font-bold text-gray-700 mb-3 text-sm uppercase tracking-wide">{{ $option->name }}</p>
                        <ul class="flex flex-wrap items-center gap-3">
-                           @foreach ($option->features->whereIn('id', $option->pivot->feature_id) as $feature)
+                            @php
+                                $featureIds = collect($option->pivot->feature_id)->map(function($f) {
+                                    return is_array($f) ? ($f['id'] ?? $f) : $f;
+                                })->toArray();
+                            @endphp
+                            @foreach ($option->features->whereIn('id', $featureIds) as $feature)
                                <li>
                                    @if ($option->type == 1)
                                        {{-- Diseño para Texto (Talla, etc) --}}
