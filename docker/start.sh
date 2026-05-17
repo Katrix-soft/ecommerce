@@ -53,11 +53,23 @@ else
     echo "[start] Ya existen $FAMILY_COUNT familias, saltando seeder."
 fi
 
-# ── 5.2 STORAGE LINK ─────────────────────────────────────────────────────────
+# ── 5.2 SEEDER DE PRODUCTOS ──────────────────────────────────────────────────
+echo "[start] Verificando productos..."
+PRODUCT_COUNT=$(php artisan tinker --execute="echo App\Models\Product::count();" 2>/dev/null | tail -1)
+
+if [ "$PRODUCT_COUNT" = "0" ] || [ -z "$PRODUCT_COUNT" ]; then
+    echo "[start] No hay productos, corriendo seeder..."
+    php artisan db:seed --force
+    echo "[start] Seeder de productos completado."
+else
+    echo "[start] Ya existen $PRODUCT_COUNT productos, saltando seeder."
+fi
+
+# ── 5.3 STORAGE LINK ─────────────────────────────────────────────────────────
 echo "[start] Creando storage link..."
 php artisan storage:link --force
 
-# ── 5.3 LIVEWIRE ASSETS ──────────────────────────────────────────────────────
+# ── 5.4 LIVEWIRE ASSETS ──────────────────────────────────────────────────────
 echo "[start] Publicando assets de Livewire..."
 php artisan livewire:publish --assets || true
 
