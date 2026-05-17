@@ -20,8 +20,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 🛡️ Si ya existen familias, no correr el seeder
-        if (Family::count() > 0) {
+        // 🛡️ Si ya existen productos, no correr el seeder
+        if (Product::count() > 0) {
             $this->command->info('Ya existen datos, saltando seeder.');
             return;
         }
