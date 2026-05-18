@@ -174,13 +174,33 @@ class Checkout extends Component
 
     public function placeOrder()
     {
+        // 0. Validar stock real en la base de datos de todos los productos en el carrito para evitar sobreventas concurrentes
+        $hasValidItems = false;
+        foreach (Cart::instance('shopping')->content() as $item) {
+            $variant = Variant::find($item->id);
+            $stock = $variant ? $variant->stock : 0;
+            if ($item->qty <= $stock) {
+                $hasValidItems = true;
+            }
+        }
+
+        if (!$hasValidItems) {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'No hay suficiente stock',
+                'text' => "Lo sentimos, ninguno de los productos en tu carrito cuenta con stock disponible en este momento. Por favor, ajusta tu carrito.",
+                'confirmButtonColor' => '#7c3aed',
+            ]);
+            return;
+        }
+
         // 1. Validar métodos de pago y campos de tarjeta si corresponde
         if ($this->paymentMethod === 'credit_card') {
             $this->validate([
-                'cardNumber' => 'required|min:16',
-                'cardName' => 'required|string|min:4',
-                'cardExpiry' => 'required|regex:/^(0[1-9]|1[0-2])\/[0-9]{2}$/',
-                'cardCvv' => 'required|numeric|digits_between:3,4',
+                'cardNumber' => ['required', 'min:16'],
+                'cardName' => ['required', 'string', 'min:4'],
+                'cardExpiry' => ['required', 'regex:/^(0[1-9]|1[0-2])\/[0-9]{2}$/'],
+                'cardCvv' => ['required', 'numeric', 'digits_between:3,4'],
             ], [
                 'cardNumber.required' => 'El número de tarjeta es obligatorio.',
                 'cardNumber.min' => 'El número de tarjeta debe tener al menos 16 dígitos.',
@@ -221,9 +241,16 @@ class Checkout extends Component
             'phone' => $addressObj->phone,
         ];
 
-        // Calcular montos finales
-        $subtotalVal = floatval(str_replace(',', '', Cart::instance('shopping')->subtotal()));
-        $totalVal = floatval(str_replace(',', '', Cart::instance('shopping')->total()));
+        // Calcular montos finales considerando solo los productos con stock disponible
+        $subtotalVal = 0;
+        foreach (Cart::instance('shopping')->content() as $item) {
+            $variant = Variant::find($item->id);
+            $stock = $variant ? $variant->stock : 0;
+            if ($item->qty <= $stock) {
+                $subtotalVal += $item->qty * $item->price;
+            }
+        }
+        $totalVal = $subtotalVal;
         $shippingCostVal = 0.00; // Envío Gratis
 
         // Crear pedido
@@ -238,34 +265,44 @@ class Checkout extends Component
             'total' => $totalVal,
         ]);
 
-        // Crear items del pedido y descontar stock si corresponde
+        // Crear items del pedido, descontar stock y eliminar del carrito solo los que tienen stock
         foreach (Cart::instance('shopping')->content() as $item) {
-            // Guardar variantes o detalles
-            $features = [];
-            if ($item->options && isset($item->options->features)) {
-                $features = $item->options->features;
-            }
-
-            OrderItem::create([
-                'order_id' => $order->id,
-                'variant_id' => $item->id, // row ID or variant ID? Let's check how cart handles id (usually variant ID)
-                'name' => $item->name,
-                'quantity' => $item->qty,
-                'price' => $item->price,
-                'features' => $features,
-            ]);
-
-            // Descontar stock
             $variant = Variant::find($item->id);
-            if ($variant) {
-                $variant->stock = max(0, $variant->stock - $item->qty);
-                $variant->save();
+            $stock = $variant ? $variant->stock : 0;
+
+            if ($item->qty <= $stock) {
+                // Guardar variantes o detalles
+                $features = [];
+                if ($item->options && isset($item->options->features)) {
+                    $features = $item->options->features;
+                }
+
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'variant_id' => $item->id,
+                    'name' => $item->name,
+                    'quantity' => $item->qty,
+                    'price' => $item->price,
+                    'features' => $features,
+                ]);
+
+                // Descontar stock de forma atómica e inmediata en la base de datos
+                if ($variant) {
+                    $variant->decrement('stock', $item->qty);
+                }
+
+                // Eliminar del carrito
+                Cart::instance('shopping')->remove($item->rowId);
             }
         }
 
-        // Vaciar el carrito
-        Cart::instance('shopping')->destroy();
+        // Sincronizar el estado del carrito en la base de datos (con los productos sobrantes que no tenían stock)
         if (auth()->check()) {
+            try {
+                \DB::table('shoppingcart')->where('identifier', auth()->id())->delete();
+            } catch (\Exception $e) {
+                // Ignorar
+            }
             Cart::instance('shopping')->store(auth()->id());
         }
 
@@ -284,6 +321,32 @@ class Checkout extends Component
 
     public function render()
     {
-        return view('livewire.checkout');
+        $cart = Cart::instance('shopping')->content();
+        
+        // Cargar todos los stocks de las variantes de forma masiva (para evitar N+1 queries)
+        $itemIds = $cart->pluck('id')->toArray();
+        $stocks = Variant::whereIn('id', $itemIds)->pluck('stock', 'id')->toArray();
+
+        $subtotalVal = 0;
+        $hasStockErrors = false;
+        $hasValidItems = false;
+
+        foreach ($cart as $item) {
+            $stock = $stocks[$item->id] ?? 0;
+            if ($item->qty <= $stock) {
+                $subtotalVal += $item->qty * $item->price;
+                $hasValidItems = true;
+            } else {
+                $hasStockErrors = true;
+            }
+        }
+
+        return view('livewire.checkout', [
+            'stocks' => $stocks,
+            'hasStockErrors' => $hasStockErrors,
+            'hasValidItems' => $hasValidItems,
+            'subtotal' => number_format($subtotalVal, 2),
+            'total' => number_format($subtotalVal, 2),
+        ]);
     }
 }

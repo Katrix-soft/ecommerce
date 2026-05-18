@@ -36,10 +36,14 @@
               4.7(55)  
             </p>
            </div>
-           <p class="text-2xl text-gray-600 font-bold mb-4 text-gray-600">
-            ${{ $product->price }}
-           </p>
-
+           <div class="flex justify-between items-center">
+               <p class="text-2xl text-gray-600 font-bold mb-4 text-gray-600">
+                  ${{ $variant?->price ?? $product->price }}
+               </p>
+               <p>
+                 Stock: {{ $stock }}
+               </p>
+           </div>
            <div class="mb-4">
                @foreach ($product->options as $option)
                    <div class="mb-6">
@@ -81,7 +85,7 @@
                @endforeach
            </div>
 
-           <div class="flex items-center space-x-6 mb-6" x-data="{ quantity: @entangle('quantity') }">
+           <div class="flex items-center space-x-6 mb-6" x-data="{ quantity: @entangle('quantity'), stock: @entangle('stock') }">
             <button class="btn btn-gray cursor-pointer rounded-full hover:bg-red-500"
                 x-on:click="if (quantity > 1) quantity--" x-bind:disabled="quantity <= 1"
                 x-bind:class="{ 'opacity-50': quantity <= 1, 'hover:bg-red-500': quantity > 1 }">
@@ -89,13 +93,18 @@
             </button>
             <span x-text="quantity" class="btn btn-gray text-sm font-bold">
             </span>
-            <button class="btn btn-gray cursor-pointer rounded-full hover:bg-green-500" x-on:click="quantity++" x-bind:class="{ 'opacity-50': quantity >= 10, 'hover:bg-green-500': quantity < 10 }">
+            <button class="btn btn-gray cursor-pointer rounded-full hover:bg-green-500" 
+                x-on:click="if (quantity < stock) quantity++" 
+                x-bind:disabled="quantity >= stock"
+                x-bind:class="{ 'opacity-50': quantity >= stock, 'hover:bg-green-500': quantity < stock }">
                 <i class="fa-solid fa-plus"></i>
             </button>
            </div>
            <button class="btn bg-purple-500 hover:bg-purple-600 text-white px-8 py-3 rounded-full w-full" wire:click="addItem"
-           wire:loading.attr="disabled">
-            Agregar al carrito
+           wire:loading.attr="disabled"
+           {{ $stock == 0 ? 'disabled' : '' }}
+           @style(['opacity: 0.5; cursor: not-allowed;' => $stock == 0])>
+            {{ $stock == 0 ? 'Agotado' : 'Agregar al carrito' }}
            </button>
            <div class="flex items-center space-x-4 mt-4 text-gray-600 text-sm">
             <i class="fa-solid fa-truck"></i>

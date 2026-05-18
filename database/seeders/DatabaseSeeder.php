@@ -20,16 +20,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 🛡️ Si ya existen productos, no correr el seeder
-        if (Product::count() > 0) {
-            $this->command->info('Ya existen datos, saltando seeder.');
-            return;
-        }
+        // 1. Asegurar que las Familias, Categorías, Subcategorías y Opciones estén creadas (son idempotentes y seguras)
+        $this->call([
+            FamilySeeder::class,
+            OptionSeeder::class,
+        ]);
 
-        Storage::deleteDirectory('products');
-        Storage::makeDirectory('products');
-
-        // User::factory(10)->create();
         if (!User::where('email', 'test@example.com')->exists()) {
             User::factory()->create([
                 'name' => 'Test User',
@@ -37,17 +33,21 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        $this->call([
-            // FamilySeeder::class,
-            OptionSeeder::class,
-        ]);
+        // 2. Solo generar productos si la tabla está vacía para evitar duplicados y lentitud
+        if (Product::count() > 0) {
+            $this->command->info('Las categorías y opciones fueron verificadas. Ya existen productos en la base de datos, saltando generación de productos de prueba.');
+            return;
+        }
+
+        Storage::deleteDirectory('products');
+        Storage::makeDirectory('products');
 
         Product::factory(1550)->create()->each(function ($product) {
             // Crear variantes con características aleatorias para probar filtros
             $features = \App\Models\Feature::all()->random(rand(1, 3));
             $variant = $product->variants()->create([
                 'sku' => $product->sku . '-V1',
-                'stock' => rand(1, 50),
+                'stock' => 100,
                 'price' => $product->price,
             ]);
             $variant->features()->attach($features);

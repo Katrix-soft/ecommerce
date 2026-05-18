@@ -367,7 +367,10 @@
 
                         <!-- Continue Button to step 2 -->
                         <div class="flex justify-end pt-4">
-                            <button wire:click="goToPayment" class="px-10 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-purple-100 flex items-center gap-3 active:scale-95">
+                            <button wire:click="goToPayment" 
+                                    {{ !$hasValidItems ? 'disabled' : '' }}
+                                    @style(['opacity: 0.5; cursor: not-allowed; pointer-events: none;' => !$hasValidItems])
+                                    class="px-10 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-purple-100 flex items-center gap-3 active:scale-95">
                                 Continuar al pago <i class="fas fa-arrow-right"></i>
                             </button>
                         </div>
@@ -637,6 +640,8 @@
                             </button>
                             <button wire:click="placeOrder" 
                                     wire:loading.attr="disabled"
+                                    {{ !$hasValidItems ? 'disabled' : '' }}
+                                    @style(['opacity: 0.5; cursor: not-allowed; pointer-events: none;' => !$hasValidItems])
                                     class="px-10 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-purple-100 flex items-center gap-3 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
                                 <span wire:loading.remove wire:target="placeOrder">Confirmar Pedido <i class="fas fa-check"></i></span>
                                 <span wire:loading wire:target="placeOrder" class="flex items-center gap-2">
@@ -655,15 +660,21 @@
                         <!-- List items in cart -->
                         <div class="max-h-56 overflow-y-auto mb-6 pr-2 space-y-4 custom-scrollbar">
                             @foreach (Cart::instance('shopping')->content() as $item)
+                                @php
+                                    $isExceeded = $item->qty > ($stocks[$item->id] ?? 0);
+                                @endphp
                                 <div class="flex items-start gap-4">
-                                    <div class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center font-bold text-xs text-purple-600 border border-gray-100/50">
+                                    <div class="w-10 h-10 {{ $isExceeded ? 'bg-red-50 text-red-500 border-red-100' : 'bg-gray-50 text-purple-600 border-gray-100/50' }} rounded-xl flex items-center justify-center font-bold text-xs border">
                                         {{ $item->qty }}x
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <p class="text-xs font-bold text-gray-800 truncate" title="{{ $item->name }}">{{ $item->name }}</p>
+                                        @if ($isExceeded)
+                                            <span class="text-[9px] text-red-500 font-bold block mb-0.5">Stock insuficiente</span>
+                                        @endif
+                                        <p class="text-xs font-bold {{ $isExceeded ? 'text-red-500' : 'text-gray-800' }} truncate" title="{{ $item->name }}">{{ $item->name }}</p>
                                         <p class="text-[10px] text-gray-400 mt-0.5">${{ number_format($item->price, 2) }} c/u</p>
                                     </div>
-                                    <span class="text-xs font-black text-gray-800">${{ number_format($item->price * $item->qty, 2) }}</span>
+                                    <span class="text-xs font-black {{ $isExceeded ? 'text-red-400 line-through' : 'text-gray-800' }}">${{ number_format($item->price * $item->qty, 2) }}</span>
                                 </div>
                             @endforeach
                         </div>
@@ -672,7 +683,7 @@
                         <div class="space-y-3 pt-6 border-t border-gray-50 mb-6">
                             <div class="flex justify-between text-gray-500 text-xs font-medium">
                                 <span>Subtotal</span>
-                                <span class="font-bold text-gray-800">${{ Cart::instance('shopping')->subtotal() }}</span>
+                                <span class="font-bold text-gray-800">${{ $subtotal }}</span>
                             </div>
                             <div class="flex justify-between text-gray-500 text-xs font-medium">
                                 <span>Envío</span>
@@ -680,9 +691,19 @@
                             </div>
                             <div class="pt-4 border-t border-gray-50 flex justify-between items-center">
                                 <span class="font-black text-gray-800 text-sm">Total</span>
-                                <span class="text-xl font-black text-purple-600">${{ Cart::instance('shopping')->total() }}</span>
+                                <span class="text-xl font-black text-purple-600">${{ $total }}</span>
                             </div>
                         </div>
+
+                        @if ($hasStockErrors)
+                            <div class="mt-4 p-4 bg-amber-50 border border-amber-100 rounded-2xl text-center mb-6">
+                                <p class="text-[10px] text-amber-600 font-black uppercase tracking-wider mb-2">Ajuste de Stock para la Compra</p>
+                                <p class="text-[10px] text-gray-500 leading-normal mb-3">Los productos marcados con stock insuficiente no se incluirán en el pedido ni se cobrarán. Puedes confirmar tu pedido solo con los productos disponibles.</p>
+                                <a href="{{ route('cart.index') }}" class="inline-block w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold rounded-xl transition-all shadow-sm">
+                                    Modificar cantidades en el carrito
+                                </a>
+                            </div>
+                        @endif
 
                         <!-- Sidebar Tips -->
                         <div class="bg-gray-50 rounded-2xl p-4 flex items-start gap-3">

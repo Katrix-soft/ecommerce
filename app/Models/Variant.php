@@ -11,6 +11,13 @@ class Variant extends Model
 {
     use HasFactory;
 
+    protected static function booted()
+    {
+        static::creating(function ($variant) {
+            $variant->stock = 100;
+        });
+    }
+
     public function image(): Attribute
     {
         return Attribute::make(
@@ -21,7 +28,9 @@ class Variant extends Model
     protected $fillable = [
         'sku',
         'image_path',
-        'product_id'
+        'product_id',
+        'stock',
+        'price'
     ];
     // relacion uno a muchos inversa
     public function product()

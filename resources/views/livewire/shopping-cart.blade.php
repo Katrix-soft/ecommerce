@@ -20,7 +20,12 @@
 
                             {{-- Info --}}
                             <div class="flex-grow text-center sm:text-left">
-                                <h3 class="text-lg font-bold text-gray-800 mb-1">{{ $item->name }}</h3>
+                                @if ($item->qty > ($stocks[$item->id] ?? 0))
+                                    <span class="text-xs text-red-500 font-bold block mb-1">
+                                        Stock insuficiente
+                                    </span>
+                                @endif
+                                <h3 class="text-lg font-bold {{ $item->qty > ($stocks[$item->id] ?? 0) ? 'text-red-500' : 'text-gray-800' }} mb-1">{{ $item->name }}</h3>
                                 <div class="flex flex-wrap justify-center sm:justify-start gap-2 mb-3">
                                     @foreach ($item->options->features as $option => $feature)
                                         <span class="px-2.5 py-0.5 rounded-lg bg-purple-50 text-purple-600 text-[10px] font-bold uppercase tracking-wider">
@@ -28,6 +33,7 @@
                                         </span>
                                     @endforeach
                                 </div>
+
                                 <div class="text-xl font-black text-purple-600">${{ number_format($item->price, 2) }}</div>
                             </div>
 
@@ -37,7 +43,7 @@
                                     <button wire:click="decreaseQty('{{ $item->rowId }}')" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white hover:shadow-sm transition-all text-gray-600">
                                         <i class="fa-solid fa-minus text-xs"></i>
                                     </button>
-                                    <span class="w-10 text-center font-bold text-gray-800">{{ $item->qty }}</span>
+                                    <span class="w-10 text-center font-bold {{ $item->qty > ($stocks[$item->id] ?? 0) ? 'text-red-600 font-extrabold scale-110' : 'text-gray-800' }}">{{ $item->qty }}</span>
                                     <button wire:click="increaseQty('{{ $item->rowId }}')" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white hover:shadow-sm transition-all text-gray-600">
                                         <i class="fa-solid fa-plus text-xs"></i>
                                     </button>
@@ -85,10 +91,23 @@
                         </div>
                     </div>
 
-                    <button wire:click="checkout" class="w-full py-4 bg-purple-600 text-white font-bold rounded-2xl hover:bg-purple-700 transition-all shadow-lg shadow-purple-200 flex items-center justify-center gap-3 active:scale-95">
+                    <button wire:click="checkout" 
+                        {{ !$hasValidItems ? 'disabled' : '' }}
+                        @style(['opacity: 0.5; cursor: not-allowed; pointer-events: none;' => !$hasValidItems])
+                        class="w-full py-4 bg-purple-600 text-white font-bold rounded-2xl hover:bg-purple-700 transition-all shadow-lg shadow-purple-200 flex items-center justify-center gap-3 active:scale-95">
                         <span>Continuar con el pago</span>
                         <i class="fa-solid fa-arrow-right text-sm"></i>
                     </button>
+
+                    @if (!$hasValidItems)
+                        <p class="text-[10px] text-red-500 font-black text-center mt-3 tracking-wider uppercase">
+                            No tienes productos con stock para continuar.
+                        </p>
+                    @elseif ($hasStockErrors)
+                        <p class="text-[10px] text-amber-600 font-bold text-center mt-3 tracking-wider uppercase">
+                            Los productos sin stock no se incluirán en el pago.
+                        </p>
+                    @endif
 
                     <div class="mt-6 flex items-center justify-center gap-4 text-gray-400">
                         <i class="fa-brands fa-cc-visa text-2xl"></i>
