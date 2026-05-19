@@ -390,14 +390,14 @@
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                                     <!-- Credit Card selector -->
                                     <label class="block cursor-pointer">
-                                        <input type="radio" name="paymentMethod" value="credit_card" 
+                                        <input type="radio" name="paymentMethod" value="mercadopago" 
                                                wire:model.live="paymentMethod" class="peer sr-only">
                                         <div class="p-5 rounded-2xl border-2 border-gray-100 peer-checked:border-purple-600 peer-checked:bg-purple-50/20 text-center hover:border-gray-200 transition-all shadow-sm">
                                             <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
                                                 <i class="fas fa-credit-card text-purple-600 text-lg"></i>
                                             </div>
-                                            <p class="font-bold text-gray-800 text-sm">Tarjeta de Crédito</p>
-                                            <p class="text-[10px] text-gray-400 mt-1">Aprobación instantánea</p>
+                                            <p class="font-bold text-gray-800 text-sm">Mercado Pago</p>
+                                            <p class="text-[10px] text-gray-400 mt-1">Tarjetas o saldo</p>
                                         </div>
                                     </label>
 
@@ -428,146 +428,9 @@
                                     </label>
                                 </div>
 
-                                <!-- Dynamic payment details display -->
-                                @if ($paymentMethod === 'credit_card')
-                                    <!-- Interactive 3D Flip Credit Card Mockup using AlpineJS -->
-                                    <div x-data="{ 
-                                            num: @entangle('cardNumber').live, 
-                                            name: @entangle('cardName').live, 
-                                            exp: @entangle('cardExpiry').live, 
-                                            cvv: @entangle('cardCvv').live, 
-                                            focused: false 
-                                        }" 
-                                         class="max-w-md mx-auto mb-10 perspective">
-                                        
-                                        <!-- Card Container -->
-                                        <div class="relative w-full h-56 rounded-2xl shadow-2xl transition-all duration-700 preserve-3d cursor-pointer"
-                                             :class="{ 'rotate-y-180': focused }">
-                                             
-                                            <!-- FRONT OF CARD -->
-                                            <div class="absolute inset-0 bg-gradient-to-tr from-purple-700 via-purple-900 to-indigo-900 rounded-2xl p-6 text-white backface-hidden flex flex-col justify-between overflow-hidden">
-                                                <!-- Abstract card design shapes -->
-                                                <div class="absolute -right-16 -top-16 w-44 h-44 bg-white/5 rounded-full blur-xl"></div>
-                                                <div class="absolute -left-12 -bottom-12 w-32 h-32 bg-purple-600/20 rounded-full blur-xl"></div>
-                                                
-                                                <div class="flex justify-between items-start">
-                                                    <!-- Credit Card Chip -->
-                                                    <div class="w-12 h-9 bg-yellow-400/90 rounded-md shadow-inner flex flex-col justify-between p-1">
-                                                        <div class="border-b border-yellow-600/30 h-1"></div>
-                                                        <div class="border-b border-yellow-600/30 h-1"></div>
-                                                        <div class="border-b border-yellow-600/30 h-1"></div>
-                                                    </div>
-                                                    <!-- Brand Logo Indicator -->
-                                                    <div>
-                                                        <template x-if="num.startsWith('4')">
-                                                            <span class="text-2xl font-black italic tracking-widest text-white/90">VISA</span>
-                                                        </template>
-                                                        <template x-if="num.startsWith('5')">
-                                                            <span class="text-2xl font-black italic tracking-widest text-white/90">Mastercard</span>
-                                                        </template>
-                                                        <template x-if="num.startsWith('3')">
-                                                            <span class="text-2xl font-black italic tracking-widest text-white/90">AMEX</span>
-                                                        </template>
-                                                        <template x-if="!num.startsWith('4') && !num.startsWith('5') && !num.startsWith('3')">
-                                                            <i class="fas fa-credit-card text-2xl text-white/60"></i>
-                                                        </template>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Card Number -->
-                                                <div class="text-xl font-bold tracking-[0.2em] font-mono py-2 text-center"
-                                                     x-text="num ? num.replace(/\s?/g, '').replace(/(\d{4})/g, '$1 ').trim() : '•••• •••• •••• ••••'">
-                                                </div>
-
-                                                <div class="flex justify-between items-end">
-                                                    <!-- Cardholder Name -->
-                                                    <div>
-                                                        <p class="text-[9px] text-purple-300 uppercase tracking-widest font-black">Titular de la tarjeta</p>
-                                                        <p class="text-sm font-semibold tracking-wider font-mono truncate max-w-[200px]" 
-                                                           x-text="name ? name.toUpperCase() : 'NOMBRE COMPLETO'"></p>
-                                                    </div>
-                                                    <!-- Expiry Date -->
-                                                    <div class="text-right">
-                                                        <p class="text-[9px] text-purple-300 uppercase tracking-widest font-black">Vence</p>
-                                                        <p class="text-sm font-semibold tracking-wider font-mono" 
-                                                           x-text="exp ? exp : 'MM/AA'"></p>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- BACK OF CARD -->
-                                            <div class="absolute inset-0 bg-gradient-to-tr from-purple-800 via-indigo-900 to-black rounded-2xl text-white backface-hidden rotate-y-180 flex flex-col justify-between py-6">
-                                                <!-- Magnetic strip -->
-                                                <div class="w-full h-11 bg-gray-900/90"></div>
-                                                
-                                                <div class="px-6">
-                                                    <p class="text-[8px] text-right text-gray-400 mb-1 font-semibold uppercase tracking-widest">Firma Autorizada</p>
-                                                    <div class="flex items-center gap-3">
-                                                        <!-- White signature strip -->
-                                                        <div class="flex-1 h-9 bg-white/95 rounded-md flex items-center justify-end px-3 font-mono italic text-gray-800 font-bold tracking-widest text-sm select-none" 
-                                                             style="background-image: repeating-linear-gradient(45deg, #e5e7eb, #e5e7eb 4px, transparent 4px, transparent 8px)">
-                                                             ••••
-                                                        </div>
-                                                        <!-- CVV Box -->
-                                                        <div class="w-16 h-8 bg-yellow-400 text-gray-900 font-black rounded-md flex items-center justify-center font-mono text-sm shadow-inner" 
-                                                             x-text="cvv ? cvv : '•••'">
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="px-6 flex justify-between items-center">
-                                                    <span class="text-[8px] text-gray-400 leading-normal max-w-[180px]">
-                                                        Esta tarjeta es de demostración ficticia para el checkout premium de la tienda.
-                                                    </span>
-                                                    <span class="text-sm font-black italic tracking-widest text-white/40">SECURE</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Card Inputs Form -->
-                                        <div class="mt-8 space-y-4">
-                                            <div>
-                                                <x-label value="Número de Tarjeta" />
-                                                <x-input type="text" maxlength="19" class="w-full text-sm mt-1 rounded-xl tracking-widest" 
-                                                         placeholder="4111 2222 3333 4444" 
-                                                         x-model="num"
-                                                         x-on:input="num = $event.target.value.replace(/\D/g, '').replace(/(\d{4})/g, '$1 ').trim()" />
-                                                <x-input-error for="cardNumber" />
-                                            </div>
-
-                                            <div>
-                                                <x-label value="Nombre del Titular (como figura en la tarjeta)" />
-                                                <x-input type="text" class="w-full text-sm mt-1 rounded-xl capitalize" 
-                                                         placeholder="JUAN PEREZ" 
-                                                         x-model="name" />
-                                                <x-input-error for="cardName" />
-                                            </div>
-
-                                            <div class="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <x-label value="Vencimiento" />
-                                                    <x-input type="text" maxlength="5" class="w-full text-sm mt-1 rounded-xl text-center tracking-widest" 
-                                                             placeholder="MM/AA" 
-                                                             x-model="exp"
-                                                             x-on:input="
-                                                                let v = $event.target.value.replace(/\D/g, '');
-                                                                if(v.length > 2) { v = v.substring(0,2) + '/' + v.substring(2,4); }
-                                                                exp = v;
-                                                             " />
-                                                    <x-input-error for="cardExpiry" />
-                                                </div>
-                                                <div>
-                                                    <x-label value="Código (CVV)" />
-                                                    <x-input type="password" maxlength="4" class="w-full text-sm mt-1 rounded-xl text-center tracking-widest" 
-                                                             placeholder="123" 
-                                                             x-model="cvv"
-                                                             x-on:focus="focused = true"
-                                                             x-on:blur="focused = false"
-                                                             x-on:input="cvv = $event.target.value.replace(/\D/g, '')" />
-                                                    <x-input-error for="cardCvv" />
-                                                </div>
-                                            </div>
-                                        </div>
+                                @if ($paymentMethod === 'mercadopago')
+                                    <div wire:ignore class="mt-8 max-w-md mx-auto">
+                                        <div id="paymentBrick_container"></div>
                                     </div>
 
                                 @elseif ($paymentMethod === 'bank_transfer')
@@ -638,16 +501,18 @@
                             <button wire:click="backToShipping" class="px-8 py-4 border-2 border-purple-200 hover:bg-purple-50 text-purple-600 font-bold rounded-2xl transition-all flex items-center gap-2 active:scale-95">
                                 <i class="fas fa-arrow-left"></i> Volver a envío
                             </button>
-                            <button wire:click="placeOrder" 
-                                    wire:loading.attr="disabled"
-                                    {{ !$hasValidItems ? 'disabled' : '' }}
-                                    @style(['opacity: 0.5; cursor: not-allowed; pointer-events: none;' => !$hasValidItems])
-                                    class="px-10 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-purple-100 flex items-center gap-3 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
-                                <span wire:loading.remove wire:target="placeOrder">Confirmar Pedido <i class="fas fa-check"></i></span>
-                                <span wire:loading wire:target="placeOrder" class="flex items-center gap-2">
-                                    <i class="fas fa-spinner fa-spin"></i> Procesando...
-                                </span>
-                            </button>
+                            @if ($paymentMethod !== 'mercadopago')
+                                <button wire:click="placeOrder" 
+                                        wire:loading.attr="disabled"
+                                        {{ !$hasValidItems ? 'disabled' : '' }}
+                                        @style(['opacity: 0.5; cursor: not-allowed; pointer-events: none;' => !$hasValidItems])
+                                        class="px-10 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-purple-100 flex items-center gap-3 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <span wire:loading.remove wire:target="placeOrder">Confirmar Pedido <i class="fas fa-check"></i></span>
+                                    <span wire:loading wire:target="placeOrder" class="flex items-center gap-2">
+                                        <i class="fas fa-spinner fa-spin"></i> Procesando...
+                                    </span>
+                                </button>
+                            @endif
                         </div>
                     @endif
                 </div>
@@ -786,6 +651,114 @@
                 }
             })
         }
+    </script>
+
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            let brickController = null;
+
+            const renderPaymentBrick = async (bricksBuilder) => {
+                const settings = {
+                    initialization: {
+                        amount: {{ $totalAmount ?? 0 }},
+                        preferenceId: null,
+                    },
+                    customization: {
+                        visual: {
+                            style: {
+                                theme: "default",
+                            },
+                        },
+                        paymentMethods: {
+                            creditCard: "all",
+                            debitCard: "all",
+                            ticket: "all",
+                        },
+                    },
+                    callbacks: {
+                        onReady: () => {
+                            // Brick rendered
+                        },
+                        onSubmit: ({ selectedPaymentMethod, formData }) => {
+                            return new Promise((resolve, reject) => {
+                                // Llamamos al backend en Laravel para crear el pago
+                                fetch('{{ route("mercadopago.process") }}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    },
+                                    body: JSON.stringify(formData),
+                                })
+                                .then((response) => response.json())
+                                .then((response) => {
+                                    resolve();
+                                    if (response.id && (response.status === 'approved' || response.status === 'in_process' || response.status === 'pending')) {
+                                        // Llamar a la función Livewire para procesar la orden
+                                        @this.placeOrderWithMP(response.id, response.status);
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error en el pago',
+                                            text: response.error || 'El pago fue rechazado. Verifica tus datos e intenta nuevamente.',
+                                            confirmButtonColor: '#7c3aed',
+                                        });
+                                    }
+                                })
+                                .catch((error) => {
+                                    reject();
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error de conexión',
+                                        text: 'Hubo un error al conectar con Mercado Pago. Intenta nuevamente.',
+                                        confirmButtonColor: '#7c3aed',
+                                    });
+                                });
+                            });
+                        },
+                        onError: (error) => {
+                            console.error('MercadoPago Error:', error);
+                        },
+                    },
+                };
+                
+                if (brickController) brickController.unmount();
+                
+                try {
+                    brickController = await bricksBuilder.create(
+                        "payment",
+                        "paymentBrick_container",
+                        settings
+                    );
+                } catch (e) {
+                    console.log("Error creando Brick:", e);
+                }
+            };
+
+            const initMercadoPago = () => {
+                // Prevenir múltiples inicializaciones
+                if (document.getElementById('paymentBrick_container') && !document.querySelector('#paymentBrick_container iframe')) {
+                    const mp = new MercadoPago('{{ config("mercadopago.public_key") }}', { locale: 'es-AR' });
+                    const bricksBuilder = mp.bricks();
+                    renderPaymentBrick(bricksBuilder);
+                }
+            }
+
+            // Escuchar cambios en el componente (cuando se cambia a la pestaña de pago)
+            Livewire.hook('morph.updated', ({ component, el }) => {
+                setTimeout(() => {
+                    if (document.getElementById('paymentBrick_container')) {
+                        initMercadoPago();
+                    }
+                }, 100);
+            });
+            
+            // Inicializar si ya está visible al cargar
+            if (document.getElementById('paymentBrick_container')) {
+                initMercadoPago();
+            }
+        });
     </script>
     @endpush
 </div>

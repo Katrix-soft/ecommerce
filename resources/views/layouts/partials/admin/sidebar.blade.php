@@ -59,6 +59,12 @@
             'icon' => 'fa-solid fa-truck-fast',
             'route' => route('admin.shipments.index'),
             'active' => request()->routeIs('admin.shipments.*'),
+        ],
+        [
+            'label' => 'Usuarios',
+            'icon' => 'fa-solid fa-users-gear',
+            'route' => route('admin.users.index'),
+            'active' => request()->routeIs('admin.users.*'),
         ]
     ];
 @endphp

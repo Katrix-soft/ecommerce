@@ -35,5 +35,8 @@ Route::middleware([
     Route::get('shipping', [ShippingController::class, 'index'])->name('shipping.index');
     Route::get('shipping/create', [ShippingController::class, 'create'])->name('shipping.create');
     Route::get('checkout', [ShippingController::class, 'index'])->name('checkout');
+    
+    // Mercado Pago Process Payment (using web session)
+    Route::post('mercadopago/process-payment', [\App\Http\Controllers\MercadoPagoController::class, 'processPayment'])->name('mercadopago.process');
 });
 

@@ -8,6 +8,8 @@ use App\Models\Order;
 use App\Models\Ticket;
 use App\Models\Driver;
 use App\Models\Shipment;
+use App\Models\Variant;
+use Illuminate\Support\Facades\DB;
 
 class OrdersIndex extends Component
 {
@@ -137,6 +139,60 @@ class OrdersIndex extends Component
         ]);
 
         $this->viewOrder($order->id);
+    }
+
+    /**
+     * Cancel an order and restore stock to variants
+     */
+    public function cancelOrder($orderId)
+    {
+        $order = Order::with('items')->find($orderId);
+
+        if (!$order) return;
+
+        // Solo permitir cancelar si no está ya cancelado, entregado o enviado
+        if (in_array($order->status, ['cancelled', 'delivered', 'shipped'])) {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'No se puede cancelar',
+                'text' => 'Este pedido no puede ser cancelado en su estado actual.',
+                'confirmButtonColor' => '#7c3aed',
+            ]);
+            return;
+        }
+
+        DB::transaction(function () use ($order) {
+            // Reponer stock de cada item de la orden
+            foreach ($order->items as $item) {
+                if ($item->variant_id) {
+                    Variant::where('id', $item->variant_id)
+                        ->lockForUpdate()
+                        ->increment('stock', $item->quantity);
+                }
+            }
+
+            // Actualizar estado de la orden
+            $order->status = 'cancelled';
+            $order->save();
+
+            // Actualizar ticket si existe
+            if ($order->ticket) {
+                $order->ticket->status = 'cancelled';
+                $order->ticket->save();
+            }
+        });
+
+        $this->dispatch('swal', [
+            'icon' => 'success',
+            'title' => '¡Pedido Cancelado!',
+            'text' => 'El pedido ha sido cancelado y el stock fue repuesto.',
+            'confirmButtonColor' => '#7c3aed',
+        ]);
+
+        // Refrescar el modal si está abierto
+        if ($this->selectedOrder && $this->selectedOrder->id == $orderId) {
+            $this->viewOrder($orderId);
+        }
     }
 
     public function render()

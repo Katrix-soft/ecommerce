@@ -177,6 +177,14 @@
                                             <i class="fa-solid fa-box-open"></i>
                                         </button>
                                     @endif
+                                    @if(in_array($order->status, ['pending', 'processing']))
+                                        <button wire:click="cancelOrder({{ $order->id }})"
+                                            wire:confirm="¿Estás seguro de que deseas cancelar este pedido? El stock será repuesto automáticamente."
+                                            title="Cancelar Pedido"
+                                            class="p-2 text-rose-600 hover:bg-rose-50 rounded-xl transition duration-150">
+                                            <i class="fa-solid fa-ban"></i>
+                                        </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -384,7 +392,16 @@
                         </div>
                     </div>
 
-                    <div class="bg-gray-50 px-6 py-4 flex justify-end rounded-b-3xl">
+                    <div class="bg-gray-50 px-6 py-4 flex justify-between rounded-b-3xl">
+                        <div>
+                            @if($selectedOrder && in_array($selectedOrder->status, ['pending', 'processing']))
+                                <button wire:click="cancelOrder({{ $selectedOrder->id }})"
+                                    wire:confirm="¿Estás seguro de que deseas cancelar este pedido? El stock será repuesto automáticamente."
+                                    class="px-5 py-2.5 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition duration-150 shadow-sm inline-flex items-center gap-2">
+                                    <i class="fa-solid fa-ban"></i> Cancelar Pedido
+                                </button>
+                            @endif
+                        </div>
                         <button wire:click="closeModal" class="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl transition duration-150 shadow-sm">
                             Cerrar
                         </button>

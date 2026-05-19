@@ -34,3 +34,6 @@ Route::get('orders', \App\Livewire\Admin\OrdersIndex::class)->name('orders.index
 Route::get('orders/{order}/print', [\App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
 Route::get('drivers', \App\Livewire\Admin\DriversIndex::class)->name('drivers.index');
 Route::get('shipments', \App\Livewire\Admin\ShipmentsIndex::class)->name('shipments.index');
+
+// Gestión de usuarios y roles
+Route::get('users', \App\Livewire\Admin\UsersIndex::class)->name('users.index');

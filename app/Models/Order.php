@@ -13,6 +13,7 @@ class Order extends Model
         'shipping_address',
         'payment_method',
         'payment_status',
+        'mp_payment_id',
         'status',
         'shipping_cost',
         'subtotal',

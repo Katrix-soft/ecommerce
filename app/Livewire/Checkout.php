@@ -8,6 +8,7 @@ use App\Models\Address;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Variant;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Gloudemans\Shoppingcart\Facades\Cart;
 
@@ -25,16 +26,19 @@ class Checkout extends Component
     public $localities = [];
     
     // Payment variables
-    public $paymentMethod = 'credit_card'; // credit_card, bank_transfer, cash
-    public $cardNumber = '';
-    public $cardName = '';
-    public $cardExpiry = '';
-    public $cardCvv = '';
+    public $paymentMethod = 'mercadopago'; // mercadopago, bank_transfer, cash
+    
+    // Mercado Pago payment data
+    public $mpPaymentId = null;
+    public $mpPaymentStatus = null;
     
     // Completed Order reference
     public $createdOrder = null;
 
-    protected $listeners = ['addressSelected' => 'selectAddress'];
+    protected $listeners = [
+        'addressSelected' => 'selectAddress',
+        'mpPaymentApproved' => 'placeOrderWithMP',
+    ];
 
     public function mount()
     {
@@ -172,47 +176,19 @@ class Checkout extends Component
         $this->step = 1;
     }
 
+    /**
+     * Procesar orden con pago de Mercado Pago (llamado desde evento JS)
+     */
+    public function placeOrderWithMP($mpPaymentId, $mpStatus)
+    {
+        $this->mpPaymentId = $mpPaymentId;
+        $this->mpPaymentStatus = $mpStatus;
+        $this->paymentMethod = 'mercadopago';
+        $this->placeOrder();
+    }
+
     public function placeOrder()
     {
-        // 0. Validar stock real en la base de datos de todos los productos en el carrito para evitar sobreventas concurrentes
-        $hasValidItems = false;
-        foreach (Cart::instance('shopping')->content() as $item) {
-            $variant = Variant::find($item->id);
-            $stock = $variant ? $variant->stock : 0;
-            if ($item->qty <= $stock) {
-                $hasValidItems = true;
-            }
-        }
-
-        if (!$hasValidItems) {
-            $this->dispatch('swal', [
-                'icon' => 'error',
-                'title' => 'No hay suficiente stock',
-                'text' => "Lo sentimos, ninguno de los productos en tu carrito cuenta con stock disponible en este momento. Por favor, ajusta tu carrito.",
-                'confirmButtonColor' => '#7c3aed',
-            ]);
-            return;
-        }
-
-        // 1. Validar métodos de pago y campos de tarjeta si corresponde
-        if ($this->paymentMethod === 'credit_card') {
-            $this->validate([
-                'cardNumber' => ['required', 'min:16'],
-                'cardName' => ['required', 'string', 'min:4'],
-                'cardExpiry' => ['required', 'regex:/^(0[1-9]|1[0-2])\/[0-9]{2}$/'],
-                'cardCvv' => ['required', 'numeric', 'digits_between:3,4'],
-            ], [
-                'cardNumber.required' => 'El número de tarjeta es obligatorio.',
-                'cardNumber.min' => 'El número de tarjeta debe tener al menos 16 dígitos.',
-                'cardName.required' => 'El nombre del titular es obligatorio.',
-                'cardName.min' => 'El nombre del titular debe ser completo.',
-                'cardExpiry.required' => 'La fecha de vencimiento es obligatoria.',
-                'cardExpiry.regex' => 'El formato de vencimiento debe ser MM/AA.',
-                'cardCvv.required' => 'El código de seguridad (CVV) es obligatorio.',
-                'cardCvv.numeric' => 'El CVV debe ser numérico.',
-                'cardCvv.digits_between' => 'El CVV debe tener 3 o 4 dígitos.',
-            ]);
-        }
 
         // Obtener dirección seleccionada
         $addressObj = Address::find($this->selectedAddressId);
@@ -241,65 +217,111 @@ class Checkout extends Component
             'phone' => $addressObj->phone,
         ];
 
-        // Calcular montos finales considerando solo los productos con stock disponible
-        $subtotalVal = 0;
-        foreach (Cart::instance('shopping')->content() as $item) {
-            $variant = Variant::find($item->id);
-            $stock = $variant ? $variant->stock : 0;
-            if ($item->qty <= $stock) {
-                $subtotalVal += $item->qty * $item->price;
-            }
-        }
-        $totalVal = $subtotalVal;
-        $shippingCostVal = 0.00; // Envío Gratis
+        // Transacción atómica: validar stock con bloqueo pesimista, crear orden y descontar stock
+        try {
+            $order = DB::transaction(function () use ($addressSnapshot) {
+                $cartContent = Cart::instance('shopping')->content();
+                $itemIds = $cartContent->pluck('id')->toArray();
 
-        // Crear pedido
-        $order = Order::create([
-            'user_id' => auth()->id(),
-            'shipping_address' => $addressSnapshot,
-            'payment_method' => $this->paymentMethod,
-            'payment_status' => $this->paymentMethod === 'credit_card' ? 'paid' : 'pending',
-            'status' => 'pending',
-            'shipping_cost' => $shippingCostVal,
-            'subtotal' => $subtotalVal,
-            'total' => $totalVal,
-        ]);
+                // Bloqueo pesimista: bloquea las filas de variantes para evitar sobreventas concurrentes
+                $variants = Variant::whereIn('id', $itemIds)->lockForUpdate()->get()->keyBy('id');
 
-        // Crear items del pedido, descontar stock y eliminar del carrito solo los que tienen stock
-        foreach (Cart::instance('shopping')->content() as $item) {
-            $variant = Variant::find($item->id);
-            $stock = $variant ? $variant->stock : 0;
+                // Validar stock real bajo bloqueo
+                $validItems = [];
+                $subtotalVal = 0;
 
-            if ($item->qty <= $stock) {
-                // Guardar variantes o detalles
-                $features = [];
-                if ($item->options && isset($item->options->features)) {
-                    $features = $item->options->features;
+                foreach ($cartContent as $item) {
+                    $variant = $variants->get($item->id);
+                    $stock = $variant ? $variant->stock : 0;
+
+                    if ($item->qty <= $stock) {
+                        $validItems[] = $item;
+                        $subtotalVal += $item->qty * $item->price;
+                    }
                 }
 
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'variant_id' => $item->id,
-                    'name' => $item->name,
-                    'quantity' => $item->qty,
-                    'price' => $item->price,
-                    'features' => $features,
+                if (empty($validItems)) {
+                    throw new \Exception('NO_STOCK');
+                }
+
+                $totalVal = $subtotalVal;
+                $shippingCostVal = 0.00; // Envío Gratis
+
+                // Determinar estado de pago según método
+                $paymentStatus = 'pending';
+                if ($this->paymentMethod === 'mercadopago' && $this->mpPaymentStatus === 'approved') {
+                    $paymentStatus = 'paid';
+                }
+
+                // Crear pedido
+                $order = Order::create([
+                    'user_id' => auth()->id(),
+                    'shipping_address' => $addressSnapshot,
+                    'payment_method' => $this->paymentMethod,
+                    'payment_status' => $paymentStatus,
+                    'mp_payment_id' => $this->mpPaymentId,
+                    'status' => 'pending',
+                    'shipping_cost' => $shippingCostVal,
+                    'subtotal' => $subtotalVal,
+                    'total' => $totalVal,
                 ]);
 
-                // Descontar stock de forma atómica e inmediata en la base de datos
-                if ($variant) {
-                    $variant->decrement('stock', $item->qty);
+                // Crear items del pedido y descontar stock atómicamente
+                foreach ($validItems as $item) {
+                    $features = [];
+                    if ($item->options && isset($item->options->features)) {
+                        $features = $item->options->features;
+                    }
+
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'variant_id' => $item->id,
+                        'name' => $item->name,
+                        'quantity' => $item->qty,
+                        'price' => $item->price,
+                        'features' => $features,
+                    ]);
+
+                    // Descontar stock de forma atómica bajo el bloqueo pesimista
+                    $variant = $variants->get($item->id);
+                    if ($variant) {
+                        $variant->decrement('stock', $item->qty);
+                    }
                 }
 
-                // Eliminar del carrito
-                Cart::instance('shopping')->remove($item->rowId);
+                return $order;
+            });
+        } catch (\Exception $e) {
+            if ($e->getMessage() === 'NO_STOCK') {
+                $this->dispatch('swal', [
+                    'icon' => 'error',
+                    'title' => 'No hay suficiente stock',
+                    'text' => 'Lo sentimos, ninguno de los productos en tu carrito cuenta con stock disponible en este momento. Por favor, ajusta tu carrito.',
+                    'confirmButtonColor' => '#7c3aed',
+                ]);
+                return;
             }
+            throw $e;
         }
 
-        // Sincronizar el estado del carrito en la base de datos (con los productos sobrantes que no tenían stock)
+        // Limpiar carrito (fuera de la transacción DB ya que es el driver de sesión/shoppingcart)
+        $cartContent = Cart::instance('shopping')->content();
+        $rowIdsToRemove = [];
+        foreach ($cartContent as $item) {
+            // Remover los items que fueron procesados en la orden
+            $wasOrdered = $order->items()->where('variant_id', $item->id)->exists();
+            if ($wasOrdered) {
+                $rowIdsToRemove[] = $item->rowId;
+            }
+        }
+        foreach ($rowIdsToRemove as $rowId) {
+            Cart::instance('shopping')->remove($rowId);
+        }
+
+        // Sincronizar el estado del carrito en la base de datos
         if (auth()->check()) {
             try {
-                \DB::table('shoppingcart')->where('identifier', auth()->id())->delete();
+                DB::table('shoppingcart')->where('identifier', auth()->id())->delete();
             } catch (\Exception $e) {
                 // Ignorar
             }
@@ -347,6 +369,8 @@ class Checkout extends Component
             'hasValidItems' => $hasValidItems,
             'subtotal' => number_format($subtotalVal, 2),
             'total' => number_format($subtotalVal, 2),
+            'totalAmount' => $subtotalVal,
+            'mpPublicKey' => config('mercadopago.public_key'),
         ]);
     }
 }
