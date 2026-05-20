@@ -1,6 +1,6 @@
 <div>
     <!-- Wizard Stepper -->
-    <div class="max-w-4xl mx-auto mb-10 px-4">
+    <div class="max-w-4xl mx-auto mb-10 px-4 print:hidden">
         <div class="relative flex items-center justify-between">
             <!-- Progress Line Background -->
             <div class="absolute left-0 right-0 top-1/2 h-1 bg-gray-100 -translate-y-1/2 rounded-full z-0"></div>
@@ -46,22 +46,22 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         @if ($step == 3)
             <!-- STEP 3: SUCCESS & CONFIRMATION -->
-            <div class="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden mb-12 animate-fadeIn print:shadow-none print:border-none">
+            <div class="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden mb-12 print:mb-0 animate-fadeIn print:shadow-none print:border-none" style="page-break-inside: avoid; break-inside: avoid;">
                 <!-- Banner Header -->
-                <div class="bg-gradient-to-r from-purple-600 to-indigo-700 py-12 px-8 text-center text-white relative overflow-hidden print:bg-none print:text-black">
+                <div class="bg-gradient-to-r from-purple-600 to-indigo-700 py-12 px-8 text-center text-white relative overflow-hidden print:rounded-t-3xl">
                     <!-- Subtle background patterns -->
                     <div class="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
                     
-                    <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-md shadow-inner animate-bounce">
+                    <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-md shadow-inner animate-bounce print:animate-none">
                         <i class="fas fa-check text-4xl text-white"></i>
                     </div>
                     <h2 class="text-3xl font-black mb-2">¡Pago Confirmado!</h2>
                     <p class="text-purple-100 text-sm font-medium">Gracias por tu compra. Tu pedido está en camino.</p>
                 </div>
 
-                <div class="p-8">
+                <div class="p-8 print:p-6">
                     <!-- Receipt Layout Info -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 border-b border-gray-100 pb-8 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 border-b border-gray-100 pb-8 mb-8 print:mb-4 print:pb-4 print:gap-4">
                         <div>
                             <h3 class="text-xs font-black uppercase text-gray-400 tracking-wider mb-2">Detalles del Pedido</h3>
                             <p class="text-lg font-bold text-gray-800 mb-1">Pedido #{{ str_pad($createdOrder->id, 6, '0', STR_PAD_LEFT) }}</p>
@@ -85,8 +85,8 @@
                     </div>
 
                     <!-- Items Table -->
-                    <h3 class="text-xs font-black uppercase text-gray-400 tracking-wider mb-4">Productos</h3>
-                    <div class="space-y-4 mb-8">
+                    <h3 class="text-xs font-black uppercase text-gray-400 tracking-wider mb-4 print:mb-2">Productos</h3>
+                    <div class="space-y-4 mb-8 print:mb-4 print:space-y-2">
                         @foreach ($createdOrder->items as $item)
                             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100/50">
                                 <div class="flex items-center gap-4">
@@ -110,8 +110,8 @@
                     </div>
 
                     <!-- Totals Box -->
-                    <div class="bg-purple-50/50 border border-purple-100 rounded-3xl p-6 mb-8">
-                        <div class="space-y-3">
+                    <div class="bg-purple-50/50 border border-purple-100 rounded-3xl p-6 mb-8 print:mb-0 print:p-4" style="page-break-inside: avoid; break-inside: avoid;">
+                        <div class="space-y-3 print:space-y-1">
                             <div class="flex justify-between text-sm text-gray-600">
                                 <span>Subtotal</span>
                                 <span class="font-bold">${{ number_format($createdOrder->subtotal, 2) }}</span>
@@ -429,7 +429,18 @@
                                 </div>
 
                                 @if ($paymentMethod === 'mercadopago')
-                                    <div wire:ignore class="mt-8 max-w-md mx-auto">
+                                    <div wire:ignore class="mt-8 max-w-md mx-auto" x-data="{
+                                        init() {
+                                            const tryInit = () => {
+                                                if (typeof window.initMercadoPago === 'function') {
+                                                    window.initMercadoPago();
+                                                } else {
+                                                    setTimeout(tryInit, 200);
+                                                }
+                                            };
+                                            tryInit();
+                                        }
+                                    }">
                                         <div id="paymentBrick_container"></div>
                                     </div>
 
@@ -611,9 +622,19 @@
             background: #d1d5db;
         }
         @media print {
+            @page {
+                margin: 0.5cm;
+            }
             body {
                 background: white !important;
                 color: black !important;
+            }
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            header, nav, footer, .navbar, .sidebar {
+                display: none !important;
             }
             .print\:hidden {
                 display: none !important;
@@ -658,11 +679,15 @@
         document.addEventListener('livewire:initialized', () => {
             let brickController = null;
 
-            const renderPaymentBrick = async (bricksBuilder) => {
+            window.initMercadoPago = async () => {
+                if (brickController) brickController.unmount();
+                
+                const mp = new MercadoPago('{{ config("mercadopago.public_key") }}', { locale: 'es-AR' });
+                const bricksBuilder = mp.bricks();
+
                 const settings = {
                     initialization: {
-                        amount: {{ $totalAmount ?? 0 }},
-                        preferenceId: null,
+                        amount: {{ $totalAmount ?? 0 }}
                     },
                     customization: {
                         visual: {
@@ -695,8 +720,8 @@
                                 .then((response) => {
                                     resolve();
                                     if (response.id && (response.status === 'approved' || response.status === 'in_process' || response.status === 'pending')) {
-                                        // Llamar a la función Livewire para procesar la orden
-                                        @this.placeOrderWithMP(response.id, response.status);
+                                        // Llamar a la función Livewire usando dispatch
+                                        Livewire.dispatch('mpPaymentApproved', { mpPaymentId: response.id, mpStatus: response.status });
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -723,8 +748,6 @@
                     },
                 };
                 
-                if (brickController) brickController.unmount();
-                
                 try {
                     brickController = await bricksBuilder.create(
                         "payment",
@@ -735,28 +758,10 @@
                     console.log("Error creando Brick:", e);
                 }
             };
-
-            const initMercadoPago = () => {
-                // Prevenir múltiples inicializaciones
-                if (document.getElementById('paymentBrick_container') && !document.querySelector('#paymentBrick_container iframe')) {
-                    const mp = new MercadoPago('{{ config("mercadopago.public_key") }}', { locale: 'es-AR' });
-                    const bricksBuilder = mp.bricks();
-                    renderPaymentBrick(bricksBuilder);
-                }
-            }
-
-            // Escuchar cambios en el componente (cuando se cambia a la pestaña de pago)
-            Livewire.hook('morph.updated', ({ component, el }) => {
-                setTimeout(() => {
-                    if (document.getElementById('paymentBrick_container')) {
-                        initMercadoPago();
-                    }
-                }, 100);
-            });
             
             // Inicializar si ya está visible al cargar
             if (document.getElementById('paymentBrick_container')) {
-                initMercadoPago();
+                window.initMercadoPago();
             }
         });
     </script>

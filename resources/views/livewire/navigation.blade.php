@@ -1,5 +1,5 @@
 <div x-data="{ open: false }">
-    <header class="bg-indigo-600">
+    <header class="bg-indigo-600 relative z-50">
         <x-container class="px-4 py-4">
           <div class="flex justify-between items-center md:space-x-8">
 
@@ -68,6 +68,13 @@
                       <x-dropdown-link href="{{ route('profile.show')}}">
                         Perfil
                       </x-dropdown-link>
+                      
+                      @role('admin')
+                      <x-dropdown-link href="{{ route('admin.dashboard')}}">
+                        Administración
+                      </x-dropdown-link>
+                      @endrole
+
                       <div class="border-t border-gray-200"></div>
                         <!-- Authentication -->
                             <form method="POST" action="{{ route('logout') }}" x-data>
