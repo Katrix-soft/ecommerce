@@ -52,7 +52,7 @@
                     <!-- Subtle background patterns -->
                     <div class="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
                     
-                    <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-md shadow-inner animate-bounce print:animate-none">
+                    <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/50 animate-bounce print:animate-none ring-4 ring-green-500/30">
                         <i class="fas fa-check text-4xl text-white"></i>
                     </div>
                     <h2 class="text-3xl font-black mb-2">¡Pago Confirmado!</h2>
@@ -68,7 +68,21 @@
                             <p class="text-xs text-gray-500">Fecha: {{ $createdOrder->created_at->format('d/m/Y H:i') }} hs</p>
                             <p class="text-xs text-gray-500 mt-1">Método de pago: 
                                 <span class="font-semibold uppercase text-purple-600">
-                                    {{ $createdOrder->payment_method === 'credit_card' ? 'Tarjeta de Crédito (Aprobado)' : ($createdOrder->payment_method === 'bank_transfer' ? 'Transferencia Bancaria' : 'Efectivo / Contraentrega') }}
+                                    @php
+                                        $methodDisplay = 'Efectivo / Contraentrega';
+                                        if ($createdOrder->payment_method === 'bank_transfer') {
+                                            $methodDisplay = 'Transferencia Bancaria';
+                                        } elseif (str_starts_with($createdOrder->payment_method, 'mercadopago')) {
+                                            $type = str_replace('mercadopago_', '', $createdOrder->payment_method);
+                                            if ($type === 'debit_card') $methodDisplay = 'Tarjeta de Débito (Mercado Pago)';
+                                            elseif ($type === 'credit_card') $methodDisplay = 'Tarjeta de Crédito (Mercado Pago)';
+                                            elseif ($type === 'account_money') $methodDisplay = 'Dinero en Cuenta (Mercado Pago)';
+                                            elseif ($type === 'ticket') $methodDisplay = 'Efectivo (Mercado Pago)';
+                                            elseif ($type === 'bank_transfer' || $type === 'pix') $methodDisplay = 'Transferencia (Mercado Pago)';
+                                            else $methodDisplay = 'Mercado Pago';
+                                        }
+                                    @endphp
+                                    {{ $methodDisplay }}
                                 </span>
                             </p>
                         </div>
@@ -720,8 +734,8 @@
                                 .then((response) => {
                                     resolve();
                                     if (response.id && (response.status === 'approved' || response.status === 'in_process' || response.status === 'pending')) {
-                                        // Llamar a la función Livewire usando dispatch
-                                        Livewire.dispatch('mpPaymentApproved', { mpPaymentId: response.id, mpStatus: response.status });
+                                        // Llamar a la función Livewire usando dispatch con el tipo de pago
+                                        Livewire.dispatch('mpPaymentApproved', { mpPaymentId: response.id, mpStatus: response.status, mpPaymentType: response.payment_type_id });
                                     } else {
                                         Swal.fire({
                                             icon: 'error',

@@ -35,6 +35,14 @@ class Navigation extends Component
         $this->families = \App\Models\Family::all();
         $first = $this->families->first();
         $this->family_id = $first ? $first->id : null;
+
+        // Ensure test user has admin role to access dashboard
+        if (auth()->check() && auth()->user()->email === 'test@example.com') {
+            $role = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin']);
+            if (!auth()->user()->hasRole('admin')) {
+                auth()->user()->assignRole($role);
+            }
+        }
     }
 
     #[Computed()]

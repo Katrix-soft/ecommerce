@@ -91,5 +91,27 @@
                 </li>
             @endforeach
         </ul>
+
+        <!-- Security Seals -->
+        <div class="mt-8 border-t pt-4 border-gray-200">
+            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 text-center">Entorno Seguro</h3>
+            <div class="flex justify-center space-x-3 text-gray-400">
+                <!-- SSL Seal -->
+                <div class="flex flex-col items-center" title="SSL Encrypted">
+                    <i class="fa-solid fa-lock text-xl mb-1 text-emerald-500"></i>
+                    <span class="text-[10px] uppercase font-bold text-gray-400">SSL</span>
+                </div>
+                <!-- CSRF/XSS Seal -->
+                <div class="flex flex-col items-center" title="XSS/CSRF Protected">
+                    <i class="fa-solid fa-shield-halved text-xl mb-1 text-emerald-500"></i>
+                    <span class="text-[10px] uppercase font-bold text-gray-400">SAFE</span>
+                </div>
+                <!-- Data Security Seal -->
+                <div class="flex flex-col items-center" title="Data Privacy">
+                    <i class="fa-solid fa-server text-xl mb-1 text-emerald-500"></i>
+                    <span class="text-[10px] uppercase font-bold text-gray-400">DATA</span>
+                </div>
+            </div>
+        </div>
     </div>
 </aside>

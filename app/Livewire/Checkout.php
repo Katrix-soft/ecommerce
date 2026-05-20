@@ -179,11 +179,11 @@ class Checkout extends Component
     /**
      * Procesar orden con pago de Mercado Pago (llamado desde evento JS)
      */
-    public function placeOrderWithMP($mpPaymentId, $mpStatus)
+    public function placeOrderWithMP($mpPaymentId, $mpStatus, $mpPaymentType = null)
     {
         $this->mpPaymentId = $mpPaymentId;
         $this->mpPaymentStatus = $mpStatus;
-        $this->paymentMethod = 'mercadopago';
+        $this->paymentMethod = 'mercadopago' . ($mpPaymentType ? '_' . $mpPaymentType : '');
         $this->placeOrder();
     }
 

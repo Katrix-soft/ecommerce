@@ -59,6 +59,7 @@ class MercadoPagoController extends Controller
                 'status' => $payment->status,
                 'status_detail' => $payment->status_detail,
                 'id' => $payment->id,
+                'payment_type_id' => $payment->payment_type_id,
             ]);
         } catch (\Exception $e) {
             return response()->json([
