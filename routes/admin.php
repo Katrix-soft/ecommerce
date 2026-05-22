@@ -14,26 +14,48 @@ Route::get('/', function () {
     return view('admin.dashboard');
 })->name('dashboard');
 
-Route::get('options', [OptionController::class, 'index'])->name('options.index');
+// ── CATÁLOGO ──
+Route::middleware('check.module:options')->group(function () {
+    Route::get('options', [OptionController::class, 'index'])->name('options.index');
+});
 
-Route::resource('families', FamilyController::class);
+Route::middleware('check.module:families')->group(function () {
+    Route::resource('families', FamilyController::class);
+});
 
-Route::resource('categories',CategoryController::Class);
+Route::middleware('check.module:categories')->group(function () {
+    Route::resource('categories', CategoryController::Class);
+});
 
-Route::resource('subcategories',SubcategoryController::Class);
+Route::middleware('check.module:subcategories')->group(function () {
+    Route::resource('subcategories', SubcategoryController::Class);
+});
 
-Route::resource('products',ProductController::Class);
+Route::middleware('check.module:products')->group(function () {
+    Route::resource('products', ProductController::Class);
+    Route::post('products/{product}/variants', [ProductController::class, 'Variants'])->name('products.variants')
+        ->scopeBindings();
+});
 
-Route::post('products/{product}/variants', [ProductController::class, 'Variants'])->name('products.variants')
+Route::middleware('check.module:covers')->group(function () {
+    Route::resource('covers', CoverController::class);
+});
 
-  ->scopeBindings();
-Route::resource('covers', CoverController::class);
+// ── OPERACIONES ──
+Route::middleware('check.module:orders')->group(function () {
+    Route::get('orders', \App\Livewire\Admin\OrdersIndex::class)->name('orders.index');
+    Route::get('orders/{order}/print', [\App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
+});
 
-// Rutas de administración de órdenes, conductores y envíos (Logística)
-Route::get('orders', \App\Livewire\Admin\OrdersIndex::class)->name('orders.index');
-Route::get('orders/{order}/print', [\App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
-Route::get('drivers', \App\Livewire\Admin\DriversIndex::class)->name('drivers.index');
-Route::get('shipments', \App\Livewire\Admin\ShipmentsIndex::class)->name('shipments.index');
+Route::middleware('check.module:drivers')->group(function () {
+    Route::get('drivers', \App\Livewire\Admin\DriversIndex::class)->name('drivers.index');
+});
 
-// Gestión de usuarios y roles
-Route::get('users', \App\Livewire\Admin\UsersIndex::class)->name('users.index');
+Route::middleware('check.module:shipments')->group(function () {
+    Route::get('shipments', \App\Livewire\Admin\ShipmentsIndex::class)->name('shipments.index');
+});
+
+// ── CONFIGURACIÓN ──
+Route::middleware('check.module:users')->group(function () {
+    Route::get('users', \App\Livewire\Admin\UsersIndex::class)->name('users.index');
+});

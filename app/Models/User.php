@@ -80,4 +80,46 @@ class User extends Authenticatable
     {
         return $this->hasMany(Order::class);
     }
+
+    /**
+     * Módulos habilitados para este admin/tenant.
+     */
+    public function tenantModules()
+    {
+        return $this->hasMany(TenantModule::class);
+    }
+
+    /**
+     * Verificar si el usuario tiene un módulo habilitado.
+     * Los superadmins siempre tienen acceso a todo.
+     */
+    public function hasModule(string $module): bool
+    {
+        if ($this->hasRole('superadmin')) {
+            return true;
+        }
+
+        return TenantModule::isEnabled($this->id, $module);
+    }
+
+    /**
+     * Métricas habilitadas para este admin/tenant.
+     */
+    public function tenantMetrics()
+    {
+        return $this->hasMany(TenantMetric::class);
+    }
+
+    /**
+     * Verificar si el usuario tiene una métrica habilitada en su dashboard.
+     * Los superadmins siempre tienen acceso a todo.
+     */
+    public function hasMetric(string $metricKey): bool
+    {
+        if ($this->hasRole('superadmin')) {
+            return true;
+        }
+
+        return TenantMetric::isEnabled($this->id, $metricKey);
+    }
 }

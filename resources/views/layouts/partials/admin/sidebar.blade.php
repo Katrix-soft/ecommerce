@@ -1,72 +1,46 @@
 @php
+    $allModules = config('modules');
+    $user = auth()->user();
+    $isSuperAdmin = $user && $user->hasRole('superadmin');
+
+    // Dashboard siempre visible
     $links = [
         [
             'icon' => 'fa-solid fa-gauge',
             'label' => 'Dashboard',
             'route' => route('admin.dashboard'),
             'active' => request()->routeIs('admin.dashboard'),
+            'module' => null, // Siempre visible
         ],
-        [
-            'icon' => 'fa-solid fa-box-open',
-            'label' => 'Familias',
-            'route' => route('admin.families.index'),
-            'active' => request()->routeIs('admin.families.*'),
-        ],
-        [
-            'icon' => 'fa-solid fa-tags',
-            'label' => 'Categorias',
-            'route' => route('admin.categories.index'),
-            'active' => request()->routeIs('admin.categories.*'),
-        ],
-        [
-            'icon' => 'fa-solid fa-tag',
-            'label' => 'Subcategorias',
-            'route' => route('admin.subcategories.index'),
-            'active' => request()->routeIs('admin.subcategories.*'),
-        ],
-        [
-            'icon' => 'fa-solid fa-box',
-            'label' => 'Productos',
-            'route' => route('admin.products.index'),
-            'active' => request()->routeIs('admin.products.*'),
-        ],
-        [
-            'icon' => 'fa-solid fa-cog',
-            'label' => 'Opciones',
-            'route' => route('admin.options.index'),
-            'active' => request()->routeIs('admin.options.*'),
-        ],
-        [
-            'label' => 'Portadas',
-            'icon' => 'fa-solid fa-image',
-            'route' => route('admin.covers.index'),
-            'active' => request()->routeIs('admin.covers.*'),
-        ],
-        [
-            'label' => 'Órdenes',
-            'icon' => 'fa-solid fa-receipt',
-            'route' => route('admin.orders.index'),
-            'active' => request()->routeIs('admin.orders.*'),
-        ],
-        [
-            'label' => 'Conductores',
-            'icon' => 'fa-solid fa-user-tie',
-            'route' => route('admin.drivers.index'),
-            'active' => request()->routeIs('admin.drivers.*'),
-        ],
-        [
-            'label' => 'Envíos',
-            'icon' => 'fa-solid fa-truck-fast',
-            'route' => route('admin.shipments.index'),
-            'active' => request()->routeIs('admin.shipments.*'),
-        ],
-        [
-            'label' => 'Usuarios',
-            'icon' => 'fa-solid fa-users-gear',
-            'route' => route('admin.users.index'),
-            'active' => request()->routeIs('admin.users.*'),
-        ]
     ];
+
+    // Agregar módulos habilitados
+    foreach ($allModules as $moduleKey => $moduleConfig) {
+        if ($isSuperAdmin || $user->hasModule($moduleKey)) {
+            // Construir la ruta del módulo
+            $routeName = 'admin.' . $moduleKey . '.index';
+
+            $links[] = [
+                'icon' => $moduleConfig['icon'],
+                'label' => $moduleConfig['label'],
+                'route' => route($routeName),
+                'active' => request()->routeIs('admin.' . $moduleKey . '.*'),
+                'module' => $moduleKey,
+            ];
+        }
+    }
+
+    // Link al panel Super Admin (solo para superadmins)
+    if ($isSuperAdmin) {
+        $links[] = [
+            'icon' => 'fa-solid fa-shield-halved',
+            'label' => 'Super Admin',
+            'route' => route('superadmin.modules'),
+            'active' => request()->routeIs('superadmin.*'),
+            'module' => null,
+            'separator' => true,
+        ];
+    }
 @endphp
 
 <aside id="top-bar-sidebar"
@@ -78,7 +52,11 @@
     <div class="h-full px-3 py-4 overflow-y-auto bg-white border-e border-gray-200 dark:border-gray-700 pt-20">
         <ul class="space-y-2 font-medium">
             @foreach ($links as $link)
-                <li>
+                @if (!empty($link['separator']))
+                    <li class="pt-4 mt-4 border-t border-gray-200">
+                @else
+                    <li>
+                @endif
                     <a href="{{ $link['route'] }}"
                         class="flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group {{ $link['active'] ? 'bg-gray-100' : '' }}">
                         <span class="inline-flex w-6 h-6 justify-center items-center">

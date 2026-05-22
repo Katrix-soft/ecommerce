@@ -28,13 +28,13 @@
                                 <h3 class="text-lg font-bold {{ $item->qty > ($stocks[$item->id] ?? 0) ? 'text-red-500' : 'text-gray-800' }} mb-1">{{ $item->name }}</h3>
                                 <div class="flex flex-wrap justify-center sm:justify-start gap-2 mb-3">
                                     @foreach ($item->options->features as $option => $feature)
-                                        <span class="px-2.5 py-0.5 rounded-lg bg-purple-50 text-purple-600 text-[10px] font-bold uppercase tracking-wider">
+                                        <span class="px-2.5 py-0.5 rounded-lg bg-teal-50 text-teal-700 text-[10px] font-bold uppercase tracking-wider">
                                             {{ $option }}: {{ $feature }}
                                         </span>
                                     @endforeach
                                 </div>
 
-                                <div class="text-xl font-black text-purple-600">${{ number_format($item->price, 2) }}</div>
+                                <div class="text-xl font-black text-teal-700">${{ number_format($item->price, 2) }}</div>
                             </div>
 
                             {{-- Cantidad --}}
@@ -61,7 +61,7 @@
                             </div>
                             <h3 class="text-xl font-bold text-gray-800 mb-2">Tu carrito está vacío</h3>
                             <p class="text-gray-500 mb-8">Parece que aún no has agregado nada a tu carrito.</p>
-                            <a href="/" class="inline-flex items-center px-8 py-3 bg-purple-600 text-white font-bold rounded-2xl hover:bg-purple-700 transition-all shadow-lg shadow-purple-200">
+                            <a href="/" class="inline-flex items-center px-8 py-3 bg-teal-700 text-white font-bold rounded-2xl hover:bg-teal-800 transition-all shadow-lg shadow-teal-200">
                                 Empezar a comprar
                             </a>
                         </div>
@@ -87,14 +87,14 @@
                         </div>
                         <div class="pt-4 border-t border-gray-50 flex justify-between">
                             <span class="text-xl font-bold text-gray-800">Total</span>
-                            <span class="text-2xl font-black text-purple-600">${{ $total }}</span>
+                            <span class="text-2xl font-black text-teal-700">${{ $total }}</span>
                         </div>
                     </div>
 
                     <button wire:click="checkout" 
                         {{ !$hasValidItems ? 'disabled' : '' }}
                         @style(['opacity: 0.5; cursor: not-allowed; pointer-events: none;' => !$hasValidItems])
-                        class="w-full py-4 bg-purple-600 text-white font-bold rounded-2xl hover:bg-purple-700 transition-all shadow-lg shadow-purple-200 flex items-center justify-center gap-3 active:scale-95">
+                        class="w-full py-4 bg-teal-700 text-white font-bold rounded-2xl hover:bg-teal-800 transition-all shadow-lg shadow-teal-200 flex items-center justify-center gap-3 active:scale-95">
                         <span>Continuar con el pago</span>
                         <i class="fa-solid fa-arrow-right text-sm"></i>
                     </button>

@@ -15,11 +15,20 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->prefix('admin')
                 ->name('admin.')
                 ->group(base_path('routes/admin.php'));
+
+            Route::middleware('web', 'auth', 'superadmin')
+                ->prefix('superadmin')
+                ->name('superadmin.')
+                ->group(base_path('routes/superadmin.php'));
         }
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'superadmin' => \App\Http\Middleware\SuperAdmin::class,
+            'check.module' => \App\Http\Middleware\CheckModule::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();
+

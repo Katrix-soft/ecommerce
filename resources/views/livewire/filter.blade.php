@@ -7,7 +7,7 @@
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-xl font-bold text-gray-800">Filtros</h2>
                         @if (count($selected_features))
-                            <button wire:click="$set('selected_features', [])" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
+                            <button wire:click="$set('selected_features', [])" class="text-sm font-semibold text-teal-600 hover:text-teal-800 transition-colors">
                                 Limpiar todo
                             </button>
                         @endif
@@ -16,7 +16,7 @@
                     <div class="space-y-6">
                         @foreach ($options as $option)
                             <div x-data="{ open: true }" wire:key="desktop-option-{{ $option['id'] }}" class="border-b border-gray-100 pb-6 last:border-0">
-                                <button class="flex w-full justify-between items-center text-gray-800 font-semibold hover:text-indigo-600 transition-colors"
+                                <button class="flex w-full justify-between items-center text-gray-800 font-semibold hover:text-teal-600 transition-colors"
                                     x-on:click="open = !open">
                                     {{ $option['name'] }}
                                     <svg class="w-4 h-4 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -28,11 +28,11 @@
                                                 <label class="flex items-center cursor-pointer group">
                                                     <input type="checkbox" value="{{ $feature['id'] }}"
                                                         wire:model.live="selected_features" class="sr-only peer">
-                                                    <div class="w-7 h-7 rounded-full border border-gray-200 shadow-sm peer-checked:ring-2 peer-checked:ring-indigo-600 peer-checked:ring-offset-2 transition-all group-hover:scale-110"
+                                                    <div class="w-7 h-7 rounded-full border border-gray-200 shadow-sm peer-checked:ring-2 peer-checked:ring-teal-600 peer-checked:ring-offset-2 transition-all group-hover:scale-110"
                                                         style="background-color: {{ $feature['value'] }}"
                                                         title="{{ $feature['description'] }}">
                                                     </div>
-                                                    <span class="ml-3 text-sm text-gray-600 group-hover:text-indigo-600 transition-colors">
+                                                    <span class="ml-3 text-sm text-gray-600 group-hover:text-teal-600 transition-colors">
                                                         {{ $feature['description'] }}
                                                     </span>
                                                 </label>
@@ -40,7 +40,7 @@
                                                 <label class="flex items-center cursor-pointer group">
                                                     <x-checkbox class="mr-3" value="{{ $feature['id'] }}"
                                                         wire:model.live="selected_features" />
-                                                    <span class="text-sm text-gray-600 group-hover:text-indigo-600 transition-colors">
+                                                    <span class="text-sm text-gray-600 group-hover:text-teal-600 transition-colors">
                                                         {{ $feature['description'] }}
                                                     </span>
                                                 </label>
@@ -57,13 +57,13 @@
             <!-- Mobile/Tablet Filter Button -->
             @if (count($options))
                 <div class="md:hidden mb-6 flex items-center justify-between">
-                    <button @click="mobileFiltersOpen = true" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <button @click="mobileFiltersOpen = true" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
                         <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" /></svg>
                         Filtrar
                     </button>
                     
                     @if (count($selected_features))
-                        <button wire:click="$set('selected_features', [])" class="text-sm font-semibold text-indigo-600">
+                        <button wire:click="$set('selected_features', [])" class="text-sm font-semibold text-teal-600">
                             Limpiar ({{ count($selected_features) }})
                         </button>
                     @endif
@@ -100,14 +100,14 @@
                                     </a>
                                 </h3>
                                 <div class="mt-2 flex-1 flex flex-col justify-end">
-                                    <p class="text-lg font-extrabold text-purple-600">
-                                        S/ {{ number_format($product->price, 2, '.', ',') }}
+                                    <p class="text-lg font-extrabold text-teal-700">
+                                        $ {{ number_format($product->price, 2, '.', ',') }}
                                     </p>
                                     <p class="mt-1 text-xs text-gray-500">
                                         Stock disponible: {{ $product->variants->sum('stock') }}
                                     </p>
                                 </div>
-                                <a href="{{ route('products.show', $product) }}" class="mt-4 w-full bg-purple-600 border border-transparent rounded-md py-2 px-4 flex items-center justify-center text-sm font-semibold text-white hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                <a href="{{ route('products.show', $product) }}" class="mt-4 w-full bg-teal-700 border border-transparent rounded-md py-2 px-4 flex items-center justify-center text-sm font-semibold text-white hover:bg-teal-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
                                     Ver detalles
                                 </a>
                             </div>
@@ -129,7 +129,7 @@
         <div x-show="mobileFiltersOpen" x-transition:enter="transition ease-in-out duration-300 transform" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in-out duration-300 transform" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full" class="ml-auto relative max-w-xs w-full h-full bg-white shadow-xl py-4 pb-12 flex flex-col overflow-y-auto">
             <div class="px-4 flex items-center justify-between">
                 <h2 class="text-lg font-bold text-gray-900">Filtros</h2>
-                <button type="button" @click="mobileFiltersOpen = false" class="-mr-2 w-10 h-10 bg-white p-2 rounded-md flex items-center justify-center text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <button type="button" @click="mobileFiltersOpen = false" class="-mr-2 w-10 h-10 bg-white p-2 rounded-md flex items-center justify-center text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-500">
                     <span class="sr-only">Cerrar menú</span>
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
@@ -155,11 +155,11 @@
                                             <label class="flex items-center cursor-pointer group">
                                                 <input type="checkbox" value="{{ $feature['id'] }}"
                                                     wire:model.live="selected_features" class="sr-only peer">
-                                                <div class="w-7 h-7 rounded-full border border-gray-200 shadow-sm peer-checked:ring-2 peer-checked:ring-indigo-600 peer-checked:ring-offset-2 transition-all group-hover:scale-110"
+                                                <div class="w-7 h-7 rounded-full border border-gray-200 shadow-sm peer-checked:ring-2 peer-checked:ring-teal-600 peer-checked:ring-offset-2 transition-all group-hover:scale-110"
                                                     style="background-color: {{ $feature['value'] }}"
                                                     title="{{ $feature['description'] }}">
                                                 </div>
-                                                <span class="ml-3 text-sm text-gray-600 group-hover:text-indigo-600 transition-colors">
+                                                <span class="ml-3 text-sm text-gray-600 group-hover:text-teal-600 transition-colors">
                                                     {{ $feature['description'] }}
                                                 </span>
                                             </label>
@@ -167,7 +167,7 @@
                                             <label class="flex items-center cursor-pointer group">
                                                 <x-checkbox class="mr-3" value="{{ $feature['id'] }}"
                                                     wire:model.live="selected_features" />
-                                                <span class="text-sm text-gray-600 group-hover:text-indigo-600 transition-colors">
+                                                <span class="text-sm text-gray-600 group-hover:text-teal-600 transition-colors">
                                                     {{ $feature['description'] }}
                                                 </span>
                                             </label>
@@ -181,7 +181,7 @@
             </div>
             
             <div class="mt-auto px-4 pt-6 border-t border-gray-200">
-                <button @click="mobileFiltersOpen = false" class="w-full bg-indigo-600 text-white py-3 rounded-md font-bold shadow-lg">
+                <button @click="mobileFiltersOpen = false" class="w-full bg-teal-700 text-white py-3 rounded-md font-bold shadow-lg">
                     Aplicar Filtros
                 </button>
             </div>

@@ -38,11 +38,11 @@
       </div>
 
       <div class="p-5 flex-1 flex flex-col">
-        <h2 class="text-base font-bold text-gray-800 line-clamp-2 min-h-[48px] mb-2 hover:text-indigo-600 transition-colors">
+        <h2 class="text-base font-bold text-gray-800 line-clamp-2 min-h-[48px] mb-2 hover:text-teal-700 transition-colors">
             <a href="{{ route('products.show', $product) }}">{{ $product->name }}</a>
         </h2>
         <div class="mt-auto">
-            <p class="text-xl font-black text-indigo-600 mb-4">
+            <p class="text-xl font-black text-teal-700 mb-4">
                 $ {{ number_format($product->price, 0, ',', '.') }}
             </p>
             <a href="{{ route('products.show', $product) }}" class="btn btn-indigo block w-full text-center transition-all hover:scale-[1.02] active:scale-[0.98]">

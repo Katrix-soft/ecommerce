@@ -1,5 +1,5 @@
 <div x-data="{ open: false }">
-    <header class="bg-indigo-600 relative z-50">
+    <header class="bg-teal-700 relative z-50">
         <x-container class="px-4 py-4">
           <div class="flex justify-between items-center md:space-x-8">
 
@@ -58,7 +58,7 @@
 
                       <p class="text-sm text-center mt-4">
                       ¿No tienes cuenta? 
-                         <a href="{{ route('register')}}" class="text-indigo-600 hover:underline transition-colors">
+                         <a href="{{ route('register')}}" class="text-teal-600 hover:underline transition-colors">
                           Registrate
                          </a>
                       </p>
@@ -94,7 +94,7 @@
              
               <a href="{{ route('cart.index')}}" class="relative">
                 <i class="fas fa-shopping-cart text-white text-xl md:text-3xl"></i>
-                <span id="cart-count"  class="absolute -top-2 -right-2 inline-flex items-center justify-center w-5 h-5 bg-red-500 rounded-full text-[10px] font-bold text-white"> {{Cart::instance('shopping')->count()}} </span>
+                <span id="cart-count"  class="absolute -top-2 -right-2 inline-flex items-center justify-center w-5 h-5 bg-amber-500 rounded-full text-[10px] font-bold text-white"> {{Cart::instance('shopping')->count()}} </span>
               </a>
           </div>
 
@@ -112,7 +112,7 @@
 
            <div class="w-screen md:w-80 h-screen bg-white">
             
-               <div class="bg-indigo-600 px-4 py-3 text-white font-semibold">
+               <div class="bg-teal-700 px-4 py-3 text-white font-semibold">
                   <div class="flex justify-between items-center">
                       <span class="text-lg"> 
                            ¡Hola!
@@ -132,7 +132,7 @@
 
                           <li wire:key="family-{{ $family->id }}" 
                               x-on:mouseenter="if (window.innerWidth >= 768) $wire.set('family_id', {{ $family->id }})">
-                              <div class="flex items-center justify-between px-4 py-4 text-gray-700 hover:bg-indigo-100 transition-colors">
+                              <div class="flex items-center justify-between px-4 py-4 text-gray-700 hover:bg-teal-50 transition-colors">
                                   <a href="{{ route('families.show', $family)}}" class="flex-1 font-medium">
                                      {{ $family->name }}
                                   </a>
@@ -145,16 +145,16 @@
 
                               <div class="md:hidden">
                                   @if ($family_id == $family->id)
-                                      <ul class="bg-indigo-50 pb-4">
+                                      <ul class="bg-teal-50 pb-4">
                                           @foreach ($this->categories as $category)
                                               <li>
-                                                  <a href="{{ route('categories.show', $category)}}" class="block px-8 py-2 text-indigo-600 font-semibold text-sm hover:bg-indigo-100">
+                                                  <a href="{{ route('categories.show', $category)}}" class="block px-8 py-2 text-teal-700 font-semibold text-sm hover:bg-teal-100">
                                                       {{ $category->name }}
                                                   </a>
                                                   <ul class="pb-2 space-y-1">
                                                       @foreach ($category->subcategories as $subcategory)
                                                           <li>
-                                                              <a href="{{ route('subcategories.show', $subcategory)}}" class="block px-12 py-1 text-xs text-gray-700 hover:text-indigo-600 hover:bg-indigo-100 transition-colors">
+                                                              <a href="{{ route('subcategories.show', $subcategory)}}" class="block px-12 py-1 text-xs text-gray-700 hover:text-teal-700 hover:bg-teal-50 transition-colors">
                                                                   {{ $subcategory->name }}
                                                               </a>
                                                           </li>
@@ -179,7 +179,7 @@
                 <div class="bg-white h-[calc(100vh-52px)] overflow-auto px-4 py-8">
                      <div class="flex mb-8 justify-between items-center">
 
-                     <p class="border-b-[3px] border-lime-400 uppercase text-xl font-semibold pb-1">
+                     <p class="border-b-[3px] border-amber-400 uppercase text-xl font-semibold pb-1">
                         
                         {{ $this->familyName }}
                      </p>
@@ -197,13 +197,13 @@
                     @foreach ( $this->categories as $category )
                        <li wire:key="category-{{ $category->id }}">
 
-                         <a href="{{ route('categories.show', $category)}}" class="text-indigo-600 font-semibold text-lg">
+                         <a href="{{ route('categories.show', $category)}}" class="text-teal-700 font-semibold text-lg">
                          {{ $category->name }}
                          </a>
                          <ul class="mt-4 space-y-2">
                             @foreach ($category->subcategories as $subcategory )
                               <li wire:key="subcategory-{{ $subcategory->id }}">
-                                 <a href="{{ route('subcategories.show', $subcategory)}}" class="text-sm text-gray-700 hover:text-indigo-600 transition-colors">
+                                 <a href="{{ route('subcategories.show', $subcategory)}}" class="text-sm text-gray-700 hover:text-teal-600 transition-colors">
                                     {{ $subcategory->name }}
                                  </a>
                             </li>

@@ -84,9 +84,23 @@ class RolePermissionSeeder extends Seeder
 
         // ── 128. Definir roles de la aplicación ──
 
-        // Admin: tiene todos los permisos
+        // Permisos adicionales de Super Admin
+        $superadminPermissions = [
+            'superadmin.modules',
+            'superadmin.dashboard',
+        ];
+
+        foreach ($superadminPermissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
+
+        // Admin: tiene todos los permisos del panel admin
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $adminRole->syncPermissions($permissions);
+
+        // Super Admin: tiene todos los permisos (admin + superadmin)
+        $superadminRole = Role::firstOrCreate(['name' => 'superadmin']);
+        $superadminRole->syncPermissions(array_merge($permissions, $superadminPermissions));
 
         // Cliente: rol por defecto sin permisos de admin
         Role::firstOrCreate(['name' => 'customer']);
