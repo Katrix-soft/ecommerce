@@ -34,7 +34,7 @@
                                     @endforeach
                                 </div>
 
-                                <div class="text-xl font-black text-teal-700">${{ number_format($item->price, 2) }}</div>
+                                <div class="text-xl font-black text-teal-700">{{ \App\Models\User::formatPrice($item->price) }}</div>
                             </div>
 
                             {{-- Cantidad --}}
@@ -79,7 +79,7 @@
                     <div class="space-y-4 mb-8">
                         <div class="flex justify-between text-gray-600">
                             <span>Subtotal</span>
-                            <span class="font-bold">${{ $subtotal }}</span>
+                            <span class="font-bold">{{ \App\Models\User::formatPrice($subtotal) }}</span>
                         </div>
                         <div class="flex justify-between text-gray-600">
                             <span>Envío</span>
@@ -87,7 +87,7 @@
                         </div>
                         <div class="pt-4 border-t border-gray-50 flex justify-between">
                             <span class="text-xl font-bold text-gray-800">Total</span>
-                            <span class="text-2xl font-black text-teal-700">${{ $total }}</span>
+                            <span class="text-2xl font-black text-teal-700">{{ \App\Models\User::formatPrice($total) }}</span>
                         </div>
                     </div>
 

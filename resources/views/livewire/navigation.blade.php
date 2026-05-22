@@ -75,6 +75,12 @@
                       </x-dropdown-link>
                       @endrole
 
+                      @role('superadmin')
+                      <x-dropdown-link href="{{ route('superadmin.dashboard')}}">
+                        Administración General
+                      </x-dropdown-link>
+                      @endrole
+
                       <div class="border-t border-gray-200"></div>
                         <!-- Authentication -->
                             <form method="POST" action="{{ route('logout') }}" x-data>

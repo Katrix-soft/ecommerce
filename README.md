@@ -1,59 +1,75 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Shoply Multi-Tenant E-commerce Platform
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Shoply es una plataforma de comercio electrónico multi-tenant de alto rendimiento construida con **Laravel 12**, **Livewire**, **PHP 8.2**, **Alpine.js** y **Tailwind CSS**. Permite a múltiples administradores gestionar sus propias tiendas independientes con control centralizado por parte de un Superadministrador.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## ✨ Características Principales
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 👑 Panel de Superadministrador (`/superadmin/modules`)
+Un centro de control exclusivo y altamente estético con diseño premium y microanimaciones para gestionar los tenants:
+- **Gestión de Módulos y Métricas (Planes)**:
+  - Asignación rápida de módulos mediante **Plan Básico** (catálogo básico, órdenes, portadas y KPIs esenciales) y **Plan Premium** (habilita el 100% de la plataforma).
+  - Toggles granulares para activar/desactivar módulos individuales y categorías completas de KPIs de negocio.
+- **Configuración de Identidad de Tienda**:
+  - Personalización de nombre de fantasía, logo, moneda local y número de WhatsApp de contacto.
+- **Gestión de Usuarios del Sistema**:
+  - Alta, edición, desactivación temporal y eliminación de usuarios por tienda.
+  - **Seguridad Garantizada**: Bloqueo absoluto a la modificación de roles de usuarios preexistentes para prevenir elevación de privilegios de forma indebida.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 📊 Límites de Recursos y Facturación (Cuotas de Suscripción)
+- Control estricto de cuotas en base al plan asignado:
+  - **Límite de Productos**: Límite máximo de catálogo por tienda.
+  - **Límite de Usuarios**: Límite máximo de colaboradores.
+  - **Límite de Pedidos Mensuales**: Límite de ventas mensuales de la tienda.
+- Facturación clara que incluye precio del plan, ciclo de facturación (mensual, trimestral, anual) y fecha de próximo vencimiento.
+- Bloqueo dinámico e inteligente en la pasarela de compra (checkout) si la tienda excede su límite mensual de pedidos.
 
-## Learning Laravel
+### 📝 Historial de Actividad y Auditoría (Audit Log)
+- Registros persistentes de auditoría ante cualquier cambio crítico en el tenant.
+- Guardado atómico de variables en formato JSON (valores anteriores vs. valores nuevos).
+- Visualizador interactivo detallado con formato monospaciado dentro del panel para comparar cambios históricos.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 🕒 Ventanas de Mantenimiento Programadas
+- Programación de fecha y hora exacta de inicio y fin de mantenimiento.
+- Activación automatizada por middleware.
+- Interfaz pública con **cuenta regresiva activa en tiempo real** (días, horas, minutos, segundos) que se refresca automáticamente al finalizar el tiempo, además de enlaces directos de soporte vía Mail y WhatsApp.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 🛠️ Tecnologías y Stack
+- **Backend:** Laravel 12 & PHP 8.2.12
+- **Frontend:** Livewire 3, Alpine.js, Tailwind CSS
+- **Base de Datos:** MySQL / MariaDB (con soporte multi-tenant y bloqueo pesimista `lockForUpdate` para evitar sobreventas)
+- **Modales & Notificaciones:** SweetAlert2 y FontAwesome 6
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## 🚀 Instalación y Servidor Local
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+1. Clonar el repositorio e instalar dependencias de Composer:
+   ```bash
+   composer install
+   ```
 
-## Contributing
+2. Instalar dependencias de Node.js y compilar assets:
+   ```bash
+   npm install
+   npm run dev
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+3. Configurar el archivo `.env`:
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-## Code of Conduct
+4. Ejecutar las migraciones y seeders:
+   ```bash
+   php artisan migrate --seed
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+5. Iniciar el servidor local:
+   ```bash
+   php artisan serve
+   ```

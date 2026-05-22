@@ -189,6 +189,21 @@ class Checkout extends Component
 
     public function placeOrder()
     {
+        $tenant = \App\Models\User::getTenant();
+        if ($tenant) {
+            $ordersThisMonth = \App\Models\Order::whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)
+                ->count();
+            if ($ordersThisMonth >= $tenant->max_orders_per_month) {
+                $this->dispatch('swal', [
+                    'icon' => 'error',
+                    'title' => 'Límite de Pedidos Excedido',
+                    'text' => 'Lo sentimos, esta tienda ha superado su límite mensual de pedidos permitidos por su plan. Por favor, intente más tarde o contacte al administrador.',
+                    'confirmButtonColor' => '#7c3aed',
+                ]);
+                return;
+            }
+        }
 
         // Obtener dirección seleccionada
         $addressObj = Address::find($this->selectedAddressId);

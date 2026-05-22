@@ -35,6 +35,24 @@ class User extends Authenticatable
         'password',
         'dni',
         'document_type',
+        'store_name',
+        'store_logo_path',
+        'is_active',
+        'store_status',
+        'maintenance_message',
+        'suspended_message',
+        'store_whatsapp',
+        'store_instagram',
+        'store_email',
+        'store_currency',
+        'max_products',
+        'max_users',
+        'max_orders_per_month',
+        'maintenance_starts_at',
+        'maintenance_ends_at',
+        'billing_plan_price',
+        'billing_next_due_date',
+        'billing_cycle',
     ];
 
     /**
@@ -68,6 +86,10 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
+            'maintenance_starts_at' => 'datetime',
+            'maintenance_ends_at' => 'datetime',
+            'billing_next_due_date' => 'date',
         ];
     }
 
@@ -121,5 +143,60 @@ class User extends Authenticatable
         }
 
         return TenantMetric::isEnabled($this->id, $metricKey);
+    }
+
+    /**
+     * Obtener el tenant (admin) principal de la tienda.
+     */
+    public static function getTenant()
+    {
+        return self::role('admin')->first();
+    }
+
+    /**
+     * Formatear un precio con la moneda del tenant actual.
+     */
+    public static function formatPrice($price)
+    {
+        $tenant = self::getTenant();
+        $currency = $tenant ? $tenant->store_currency : 'ARS';
+
+        $symbols = [
+            'ARS' => '$',
+            'USD' => 'US$',
+            'EUR' => '€',
+            'UYU' => '$U',
+            'CLP' => '$',
+        ];
+
+        $symbol = $symbols[$currency] ?? '$';
+
+        return $symbol . ' ' . number_format($price, 2, ',', '.');
+    }
+
+    /**
+     * Get the count of products.
+     */
+    public function getProductsCount(): int
+    {
+        return \App\Models\Product::count();
+    }
+
+    /**
+     * Get the count of users.
+     */
+    public function getUsersCount(): int
+    {
+        return \App\Models\User::count();
+    }
+
+    /**
+     * Get the count of orders created this month.
+     */
+    public function getOrdersThisMonthCount(): int
+    {
+        return \App\Models\Order::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
     }
 }

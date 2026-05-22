@@ -101,7 +101,7 @@
                                 </h3>
                                 <div class="mt-2 flex-1 flex flex-col justify-end">
                                     <p class="text-lg font-extrabold text-teal-700">
-                                        $ {{ number_format($product->price, 2, '.', ',') }}
+                                        {{ \App\Models\User::formatPrice($product->price) }}
                                     </p>
                                     <p class="mt-1 text-xs text-gray-500">
                                         Stock disponible: {{ $product->variants->sum('stock') }}

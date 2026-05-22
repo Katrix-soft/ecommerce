@@ -23,6 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(append: [
+            \App\Http\Middleware\CheckAccountStatus::class,
+        ]);
         $middleware->alias([
             'superadmin' => \App\Http\Middleware\SuperAdmin::class,
             'check.module' => \App\Http\Middleware\CheckModule::class,

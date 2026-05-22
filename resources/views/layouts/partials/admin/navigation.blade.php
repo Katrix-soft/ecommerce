@@ -11,10 +11,16 @@
    </svg>
          </button>
         <a href="{{ route('admin.dashboard') }}" class="flex items-center ms-2 md:me-24 gap-2">
-          <div class="size-8 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-md shadow-indigo-200">
-            <i class="fa-solid fa-bag-shopping text-sm"></i>
-          </div>
-          <span class="self-center text-xl font-extrabold bg-gradient-to-r from-purple-700 to-indigo-800 bg-clip-text text-transparent">Shoply</span>
+          @if(auth()->user() && auth()->user()->store_logo_path)
+            <img class="size-8 object-contain rounded-md" src="{{ Storage::url(auth()->user()->store_logo_path) }}" alt="Logo" />
+          @else
+            <div class="size-8 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-md shadow-indigo-200">
+              <i class="fa-solid fa-bag-shopping text-sm"></i>
+            </div>
+          @endif
+          <span class="self-center text-xl font-extrabold bg-gradient-to-r from-purple-700 to-indigo-800 bg-clip-text text-transparent">
+            {{ (auth()->user() && auth()->user()->store_name) ? auth()->user()->store_name : 'Shoply' }}
+          </span>
         </a>
       </div>
       <div class="flex items-center">

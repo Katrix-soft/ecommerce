@@ -118,7 +118,7 @@
                                         @endif
                                     </div>
                                 </div>
-                                <span class="font-extrabold text-gray-800">${{ number_format($item->price * $item->quantity, 2) }}</span>
+                                <span class="font-extrabold text-gray-800">{{ \App\Models\User::formatPrice($item->price * $item->quantity) }}</span>
                             </div>
                         @endforeach
                     </div>
@@ -128,7 +128,7 @@
                         <div class="space-y-3 print:space-y-1">
                             <div class="flex justify-between text-sm text-gray-600">
                                 <span>Subtotal</span>
-                                <span class="font-bold">${{ number_format($createdOrder->subtotal, 2) }}</span>
+                                <span class="font-bold">{{ \App\Models\User::formatPrice($createdOrder->subtotal) }}</span>
                             </div>
                             <div class="flex justify-between text-sm text-gray-600">
                                 <span>Costo de envío</span>
@@ -136,7 +136,7 @@
                             </div>
                             <div class="pt-4 border-t border-purple-100 flex justify-between items-center">
                                 <span class="font-black text-gray-800 text-lg">Total</span>
-                                <span class="text-2xl font-black text-purple-600">${{ number_format($createdOrder->total, 2) }}</span>
+                                <span class="text-2xl font-black text-purple-600">{{ \App\Models\User::formatPrice($createdOrder->total) }}</span>
                             </div>
                         </div>
                     </div>
@@ -562,9 +562,9 @@
                                             <span class="text-[9px] text-red-500 font-bold block mb-0.5">Stock insuficiente</span>
                                         @endif
                                         <p class="text-xs font-bold {{ $isExceeded ? 'text-red-500' : 'text-gray-800' }} truncate" title="{{ $item->name }}">{{ $item->name }}</p>
-                                        <p class="text-[10px] text-gray-400 mt-0.5">${{ number_format($item->price, 2) }} c/u</p>
+                                        <p class="text-[10px] text-gray-400 mt-0.5">{{ \App\Models\User::formatPrice($item->price) }} c/u</p>
                                     </div>
-                                    <span class="text-xs font-black {{ $isExceeded ? 'text-red-400 line-through' : 'text-gray-800' }}">${{ number_format($item->price * $item->qty, 2) }}</span>
+                                    <span class="text-xs font-black {{ $isExceeded ? 'text-red-400 line-through' : 'text-gray-800' }}">{{ \App\Models\User::formatPrice($item->price * $item->qty) }}</span>
                                 </div>
                             @endforeach
                         </div>
@@ -573,7 +573,7 @@
                         <div class="space-y-3 pt-6 border-t border-gray-50 mb-6">
                             <div class="flex justify-between text-gray-500 text-xs font-medium">
                                 <span>Subtotal</span>
-                                <span class="font-bold text-gray-800">${{ $subtotal }}</span>
+                                <span class="font-bold text-gray-800">{{ \App\Models\User::formatPrice($subtotal) }}</span>
                             </div>
                             <div class="flex justify-between text-gray-500 text-xs font-medium">
                                 <span>Envío</span>
@@ -581,7 +581,7 @@
                             </div>
                             <div class="pt-4 border-t border-gray-50 flex justify-between items-center">
                                 <span class="font-black text-gray-800 text-sm">Total</span>
-                                <span class="text-xl font-black text-purple-600">${{ $total }}</span>
+                                <span class="text-xl font-black text-purple-600">{{ \App\Models\User::formatPrice($total) }}</span>
                             </div>
                         </div>
 

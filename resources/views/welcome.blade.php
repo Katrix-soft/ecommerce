@@ -43,7 +43,7 @@
         </h2>
         <div class="mt-auto">
             <p class="text-xl font-black text-teal-700 mb-4">
-                $ {{ number_format($product->price, 0, ',', '.') }}
+                {{ \App\Models\User::formatPrice($product->price) }}
             </p>
             <a href="{{ route('products.show', $product) }}" class="btn btn-indigo block w-full text-center transition-all hover:scale-[1.02] active:scale-[0.98]">
                  Ver detalles

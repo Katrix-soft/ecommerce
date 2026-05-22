@@ -58,6 +58,20 @@ class ProductCreate extends Component
 
     public function store()
     {
+        $tenant = \App\Models\User::getTenant();
+        if ($tenant) {
+            $currentProducts = \App\Models\Product::count();
+            if ($currentProducts >= $tenant->max_products) {
+                $this->dispatch('swal', [
+                    'icon' => 'error',
+                    'title' => 'Límite de Productos Excedido',
+                    'text' => "No podés crear más productos. Tu plan actual permite un máximo de {$tenant->max_products} productos.",
+                    'confirmButtonColor' => '#7c3aed',
+                ]);
+                return;
+            }
+        }
+
         try {
             $this->validate([
                 'image' => 'required|image|max:10240',
