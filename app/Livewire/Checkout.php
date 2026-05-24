@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use App\Livewire\Forms\CreateAddressForm;
 use App\Models\Address;
 use App\Models\Order;
@@ -14,7 +15,15 @@ use Gloudemans\Shoppingcart\Facades\Cart;
 
 class Checkout extends Component
 {
+    use WithFileUploads;
+
     public CreateAddressForm $form;
+    
+    // Transfer details
+    public $transfer_issuer_name;
+    public $transfer_issuer_cuit;
+    public $transfer_receipt;
+
     
     // Wizard Steps: 1 = Shipping, 2 = Payment, 3 = Confirmation/Success
     public $step = 1;
@@ -207,6 +216,20 @@ class Checkout extends Component
 
     public function placeOrder()
     {
+        if ($this->paymentMethod === 'bank_transfer') {
+            $this->validate([
+                'transfer_issuer_name' => 'required|string|max:255',
+                'transfer_issuer_cuit' => 'required|string|max:20',
+                'transfer_receipt' => 'required|mimes:jpg,jpeg,png,pdf|max:5120',
+            ], [
+                'transfer_issuer_name.required' => 'El nombre del titular es obligatorio.',
+                'transfer_issuer_cuit.required' => 'El CUIT/CUIL es obligatorio.',
+                'transfer_receipt.required' => 'Debe adjuntar el comprobante de transferencia.',
+                'transfer_receipt.mimes' => 'El comprobante debe ser una imagen o PDF.',
+                'transfer_receipt.max' => 'El archivo no puede pesar más de 5MB.',
+            ]);
+        }
+
         $tenant = \App\Models\User::getTenant();
         if ($tenant) {
             $ordersThisMonth = \App\Models\Order::whereMonth('created_at', now()->month)
@@ -250,9 +273,14 @@ class Checkout extends Component
             'phone' => $addressObj->phone,
         ];
 
+        $receiptPath = null;
+        if ($this->paymentMethod === 'bank_transfer' && $this->transfer_receipt) {
+            $receiptPath = $this->transfer_receipt->store('receipts', 'public');
+        }
+
         // Transacción atómica: validar stock con bloqueo pesimista, crear orden y descontar stock
         try {
-            $order = DB::transaction(function () use ($addressSnapshot) {
+            $order = DB::transaction(function () use ($addressSnapshot, $receiptPath) {
                 $cartContent = Cart::instance('shopping')->content();
                 $itemIds = $cartContent->pluck('id')->toArray();
 
@@ -297,6 +325,9 @@ class Checkout extends Component
                     'shipping_cost' => $shippingCostVal,
                     'subtotal' => $subtotalVal,
                     'total' => $totalVal,
+                    'transfer_issuer_name' => $this->transfer_issuer_name,
+                    'transfer_issuer_cuit' => $this->transfer_issuer_cuit,
+                    'transfer_receipt_path' => $receiptPath,
                 ]);
 
                 // Crear items del pedido y descontar stock atómicamente

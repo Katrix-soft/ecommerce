@@ -459,44 +459,117 @@
                                     </div>
 
                                 @elseif ($paymentMethod === 'bank_transfer')
-                                    <!-- Bank Details view -->
-                                    <div class="max-w-md mx-auto bg-purple-50/50 border border-purple-100 rounded-3xl p-6 mb-4 animate-fadeIn">
-                                        <h3 class="font-bold text-gray-800 text-base mb-4 flex items-center gap-2">
-                                            <i class="fas fa-university text-purple-600"></i>
-                                            Datos de nuestra cuenta bancaria
-                                        </h3>
-                                        <div class="space-y-4 text-sm text-gray-600">
-                                            <div class="flex justify-between border-b border-purple-100/50 pb-2">
-                                                <span class="font-medium text-gray-500">Banco</span>
-                                                <span class="font-black text-gray-800">Banco Galicia</span>
-                                            </div>
-                                            <div class="flex justify-between border-b border-purple-100/50 pb-2">
-                                                <span class="font-medium text-gray-500">Tipo de cuenta</span>
-                                                <span class="font-black text-gray-800">Cuenta Corriente en $</span>
-                                            </div>
-                                            <div class="flex justify-between border-b border-purple-100/50 pb-2">
-                                                <span class="font-medium text-gray-500">CBU</span>
-                                                <span class="font-mono font-black text-gray-800 tracking-wider">0070001120000004242421</span>
-                                            </div>
-                                            <div class="flex justify-between border-b border-purple-100/50 pb-2">
-                                                <span class="font-medium text-gray-500">Alias</span>
-                                                <span class="font-black text-purple-600 select-all cursor-pointer hover:underline" title="Copiar alias">shoply.ecommerce.mp</span>
-                                            </div>
-                                            <div class="flex justify-between border-b border-purple-100/50 pb-2">
-                                                <span class="font-medium text-gray-500">CUIT</span>
-                                                <span class="font-mono font-black text-gray-800">30-71649234-9</span>
-                                            </div>
-                                            <div class="flex justify-between pb-1">
-                                                <span class="font-medium text-gray-500">Titular</span>
-                                                <span class="font-black text-gray-800">Shoply S.A.</span>
+                                    <!-- Bank Transfer UI -->
+                                    <div class="max-w-xl mx-auto bg-gray-50/50 border border-gray-100 rounded-3xl p-8 mb-4 animate-fadeIn shadow-sm">
+                                        <div class="text-center mb-8">
+                                            <h2 class="text-2xl font-black text-gray-800 uppercase tracking-tight">Esperando tu transferencia</h2>
+                                            <p class="text-sm text-gray-600 mt-2">Realiza el pago y valida tus datos para que podamos procesar tu pedido.</p>
+                                            <div class="mt-4 inline-flex flex-col items-center">
+                                                <i class="fas fa-hourglass-half text-gray-400 text-3xl mb-2"></i>
+                                                <span class="text-sm font-bold text-gray-800">Estado: <span class="text-gray-900">Pendiente de validación</span></span>
                                             </div>
                                         </div>
 
-                                        <div class="bg-white rounded-2xl p-4 border border-purple-100 mt-6 flex gap-3 items-start">
-                                            <i class="fas fa-info-circle text-purple-500 mt-1"></i>
-                                            <p class="text-xs text-gray-500 leading-relaxed">
-                                                Una vez realizada la transferencia bancaria, por favor envía el comprobante por e-mail a <strong>pagos@shoply.com</strong> indicando tu número de orden en el asunto.
-                                            </p>
+                                        <!-- Datos Bancarios -->
+                                        <div class="bg-gray-100/80 rounded-2xl p-6 border border-gray-200 mb-6 relative">
+                                            <div class="flex justify-between items-center mb-4">
+                                                <h3 class="font-bold text-gray-800 text-base">1. Datos Bancarios</h3>
+                                                <span class="text-sm text-gray-600 font-medium">Monto total a transferir: <span class="font-black text-gray-800">{{ \App\Models\User::formatPrice($total) }}</span></span>
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
+                                                <div class="flex items-center justify-between col-span-2 sm:col-span-1">
+                                                    <span class="text-gray-500">Banco</span>
+                                                    <span class="font-bold text-gray-800">Banco Galicia</span>
+                                                </div>
+                                                <div class="flex items-center justify-between col-span-2 sm:col-span-1">
+                                                    <span class="text-gray-500">CUIT</span>
+                                                    <span class="font-bold text-gray-800 tracking-wide">30-71649234-9</span>
+                                                </div>
+                                                <div class="flex items-center justify-between col-span-2 sm:col-span-1">
+                                                    <span class="text-gray-500">CBU</span>
+                                                    <span class="font-bold text-gray-800 tracking-wide">0070001120000004242421</span>
+                                                </div>
+                                                <div class="flex items-center justify-between col-span-2 sm:col-span-1">
+                                                    <span class="text-gray-500">Titular</span>
+                                                    <span class="font-bold text-gray-800">Shoply S.A.</span>
+                                                </div>
+                                                <div class="flex items-center justify-between col-span-2 sm:col-span-1">
+                                                    <span class="text-gray-500">Alias</span>
+                                                    <span class="font-bold text-gray-800 select-all">shoply.ecommerce.mp</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Formulario de Validación -->
+                                        <div class="bg-white rounded-2xl p-6 border-[3px] border-purple-500 shadow-md shadow-purple-200/50 relative overflow-hidden">
+                                            <h3 class="font-bold text-gray-800 text-base mb-1">2. Validación de Transferencia <span class="text-purple-600">(Obligatorio)</span></h3>
+                                            <p class="text-sm font-bold text-gray-800 mb-4">Dinos quién eres y sube tu comprobante</p>
+                                            
+                                            <div class="space-y-4">
+                                                <div>
+                                                    <label class="block text-xs text-gray-600 mb-1">Nombre completo del titular que transfiere (debe coincidir con la cuenta de origen):</label>
+                                                    <input type="text" wire:model="transfer_issuer_name" class="w-full text-sm rounded-xl border-gray-200 focus:ring-purple-500 focus:border-purple-500 px-4 py-2.5 bg-gray-50/50" placeholder="Juan Pérez">
+                                                    @error('transfer_issuer_name') <span class="text-[10px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs text-gray-600 mb-1">CUIT/CUIL del titular emisor:</label>
+                                                    <input type="text" wire:model="transfer_issuer_cuit" class="w-full text-sm rounded-xl border-gray-200 focus:ring-purple-500 focus:border-purple-500 px-4 py-2.5 bg-gray-50/50" placeholder="XX-XXXXXXXX-X">
+                                                    @error('transfer_issuer_cuit') <span class="text-[10px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
+                                                </div>
+                                                
+                                                <!-- Dropzone File Upload -->
+                                                <div class="relative border-2 border-dashed border-purple-300 rounded-2xl p-6 text-center bg-purple-50/30 hover:bg-purple-50/50 transition-colors mt-2 group">
+                                                    <input type="file" wire:model="transfer_receipt" accept="image/*,.pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" id="receiptUpload">
+                                                    
+                                                    <div wire:loading wire:target="transfer_receipt" class="absolute inset-0 bg-white/80 z-20 flex flex-col items-center justify-center rounded-2xl">
+                                                        <i class="fas fa-spinner fa-spin text-purple-600 text-2xl mb-2"></i>
+                                                        <span class="text-xs font-bold text-purple-600">Subiendo archivo...</span>
+                                                    </div>
+
+                                                    <div class="flex flex-col items-center justify-center pointer-events-none">
+                                                        @if ($transfer_receipt)
+                                                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3 shadow-sm border border-green-200">
+                                                                <i class="fas fa-check text-green-600 text-xl"></i>
+                                                            </div>
+                                                            <p class="font-bold text-gray-800 text-sm">¡Archivo cargado!</p>
+                                                            <p class="text-xs text-gray-500 mt-1 truncate max-w-[200px]">{{ is_string($transfer_receipt) ? 'Archivo procesado' : $transfer_receipt->getClientOriginalName() }}</p>
+                                                        @else
+                                                            <div class="flex items-center gap-3 text-purple-600 mb-3">
+                                                                <i class="fas fa-upload text-xl"></i>
+                                                                <i class="fas fa-file-pdf text-xl"></i>
+                                                                <i class="fas fa-image text-xl"></i>
+                                                            </div>
+                                                            <p class="font-bold text-gray-800 text-sm">**Adjuntar Comprobante (PDF o imagen)</p>
+                                                            <div class="mt-3 bg-purple-600 text-white font-bold text-xs px-6 py-2.5 rounded-xl shadow-sm group-hover:bg-purple-700 transition-colors pointer-events-auto">
+                                                                Sube tu ticket aquí
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                @error('transfer_receipt') <span class="text-[10px] text-red-500 font-bold block text-center mt-1">{{ $message }}</span> @enderror
+
+                                                <p class="text-xs text-gray-700 font-medium leading-relaxed mt-4">
+                                                    Nuestros operadores verificarán los datos en el banco para aprobar tu pedido de inmediato, evitando el correo electrónico.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Botón de Confirmación -->
+                                        <div class="mt-6 flex flex-col items-center">
+                                            <button wire:click="placeOrder" 
+                                                    wire:loading.attr="disabled"
+                                                    {{ !$hasValidItems ? 'disabled' : '' }}
+                                                    @style(['opacity: 0.5; cursor: not-allowed; pointer-events: none;' => !$hasValidItems])
+                                                    class="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-purple-200 flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                <span wire:loading.remove wire:target="placeOrder, transfer_receipt">VERIFICAR TRANSFERENCIA Y COMPLETAR PEDIDO</span>
+                                                <span wire:loading wire:target="placeOrder, transfer_receipt" class="flex items-center gap-2">
+                                                    <i class="fas fa-spinner fa-spin"></i> Procesando...
+                                                </span>
+                                            </button>
+                                            <p class="text-xs text-gray-700 mt-3 text-center font-medium">Al enviar, confirmas que has realizado la transferencia.</p>
+                                            <button wire:click="backToShipping" class="mt-4 text-sm font-bold text-gray-600 hover:text-gray-900 transition-colors">
+                                                <i class="fas fa-arrow-left mr-1"></i> Volver atrás
+                                            </button>
                                         </div>
                                     </div>
 
@@ -522,23 +595,26 @@
                         </div>
 
                         <!-- Buttons Navigation for step 2 -->
-                        <div class="flex justify-between pt-4">
-                            <button wire:click="backToShipping" class="px-8 py-4 border-2 border-purple-200 hover:bg-purple-50 text-purple-600 font-bold rounded-2xl transition-all flex items-center gap-2 active:scale-95">
-                                <i class="fas fa-arrow-left"></i> Volver a envío
-                            </button>
-                            @if ($paymentMethod !== 'mercadopago')
-                                <button wire:click="placeOrder" 
-                                        wire:loading.attr="disabled"
-                                        {{ !$hasValidItems ? 'disabled' : '' }}
-                                        @style(['opacity: 0.5; cursor: not-allowed; pointer-events: none;' => !$hasValidItems])
-                                        class="px-10 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-purple-100 flex items-center gap-3 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
-                                    <span wire:loading.remove wire:target="placeOrder">Confirmar Pedido <i class="fas fa-check"></i></span>
-                                    <span wire:loading wire:target="placeOrder" class="flex items-center gap-2">
-                                        <i class="fas fa-spinner fa-spin"></i> Procesando...
-                                    </span>
+                        @if ($paymentMethod !== 'bank_transfer')
+                            <div class="flex justify-between pt-4">
+                                <button wire:click="backToShipping" class="px-8 py-4 border-2 border-purple-200 hover:bg-purple-50 text-purple-600 font-bold rounded-2xl transition-all flex items-center gap-2 active:scale-95">
+                                    <i class="fas fa-arrow-left"></i> Volver a envío
                                 </button>
-                            @endif
-                        </div>
+
+                                @if ($paymentMethod !== 'mercadopago')
+                                    <button wire:click="placeOrder" 
+                                            wire:loading.attr="disabled"
+                                            {{ !$hasValidItems ? 'disabled' : '' }}
+                                            @style(['opacity: 0.5; cursor: not-allowed; pointer-events: none;' => !$hasValidItems])
+                                            class="px-10 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-purple-100 flex items-center gap-3 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <span wire:loading.remove wire:target="placeOrder">Confirmar Pedido <i class="fas fa-check"></i></span>
+                                        <span wire:loading wire:target="placeOrder" class="flex items-center gap-2">
+                                            <i class="fas fa-spinner fa-spin"></i> Procesando...
+                                        </span>
+                                    </button>
+                                @endif
+                            </div>
+                        @endif
                     @endif
                 </div>
 

@@ -18,6 +18,9 @@ class Order extends Model
         'shipping_cost',
         'subtotal',
         'total',
+        'transfer_issuer_name',
+        'transfer_issuer_cuit',
+        'transfer_receipt_path',
     ];
 
     protected $casts = [
