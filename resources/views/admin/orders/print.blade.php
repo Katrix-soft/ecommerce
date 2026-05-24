@@ -11,13 +11,32 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print {
+            @page {
+                margin: 0.5cm;
+                size: portrait;
+            }
             .no-print {
-                display: none;
+                display: none !important;
             }
             body {
-                background-color: white;
-                color: black;
-                font-size: 12px;
+                background-color: white !important;
+                color: black !important;
+                font-size: 10px !important;
+                padding: 0 !important;
+            }
+            .mb-6 { margin-bottom: 10px !important; }
+            .mb-5 { margin-bottom: 10px !important; }
+            .pb-5 { padding-bottom: 10px !important; }
+            .mb-10 { margin-bottom: 10px !important; }
+            .mt-10 { margin-top: 15px !important; }
+            .pt-10 { padding-top: 15px !important; }
+            .py-3 { padding-top: 4px !important; padding-bottom: 4px !important; }
+            h1 { font-size: 16px !important; }
+            h3 { font-size: 11px !important; margin-bottom: 2px !important; }
+            p, span, td, th { font-size: 10px !important; }
+            /* Hide URL printing from browsers */
+            a[href]:after {
+                content: none !important;
             }
         }
     </style>
