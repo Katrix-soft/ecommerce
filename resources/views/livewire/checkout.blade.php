@@ -427,7 +427,8 @@
                                                 </div>
                                             </label>
 
-                                            <!-- Bank Transfer selector -->
+                                            <!-- Bank Transfer selector (Comentado temporalmente) -->
+                                            {{--
                                             <label class="block cursor-pointer">
                                                 <input type="radio" name="paymentMethod" value="bank_transfer" 
                                                        wire:model.live="paymentMethod" class="peer sr-only">
@@ -439,6 +440,7 @@
                                                     <p class="text-[9px] text-gray-400 mt-0.5">Coordinar envío del ticket</p>
                                                 </div>
                                             </label>
+                                            --}}
 
                                             <!-- Cash on Delivery selector (Comentado temporalmente) -->
                                             {{--
