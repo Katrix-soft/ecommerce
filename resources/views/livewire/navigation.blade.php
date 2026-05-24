@@ -104,7 +104,7 @@
                     <span id="cart-count" class="absolute -top-1 -right-2 inline-flex items-center justify-center w-5 h-5 bg-amber-500 rounded-full text-[10px] font-bold text-white"> {{Cart::instance('shopping')->count()}} </span>
                     
                     <!-- Leyenda de productos en carrito constante -->
-                    <div id="cart-tooltip" class="absolute top-1/2 -translate-y-1/2 left-full ml-3 mt-4 w-36 bg-white rounded-lg shadow-lg border border-gray-100 p-2 z-[60] transform origin-left transition-all duration-500 {{ Cart::instance('shopping')->count() > 0 ? 'animate-pulse' : 'opacity-0 pointer-events-none' }}">
+                    <div id="cart-tooltip" class="hidden md:block absolute top-1/2 -translate-y-1/2 left-full ml-3 mt-4 w-36 bg-white rounded-lg shadow-lg border border-gray-100 p-2 z-[60] transform origin-left transition-all duration-500 group-hover:opacity-0 group-hover:invisible group-hover:animate-none {{ Cart::instance('shopping')->count() > 0 ? 'animate-pulse' : 'opacity-0 pointer-events-none' }}">
                         <div class="absolute top-1/2 -translate-y-1/2 -left-1.5 -mt-4 w-3 h-3 bg-white border-b border-l border-gray-100 transform rotate-45"></div>
                         <div class="relative z-10 flex flex-col items-center justify-center gap-0.5">
                             <i class="fas fa-shopping-basket text-amber-500 text-base mb-0.5"></i>

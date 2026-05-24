@@ -29,7 +29,12 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        if (auth()->user()->hasRole('superadmin')) {
+            return redirect()->route('superadmin.dashboard');
+        } elseif (auth()->user()->hasRole('admin')) {
+            return redirect()->route('admin.dashboard');
+        }
+        return redirect()->route('welcome.index');
     })->name('dashboard');
 
     Route::get('shipping', [ShippingController::class, 'index'])->name('shipping.index');

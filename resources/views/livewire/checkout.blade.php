@@ -155,9 +155,9 @@
 
         @else
             <!-- STEPS 1 & 2: MAIN WORKSPACE -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+            <div class="max-w-4xl mx-auto mb-12">
                 <!-- Form Area -->
-                <div class="lg:col-span-2 space-y-8">
+                <div class="space-y-8">
                     @if ($step == 1)
                         <!-- STEP 1: SHIPPING ADDRESSES -->
                         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
@@ -379,6 +379,8 @@
                             </div>
                         </div>
 
+                        @include('livewire.partials.checkout-summary')
+
                         <!-- Continue Button to step 2 -->
                         <div class="flex justify-end pt-4">
                             <button wire:click="goToPayment" 
@@ -401,7 +403,7 @@
 
                             <div class="p-6">
                                 <!-- Payment Selector Cards -->
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                                     <!-- Credit Card selector -->
                                     <label class="block cursor-pointer">
                                         <input type="radio" name="paymentMethod" value="mercadopago" 
@@ -428,7 +430,8 @@
                                         </div>
                                     </label>
 
-                                    <!-- Cash on Delivery selector -->
+                                    <!-- Cash on Delivery selector (Comentado temporalmente) -->
+                                    {{--
                                     <label class="block cursor-pointer">
                                         <input type="radio" name="paymentMethod" value="cash" 
                                                wire:model.live="paymentMethod" class="peer sr-only">
@@ -440,7 +443,10 @@
                                             <p class="text-[10px] text-gray-400 mt-1">Pagás al recibir el pedido</p>
                                         </div>
                                     </label>
+                                    --}}
                                 </div>
+
+                                @include('livewire.partials.checkout-summary')
 
                                 @if ($paymentMethod === 'mercadopago')
                                     <div wire:key="payment-method-mp">
@@ -613,69 +619,6 @@
                             </div>
                         @endif
                     @endif
-                </div>
-
-                <!-- Sticky Order Summary Sidebar -->
-                <div class="lg:col-span-1">
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sticky top-8">
-                        <h3 class="text-xl font-bold text-gray-800 mb-6">Resumen</h3>
-                        
-                        <!-- List items in cart -->
-                        <div class="max-h-56 overflow-y-auto mb-6 pr-2 space-y-4 custom-scrollbar">
-                            @foreach (Cart::instance('shopping')->content() as $item)
-                                @php
-                                    $isExceeded = $item->qty > ($stocks[$item->id] ?? 0);
-                                @endphp
-                                <div class="flex items-start gap-4">
-                                    <div class="w-10 h-10 {{ $isExceeded ? 'bg-red-50 text-red-500 border-red-100' : 'bg-gray-50 text-purple-600 border-gray-100/50' }} rounded-xl flex items-center justify-center font-bold text-xs border">
-                                        {{ $item->qty }}x
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        @if ($isExceeded)
-                                            <span class="text-[9px] text-red-500 font-bold block mb-0.5">Stock insuficiente</span>
-                                        @endif
-                                        <p class="text-xs font-bold {{ $isExceeded ? 'text-red-500' : 'text-gray-800' }} truncate" title="{{ $item->name }}">{{ $item->name }}</p>
-                                        <p class="text-[10px] text-gray-400 mt-0.5">{{ \App\Models\User::formatPrice($item->price) }} c/u</p>
-                                    </div>
-                                    <span class="text-xs font-black {{ $isExceeded ? 'text-red-400 line-through' : 'text-gray-800' }}">{{ \App\Models\User::formatPrice($item->price * $item->qty) }}</span>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        <!-- Price Breakdown -->
-                        <div class="space-y-3 pt-6 border-t border-gray-50 mb-6">
-                            <div class="flex justify-between text-gray-500 text-xs font-medium">
-                                <span>Subtotal</span>
-                                <span class="font-bold text-gray-800">{{ \App\Models\User::formatPrice($subtotal) }}</span>
-                            </div>
-                            <div class="flex justify-between text-gray-500 text-xs font-medium">
-                                <span>Envío</span>
-                                <span class="text-green-600 font-extrabold italic">¡GRATIS!</span>
-                            </div>
-                            <div class="pt-4 border-t border-gray-50 flex justify-between items-center">
-                                <span class="font-black text-gray-800 text-sm">Total</span>
-                                <span class="text-xl font-black text-purple-600">{{ \App\Models\User::formatPrice($total) }}</span>
-                            </div>
-                        </div>
-
-                        @if ($hasStockErrors)
-                            <div class="mt-4 p-4 bg-amber-50 border border-amber-100 rounded-2xl text-center mb-6">
-                                <p class="text-[10px] text-amber-600 font-black uppercase tracking-wider mb-2">Ajuste de Stock para la Compra</p>
-                                <p class="text-[10px] text-gray-500 leading-normal mb-3">Los productos marcados con stock insuficiente no se incluirán en el pedido ni se cobrarán. Puedes confirmar tu pedido solo con los productos disponibles.</p>
-                                <a href="{{ route('cart.index') }}" class="inline-block w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold rounded-xl transition-all shadow-sm">
-                                    Modificar cantidades en el carrito
-                                </a>
-                            </div>
-                        @endif
-
-                        <!-- Sidebar Tips -->
-                        <div class="bg-gray-50 rounded-2xl p-4 flex items-start gap-3">
-                            <i class="fas fa-shield-alt text-purple-500 mt-0.5 text-sm"></i>
-                            <p class="text-[10px] text-gray-500 leading-relaxed">
-                                Compra 100% protegida. Cumplimos con los estándares de seguridad de datos de la industria bancaria.
-                             </p>
-                        </div>
-                    </div>
                 </div>
             </div>
         @endif
