@@ -7,7 +7,7 @@ echo "[start] Iniciando contenedor Laravel..."
 if [ ! -f /var/www/html/.env ]; then
     touch /var/www/html/.env
 fi
-printenv | grep -E "^(APP_|DB_|SESSION_|CACHE_|QUEUE_|MAIL_|REDIS_|LIVEWIRE_)" \
+printenv | grep -E "^(APP_|DB_|SESSION_|CACHE_|QUEUE_|MAIL_|REDIS_|LIVEWIRE_|MP_)" \
     | while IFS='=' read -r key value; do
         grep -q "^${key}=" /var/www/html/.env || echo "${key}=${value}" >> /var/www/html/.env
     done
