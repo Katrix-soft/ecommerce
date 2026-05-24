@@ -213,13 +213,7 @@ class Checkout extends Component
     public function placeOrder()
     {
         if ($this->paymentMethod === 'bank_transfer') {
-            $this->validate([
-                'transfer_issuer_name' => 'required|string|max:255',
-                'transfer_issuer_cuit' => 'required|string|max:20',
-            ], [
-                'transfer_issuer_name.required' => 'El nombre del titular es obligatorio.',
-                'transfer_issuer_cuit.required' => 'El CUIT/CUIL es obligatorio.',
-            ]);
+            // Sin validaciones, el webhook hace todo
         }
 
         $tenant = \App\Models\User::getTenant();

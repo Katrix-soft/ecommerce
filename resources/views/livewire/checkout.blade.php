@@ -457,110 +457,52 @@
                                     }">
                                         <div id="paymentBrick_container"></div>
                                     </div>
-
                                 @elseif ($paymentMethod === 'bank_transfer')
-                                    <!-- Bank Transfer UI -->
-                                    <div class="max-w-xl mx-auto bg-gray-50/50 border border-gray-100 rounded-3xl p-8 mb-4 animate-fadeIn shadow-sm">
-                                        <div class="text-center mb-8">
-                                            <h2 class="text-2xl font-black text-gray-800 uppercase tracking-tight">Esperando tu transferencia</h2>
-                                            <p class="text-sm text-gray-600 mt-2">Realiza el pago y valida tus datos para que podamos procesar tu pedido.</p>
-                                            <div class="mt-4 inline-flex flex-col items-center">
-                                                <i class="fas fa-hourglass-half text-gray-400 text-3xl mb-2"></i>
-                                                <span class="text-sm font-bold text-gray-800">Estado: <span class="text-gray-900">Pendiente de validación</span></span>
+                                    <div class="max-w-xl mx-auto bg-white border border-gray-100 rounded-3xl p-8 mb-4 animate-fadeIn shadow-sm">
+                                        <h3 class="font-bold text-gray-800 text-lg mb-6 flex items-center gap-2">
+                                            <i class="fas fa-university text-purple-500"></i>
+                                            Datos de nuestra cuenta bancaria
+                                        </h3>
+
+                                        <div class="space-y-4 mb-6">
+                                            <div class="flex justify-between text-sm border-b border-gray-50 pb-3">
+                                                <span class="text-gray-500">Banco</span>
+                                                <span class="font-bold text-gray-800">Banco Galicia</span>
+                                            </div>
+                                            <div class="flex justify-between text-sm border-b border-gray-50 pb-3">
+                                                <span class="text-gray-500">CBU</span>
+                                                <span class="font-bold text-gray-800 select-all tracking-wide">0070001120000004242421</span>
+                                            </div>
+                                            <div class="flex justify-between text-sm border-b border-gray-50 pb-3">
+                                                <span class="text-gray-500">Alias</span>
+                                                <span class="font-bold text-purple-600 select-all">shoply.ecommerce.mp</span>
+                                            </div>
+                                            <div class="flex justify-between text-sm border-b border-gray-50 pb-3">
+                                                <span class="text-gray-500">CUIT</span>
+                                                <span class="font-bold text-gray-800">30-71649234-9</span>
+                                            </div>
+                                            <div class="flex justify-between text-sm border-b border-gray-50 pb-3">
+                                                <span class="text-gray-500">Titular</span>
+                                                <span class="font-bold text-gray-800">Shoply S.A.</span>
+                                            </div>
+                                            <div class="flex justify-between text-sm border-b border-gray-50 pb-3">
+                                                <span class="text-gray-500">Monto</span>
+                                                <span class="font-black text-purple-600">{{ \App\Models\User::formatPrice($total) }}</span>
                                             </div>
                                         </div>
 
-                                        <!-- Datos Bancarios -->
-                                        <div class="bg-gray-100/80 rounded-2xl p-6 border border-gray-200 mb-6 relative">
-                                            <div class="flex justify-between items-center mb-4">
-                                                <h3 class="font-bold text-gray-800 text-base">1. Datos Bancarios</h3>
-                                                <span class="text-sm text-gray-600 font-medium">Monto total a transferir: <span class="font-black text-gray-800">{{ \App\Models\User::formatPrice($total) }}</span></span>
-                                            </div>
-                                            <div class="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
-                                                <div class="flex items-center justify-between col-span-2 sm:col-span-1">
-                                                    <span class="text-gray-500">Banco</span>
-                                                    <span class="font-bold text-gray-800">Banco Galicia</span>
-                                                </div>
-                                                <div class="flex items-center justify-between col-span-2 sm:col-span-1">
-                                                    <span class="text-gray-500">CUIT</span>
-                                                    <span class="font-bold text-gray-800 tracking-wide">30-71649234-9</span>
-                                                </div>
-                                                <div class="flex items-center justify-between col-span-2 sm:col-span-1">
-                                                    <span class="text-gray-500">CBU</span>
-                                                    <span class="font-bold text-gray-800 tracking-wide">0070001120000004242421</span>
-                                                </div>
-                                                <div class="flex items-center justify-between col-span-2 sm:col-span-1">
-                                                    <span class="text-gray-500">Titular</span>
-                                                    <span class="font-bold text-gray-800">Shoply S.A.</span>
-                                                </div>
-                                                <div class="flex items-center justify-between col-span-2 sm:col-span-1">
-                                                    <span class="text-gray-500">Alias</span>
-                                                    <span class="font-bold text-gray-800 select-all">shoply.ecommerce.mp</span>
-                                                </div>
-                                                <div class="flex items-center justify-between col-span-2 bg-yellow-50 border border-yellow-200 rounded-xl p-3 mt-2">
-                                                    <span class="text-gray-700 font-bold text-xs">⚠️ Concepto obligatorio</span>
-                                                    <span class="font-black text-purple-700 text-sm select-all tracking-wider">
-                                                        ECO-{{ str_pad($createdOrder->id ?? (\App\Models\Order::max('id') + 1), 6, '0', STR_PAD_LEFT) }}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                           <!-- Formulario de Validación -->
-                                        <div class="bg-white rounded-2xl p-6 border-[3px] border-purple-500 shadow-md shadow-purple-200/50">
-                                            <h3 class="font-bold text-gray-800 text-base mb-1">
-                                                2. Confirmá tus datos <span class="text-purple-600">(Obligatorio)</span>
-                                            </h3>
-                                            <p class="text-sm text-gray-500 mb-4">
-                                                Verificamos tu transferencia automáticamente. Solo necesitamos saber quién eres.
+                                        <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 flex justify-between items-center mb-6">
+                                            <span class="text-sm font-bold text-gray-700">⚠️ Concepto obligatorio</span>
+                                            <span class="font-black text-purple-700 text-lg select-all tracking-wider">
+                                                ECO-{{ str_pad($createdOrder->id ?? (\App\Models\Order::max('id') + 1), 6, '0', STR_PAD_LEFT) }}
+                                            </span>
+                                        </div>
+
+                                        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex gap-3 items-start">
+                                            <i class="fas fa-robot text-blue-500 mt-0.5"></i>
+                                            <p class="text-xs text-blue-700 font-medium leading-relaxed">
+                                                Tu pedido se aprobará automáticamente una vez que detectemos la transferencia. No necesitás subir ningún comprobante.
                                             </p>
-                                            
-                                            <div class="space-y-4">
-                                                <div>
-                                                    <label class="block text-xs text-gray-600 mb-1">
-                                                        Nombre completo del titular que transfiere:
-                                                    </label>
-                                                    <input type="text" wire:model="transfer_issuer_name" 
-                                                           class="w-full text-sm rounded-xl border-gray-200 focus:ring-purple-500 focus:border-purple-500 px-4 py-2.5 bg-gray-50/50" 
-                                                           placeholder="Juan Pérez">
-                                                    @error('transfer_issuer_name') 
-                                                        <span class="text-[10px] text-red-500 font-bold block mt-1">{{ $message }}</span> 
-                                                    @enderror
-                                                </div>
-                                                <div>
-                                                    <label class="block text-xs text-gray-600 mb-1">CUIT/CUIL del titular emisor:</label>
-                                                    <input type="text" wire:model="transfer_issuer_cuit" 
-                                                           class="w-full text-sm rounded-xl border-gray-200 focus:ring-purple-500 focus:border-purple-500 px-4 py-2.5 bg-gray-50/50" 
-                                                           placeholder="XX-XXXXXXXX-X">
-                                                    @error('transfer_issuer_cuit') 
-                                                        <span class="text-[10px] text-red-500 font-bold block mt-1">{{ $message }}</span> 
-                                                    @enderror
-                                                </div>
-
-                                                <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3 items-start">
-                                                    <i class="fas fa-robot text-blue-500 mt-0.5"></i>
-                                                    <p class="text-xs text-blue-700 font-medium leading-relaxed">
-                                                        Una vez que realices la transferencia con el concepto <strong>ECO-{{ str_pad($createdOrder->id ?? (\App\Models\Order::max('id') + 1), 6, '0', STR_PAD_LEFT) }}</strong>, 
-                                                        tu pedido se aprobará automáticamente. No necesitás subir ningún comprobante.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Botón de Confirmación -->
-                                        <div class="mt-6 flex flex-col items-center">
-                                            <button wire:click="placeOrder" 
-                                                    wire:loading.attr="disabled"
-                                                    {{ !$hasValidItems ? 'disabled' : '' }}
-                                                    @style(['opacity: 0.5; cursor: not-allowed; pointer-events: none;' => !$hasValidItems])
-                                                    class="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-purple-200 flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
-                                                <span wire:loading.remove wire:target="placeOrder">VERIFICAR TRANSFERENCIA Y COMPLETAR PEDIDO</span>
-                                                <span wire:loading wire:target="placeOrder" class="flex items-center gap-2">
-                                                    <i class="fas fa-spinner fa-spin"></i> Procesando...
-                                                </span>
-                                            </button>
-                                            <p class="text-xs text-gray-700 mt-3 text-center font-medium">Al enviar, confirmas que has realizado la transferencia.</p>
-                                            <button wire:click="backToShipping" class="mt-4 text-sm font-bold text-gray-600 hover:text-gray-900 transition-colors">
-                                                <i class="fas fa-arrow-left mr-1"></i> Volver atrás
-                                            </button>
                                         </div>
                                     </div>
 
@@ -586,26 +528,23 @@
                         </div>
 
                         <!-- Buttons Navigation for step 2 -->
-                        @if ($paymentMethod !== 'bank_transfer')
-                            <div class="flex justify-between pt-4">
-                                <button wire:click="backToShipping" class="px-8 py-4 border-2 border-purple-200 hover:bg-purple-50 text-purple-600 font-bold rounded-2xl transition-all flex items-center gap-2 active:scale-95">
-                                    <i class="fas fa-arrow-left"></i> Volver a envío
-                                </button>
+                        <div class="flex justify-between pt-4">
+                            <button wire:click="backToShipping" class="px-8 py-4 border-2 border-purple-200 hover:bg-purple-50 text-purple-600 font-bold rounded-2xl transition-all flex items-center gap-2 active:scale-95">
+                                <i class="fas fa-arrow-left"></i> Volver a envío
+                            </button>
 
-                                @if ($paymentMethod !== 'mercadopago')
-                                    <button wire:click="placeOrder" 
-                                            wire:loading.attr="disabled"
-                                            {{ !$hasValidItems ? 'disabled' : '' }}
-                                            @style(['opacity: 0.5; cursor: not-allowed; pointer-events: none;' => !$hasValidItems])
-                                            class="px-10 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-purple-100 flex items-center gap-3 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
-                                        <span wire:loading.remove wire:target="placeOrder">Confirmar Pedido <i class="fas fa-check"></i></span>
-                                        <span wire:loading wire:target="placeOrder" class="flex items-center gap-2">
-                                            <i class="fas fa-spinner fa-spin"></i> Procesando...
-                                        </span>
-                                    </button>
-                                @endif
-                            </div>
-                        @endif
+                            @if ($paymentMethod !== 'mercadopago')
+                                <button wire:click="placeOrder"
+                                        wire:loading.attr="disabled"
+                                        {{ !$hasValidItems ? 'disabled' : '' }}
+                                        class="px-10 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-purple-100 flex items-center gap-3 active:scale-95 disabled:opacity-50">
+                                    <span wire:loading.remove wire:target="placeOrder">Confirmar Pedido <i class="fas fa-check"></i></span>
+                                    <span wire:loading wire:target="placeOrder" class="flex items-center gap-2">
+                                        <i class="fas fa-spinner fa-spin"></i> Procesando...
+                                    </span>
+                                </button>
+                            @endif
+                        </div>
                     @endif
                 </div>
 
