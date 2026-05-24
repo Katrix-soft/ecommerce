@@ -148,7 +148,9 @@ class Checkout extends Component
 
     public function goToPayment()
     {
-        if (Cart::instance('shopping')->count() == 0) {
+        $cart = Cart::instance('shopping')->content();
+
+        if ($cart->count() == 0) {
             $this->dispatch('swal', [
                 'icon' => 'warning',
                 'title' => 'Carrito vacío',
@@ -156,6 +158,22 @@ class Checkout extends Component
                 'confirmButtonColor' => '#7c3aed',
             ]);
             return;
+        }
+
+        $itemIds = $cart->pluck('id')->toArray();
+        $stocks = Variant::whereIn('id', $itemIds)->pluck('stock', 'id')->toArray();
+        $hasValidItems = false;
+
+        foreach ($cart as $item) {
+            $stock = $stocks[$item->id] ?? 0;
+            if ($item->qty <= $stock) {
+                $hasValidItems = true;
+                break;
+            }
+        }
+
+        if (!$hasValidItems) {
+            return redirect()->route('cart.index');
         }
 
         if (!$this->selectedAddressId) {
@@ -382,8 +400,8 @@ class Checkout extends Component
             'stocks' => $stocks,
             'hasStockErrors' => $hasStockErrors,
             'hasValidItems' => $hasValidItems,
-            'subtotal' => number_format($subtotalVal, 2),
-            'total' => number_format($subtotalVal, 2),
+            'subtotal' => $subtotalVal,
+            'total' => $subtotalVal,
             'totalAmount' => $subtotalVal,
             'mpPublicKey' => config('mercadopago.public_key'),
         ]);

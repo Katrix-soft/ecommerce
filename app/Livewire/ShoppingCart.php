@@ -113,8 +113,8 @@ class ShoppingCart extends Component
             'stocks' => $stocks,
             'hasStockErrors' => $hasStockErrors,
             'hasValidItems' => $hasValidItems,
-            'total' => number_format($subtotalVal, 2),
-            'subtotal' => number_format($subtotalVal, 2),
+            'total' => $subtotalVal,
+            'subtotal' => $subtotalVal,
         ]);
     }
 }
