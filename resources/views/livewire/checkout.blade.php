@@ -392,79 +392,87 @@
                         </div>
 
                     @elseif ($step == 2)
-                        <!-- STEP 2: PAYMENT METHOD -->
-                        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div class="p-6 border-b border-gray-50 bg-gray-50/50">
-                                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                                    <i class="fas fa-credit-card text-purple-500"></i>
-                                    Método de Pago
-                                </h2>
+                        <!-- STEP 2: PAYMENT METHOD (2-column layout) -->
+                        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                            <!-- LEFT: Order Summary -->
+                            <div class="lg:col-span-2">
+                                <div class="lg:sticky lg:top-8">
+                                    @include('livewire.partials.checkout-summary')
+                                </div>
                             </div>
 
-                            <div class="p-6">
-                                <!-- Payment Selector Cards -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                                    <!-- Credit Card selector -->
-                                    <label class="block cursor-pointer">
-                                        <input type="radio" name="paymentMethod" value="mercadopago" 
-                                               wire:model.live="paymentMethod" class="peer sr-only">
-                                        <div class="p-5 rounded-2xl border-2 border-gray-100 peer-checked:border-purple-600 peer-checked:bg-purple-50/20 text-center hover:border-gray-200 transition-all shadow-sm">
-                                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                                <i class="fas fa-credit-card text-purple-600 text-lg"></i>
-                                            </div>
-                                            <p class="font-bold text-gray-800 text-sm">Mercado Pago</p>
-                                            <p class="text-[10px] text-gray-400 mt-1">Tarjetas o saldo</p>
-                                        </div>
-                                    </label>
-
-                                    <!-- Bank Transfer selector -->
-                                    <label class="block cursor-pointer">
-                                        <input type="radio" name="paymentMethod" value="bank_transfer" 
-                                               wire:model.live="paymentMethod" class="peer sr-only">
-                                        <div class="p-5 rounded-2xl border-2 border-gray-100 peer-checked:border-purple-600 peer-checked:bg-purple-50/20 text-center hover:border-gray-200 transition-all shadow-sm">
-                                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                                <i class="fas fa-university text-purple-600 text-lg"></i>
-                                            </div>
-                                            <p class="font-bold text-gray-800 text-sm">Transferencia</p>
-                                            <p class="text-[10px] text-gray-400 mt-1">Coordinar envío del ticket</p>
-                                        </div>
-                                    </label>
-
-                                    <!-- Cash on Delivery selector (Comentado temporalmente) -->
-                                    {{--
-                                    <label class="block cursor-pointer">
-                                        <input type="radio" name="paymentMethod" value="cash" 
-                                               wire:model.live="paymentMethod" class="peer sr-only">
-                                        <div class="p-5 rounded-2xl border-2 border-gray-100 peer-checked:border-purple-600 peer-checked:bg-purple-50/20 text-center hover:border-gray-200 transition-all shadow-sm">
-                                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                                <i class="fas fa-hand-holding-usd text-purple-600 text-lg"></i>
-                                            </div>
-                                            <p class="font-bold text-gray-800 text-sm">Efectivo / Contraentrega</p>
-                                            <p class="text-[10px] text-gray-400 mt-1">Pagás al recibir el pedido</p>
-                                        </div>
-                                    </label>
-                                    --}}
-                                </div>
-
-                                @include('livewire.partials.checkout-summary')
-
-                                @if ($paymentMethod === 'mercadopago')
-                                    <div wire:key="payment-method-mp">
-                                        <div wire:ignore class="mt-8 max-w-md mx-auto" x-data="{
-                                            init() {
-                                                const tryInit = () => {
-                                                    if (typeof window.initMercadoPago === 'function') {
-                                                        window.initMercadoPago();
-                                                    } else {
-                                                        setTimeout(tryInit, 200);
-                                                    }
-                                                };
-                                                tryInit();
-                                            }
-                                        }">
-                                            <div id="paymentBrick_container"></div>
-                                        </div>
+                            <!-- RIGHT: Payment Methods -->
+                            <div class="lg:col-span-3 space-y-6">
+                                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                                    <div class="p-5 border-b border-gray-50 bg-gray-50/50">
+                                        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                                            <i class="fas fa-credit-card text-purple-500"></i>
+                                            Método de Pago
+                                        </h2>
                                     </div>
+
+                                    <div class="p-5">
+                                        <!-- Payment Selector Cards -->
+                                        <div class="grid grid-cols-2 gap-3 mb-6">
+                                            <!-- Credit Card selector -->
+                                            <label class="block cursor-pointer">
+                                                <input type="radio" name="paymentMethod" value="mercadopago" 
+                                                       wire:model.live="paymentMethod" class="peer sr-only">
+                                                <div class="p-4 rounded-2xl border-2 border-gray-100 peer-checked:border-purple-600 peer-checked:bg-purple-50/20 text-center hover:border-gray-200 transition-all shadow-sm">
+                                                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                                        <i class="fas fa-credit-card text-purple-600 text-sm"></i>
+                                                    </div>
+                                                    <p class="font-bold text-gray-800 text-xs">Mercado Pago</p>
+                                                    <p class="text-[9px] text-gray-400 mt-0.5">Tarjetas o saldo</p>
+                                                </div>
+                                            </label>
+
+                                            <!-- Bank Transfer selector -->
+                                            <label class="block cursor-pointer">
+                                                <input type="radio" name="paymentMethod" value="bank_transfer" 
+                                                       wire:model.live="paymentMethod" class="peer sr-only">
+                                                <div class="p-4 rounded-2xl border-2 border-gray-100 peer-checked:border-purple-600 peer-checked:bg-purple-50/20 text-center hover:border-gray-200 transition-all shadow-sm">
+                                                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                                        <i class="fas fa-university text-purple-600 text-sm"></i>
+                                                    </div>
+                                                    <p class="font-bold text-gray-800 text-xs">Transferencia</p>
+                                                    <p class="text-[9px] text-gray-400 mt-0.5">Coordinar envío del ticket</p>
+                                                </div>
+                                            </label>
+
+                                            <!-- Cash on Delivery selector (Comentado temporalmente) -->
+                                            {{--
+                                            <label class="block cursor-pointer">
+                                                <input type="radio" name="paymentMethod" value="cash" 
+                                                       wire:model.live="paymentMethod" class="peer sr-only">
+                                                <div class="p-4 rounded-2xl border-2 border-gray-100 peer-checked:border-purple-600 peer-checked:bg-purple-50/20 text-center hover:border-gray-200 transition-all shadow-sm">
+                                                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                                        <i class="fas fa-hand-holding-usd text-purple-600 text-sm"></i>
+                                                    </div>
+                                                    <p class="font-bold text-gray-800 text-xs">Efectivo / Contraentrega</p>
+                                                    <p class="text-[9px] text-gray-400 mt-0.5">Pagás al recibir el pedido</p>
+                                                </div>
+                                            </label>
+                                            --}}
+                                        </div>
+
+                                        @if ($paymentMethod === 'mercadopago')
+                                            <div wire:key="payment-method-mp">
+                                                <div wire:ignore class="mt-4" x-data="{
+                                                    init() {
+                                                        const tryInit = () => {
+                                                            if (typeof window.initMercadoPago === 'function') {
+                                                                window.initMercadoPago();
+                                                            } else {
+                                                                setTimeout(tryInit, 200);
+                                                            }
+                                                        };
+                                                        tryInit();
+                                                    }
+                                                }">
+                                                    <div id="paymentBrick_container"></div>
+                                                </div>
+                                            </div>
                                 @elseif ($paymentMethod === 'bank_transfer')
                                     <div wire:key="payment-method-transfer" class="max-w-xl mx-auto bg-white border border-gray-100 rounded-3xl p-4 sm:p-8 pb-4 mb-0 animate-fadeIn shadow-sm text-center">
                                         <h2 class="text-xl font-black text-gray-800 mb-2 uppercase tracking-wide">Esperando tu transferencia</h2>
@@ -595,29 +603,31 @@
                                         </div>
                                     </div>
                                 @endif
-                            </div>
-                        </div>
+                                    </div>
+                                </div>
 
-                        <!-- Buttons Navigation for step 2 -->
-                        @if ($paymentMethod !== 'bank_transfer')
-                            <div class="flex justify-between pt-4">
-                                <button wire:click="backToShipping" class="px-8 py-4 border-2 border-purple-200 hover:bg-purple-50 text-purple-600 font-bold rounded-2xl transition-all flex items-center gap-2 active:scale-95">
-                                    <i class="fas fa-arrow-left"></i> Volver a envío
-                                </button>
+                                <!-- Buttons Navigation for step 2 -->
+                                @if ($paymentMethod !== 'bank_transfer')
+                                    <div class="flex justify-between pt-4">
+                                        <button wire:click="backToShipping" class="px-6 py-3 border-2 border-purple-200 hover:bg-purple-50 text-purple-600 font-bold rounded-2xl transition-all flex items-center gap-2 active:scale-95 text-sm">
+                                            <i class="fas fa-arrow-left"></i> Volver a envío
+                                        </button>
 
-                                @if ($paymentMethod !== 'mercadopago')
-                                    <button wire:click="placeOrder"
-                                            wire:loading.attr="disabled"
-                                            {{ !$hasValidItems ? 'disabled' : '' }}
-                                            class="px-10 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-purple-100 flex items-center gap-3 active:scale-95 disabled:opacity-50">
-                                        <span wire:loading.remove wire:target="placeOrder">Confirmar Pedido <i class="fas fa-check"></i></span>
-                                        <span wire:loading wire:target="placeOrder" class="flex items-center gap-2">
-                                            <i class="fas fa-spinner fa-spin"></i> Procesando...
-                                        </span>
-                                    </button>
+                                        @if ($paymentMethod !== 'mercadopago')
+                                            <button wire:click="placeOrder"
+                                                    wire:loading.attr="disabled"
+                                                    {{ !$hasValidItems ? 'disabled' : '' }}
+                                                    class="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-purple-100 flex items-center gap-3 active:scale-95 disabled:opacity-50 text-sm">
+                                                <span wire:loading.remove wire:target="placeOrder">Confirmar Pedido <i class="fas fa-check"></i></span>
+                                                <span wire:loading wire:target="placeOrder" class="flex items-center gap-2">
+                                                    <i class="fas fa-spinner fa-spin"></i> Procesando...
+                                                </span>
+                                            </button>
+                                        @endif
+                                    </div>
                                 @endif
                             </div>
-                        @endif
+                        </div>
                     @endif
                 </div>
             </div>
