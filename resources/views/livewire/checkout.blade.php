@@ -497,60 +497,51 @@
                                                     <span class="text-gray-500">Alias</span>
                                                     <span class="font-bold text-gray-800 select-all">shoply.ecommerce.mp</span>
                                                 </div>
+                                                <div class="flex items-center justify-between col-span-2 bg-yellow-50 border border-yellow-200 rounded-xl p-3 mt-2">
+                                                    <span class="text-gray-700 font-bold text-xs">⚠️ Concepto obligatorio</span>
+                                                    <span class="font-black text-purple-700 text-sm select-all tracking-wider">
+                                                        ECO-{{ str_pad($createdOrder->id ?? (\App\Models\Order::max('id') + 1), 6, '0', STR_PAD_LEFT) }}
+                                                    </span>
+                                                </div>
                                             </div>
-                                        </div>
-
-                                        <!-- Formulario de Validación -->
-                                        <div class="bg-white rounded-2xl p-6 border-[3px] border-purple-500 shadow-md shadow-purple-200/50 relative overflow-hidden">
-                                            <h3 class="font-bold text-gray-800 text-base mb-1">2. Validación de Transferencia <span class="text-purple-600">(Obligatorio)</span></h3>
-                                            <p class="text-sm font-bold text-gray-800 mb-4">Dinos quién eres y sube tu comprobante</p>
+                                           <!-- Formulario de Validación -->
+                                        <div class="bg-white rounded-2xl p-6 border-[3px] border-purple-500 shadow-md shadow-purple-200/50">
+                                            <h3 class="font-bold text-gray-800 text-base mb-1">
+                                                2. Confirmá tus datos <span class="text-purple-600">(Obligatorio)</span>
+                                            </h3>
+                                            <p class="text-sm text-gray-500 mb-4">
+                                                Verificamos tu transferencia automáticamente. Solo necesitamos saber quién eres.
+                                            </p>
                                             
                                             <div class="space-y-4">
                                                 <div>
-                                                    <label class="block text-xs text-gray-600 mb-1">Nombre completo del titular que transfiere (debe coincidir con la cuenta de origen):</label>
-                                                    <input type="text" wire:model="transfer_issuer_name" class="w-full text-sm rounded-xl border-gray-200 focus:ring-purple-500 focus:border-purple-500 px-4 py-2.5 bg-gray-50/50" placeholder="Juan Pérez">
-                                                    @error('transfer_issuer_name') <span class="text-[10px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
+                                                    <label class="block text-xs text-gray-600 mb-1">
+                                                        Nombre completo del titular que transfiere:
+                                                    </label>
+                                                    <input type="text" wire:model="transfer_issuer_name" 
+                                                           class="w-full text-sm rounded-xl border-gray-200 focus:ring-purple-500 focus:border-purple-500 px-4 py-2.5 bg-gray-50/50" 
+                                                           placeholder="Juan Pérez">
+                                                    @error('transfer_issuer_name') 
+                                                        <span class="text-[10px] text-red-500 font-bold block mt-1">{{ $message }}</span> 
+                                                    @enderror
                                                 </div>
                                                 <div>
                                                     <label class="block text-xs text-gray-600 mb-1">CUIT/CUIL del titular emisor:</label>
-                                                    <input type="text" wire:model="transfer_issuer_cuit" class="w-full text-sm rounded-xl border-gray-200 focus:ring-purple-500 focus:border-purple-500 px-4 py-2.5 bg-gray-50/50" placeholder="XX-XXXXXXXX-X">
-                                                    @error('transfer_issuer_cuit') <span class="text-[10px] text-red-500 font-bold block mt-1">{{ $message }}</span> @enderror
+                                                    <input type="text" wire:model="transfer_issuer_cuit" 
+                                                           class="w-full text-sm rounded-xl border-gray-200 focus:ring-purple-500 focus:border-purple-500 px-4 py-2.5 bg-gray-50/50" 
+                                                           placeholder="XX-XXXXXXXX-X">
+                                                    @error('transfer_issuer_cuit') 
+                                                        <span class="text-[10px] text-red-500 font-bold block mt-1">{{ $message }}</span> 
+                                                    @enderror
                                                 </div>
-                                                
-                                                <!-- Dropzone File Upload -->
-                                                <div class="relative border-2 border-dashed border-purple-300 rounded-2xl p-6 text-center bg-purple-50/30 hover:bg-purple-50/50 transition-colors mt-2 group">
-                                                    <input type="file" wire:model="transfer_receipt" accept="image/*,.pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" id="receiptUpload">
-                                                    
-                                                    <div wire:loading wire:target="transfer_receipt" class="absolute inset-0 bg-white/80 z-20 flex flex-col items-center justify-center rounded-2xl">
-                                                        <i class="fas fa-spinner fa-spin text-purple-600 text-2xl mb-2"></i>
-                                                        <span class="text-xs font-bold text-purple-600">Subiendo archivo...</span>
-                                                    </div>
 
-                                                    <div class="flex flex-col items-center justify-center pointer-events-none">
-                                                        @if ($transfer_receipt)
-                                                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3 shadow-sm border border-green-200">
-                                                                <i class="fas fa-check text-green-600 text-xl"></i>
-                                                            </div>
-                                                            <p class="font-bold text-gray-800 text-sm">¡Archivo cargado!</p>
-                                                            <p class="text-xs text-gray-500 mt-1 truncate max-w-[200px]">{{ is_string($transfer_receipt) ? 'Archivo procesado' : $transfer_receipt->getClientOriginalName() }}</p>
-                                                        @else
-                                                            <div class="flex items-center gap-3 text-purple-600 mb-3">
-                                                                <i class="fas fa-upload text-xl"></i>
-                                                                <i class="fas fa-file-pdf text-xl"></i>
-                                                                <i class="fas fa-image text-xl"></i>
-                                                            </div>
-                                                            <p class="font-bold text-gray-800 text-sm">**Adjuntar Comprobante (PDF o imagen)</p>
-                                                            <div class="mt-3 bg-purple-600 text-white font-bold text-xs px-6 py-2.5 rounded-xl shadow-sm group-hover:bg-purple-700 transition-colors pointer-events-auto">
-                                                                Sube tu ticket aquí
-                                                            </div>
-                                                        @endif
-                                                    </div>
+                                                <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3 items-start">
+                                                    <i class="fas fa-robot text-blue-500 mt-0.5"></i>
+                                                    <p class="text-xs text-blue-700 font-medium leading-relaxed">
+                                                        Una vez que realices la transferencia con el concepto <strong>ECO-{{ str_pad($createdOrder->id ?? (\App\Models\Order::max('id') + 1), 6, '0', STR_PAD_LEFT) }}</strong>, 
+                                                        tu pedido se aprobará automáticamente. No necesitás subir ningún comprobante.
+                                                    </p>
                                                 </div>
-                                                @error('transfer_receipt') <span class="text-[10px] text-red-500 font-bold block text-center mt-1">{{ $message }}</span> @enderror
-
-                                                <p class="text-xs text-gray-700 font-medium leading-relaxed mt-4">
-                                                    Nuestros operadores verificarán los datos en el banco para aprobar tu pedido de inmediato, evitando el correo electrónico.
-                                                </p>
                                             </div>
                                         </div>
 
@@ -561,8 +552,8 @@
                                                     {{ !$hasValidItems ? 'disabled' : '' }}
                                                     @style(['opacity: 0.5; cursor: not-allowed; pointer-events: none;' => !$hasValidItems])
                                                     class="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-purple-200 flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
-                                                <span wire:loading.remove wire:target="placeOrder, transfer_receipt">VERIFICAR TRANSFERENCIA Y COMPLETAR PEDIDO</span>
-                                                <span wire:loading wire:target="placeOrder, transfer_receipt" class="flex items-center gap-2">
+                                                <span wire:loading.remove wire:target="placeOrder">VERIFICAR TRANSFERENCIA Y COMPLETAR PEDIDO</span>
+                                                <span wire:loading wire:target="placeOrder" class="flex items-center gap-2">
                                                     <i class="fas fa-spinner fa-spin"></i> Procesando...
                                                 </span>
                                             </button>

@@ -83,42 +83,72 @@ class MercadoPagoController extends Controller
      */
     public function handleWebhook(Request $request)
     {
-        \Illuminate\Support\Facades\Log::info('Mercado Pago Webhook Received:', $request->all());
+        \Illuminate\Support\Facades\Log::info('MP Webhook:', $request->all());
 
-        $type = $request->input('type');
+        $type   = $request->input('type');
         $action = $request->input('action');
-        
+
         $paymentId = null;
-        
         if ($type === 'payment' && $request->has('data.id')) {
             $paymentId = $request->input('data.id');
-        } elseif (isset($action) && strpos($action, 'payment.') === 0 && $request->has('data.id')) {
+        } elseif (isset($action) && str_starts_with($action, 'payment.') && $request->has('data.id')) {
             $paymentId = $request->input('data.id');
         }
 
-        if ($paymentId) {
-            try {
-                $client = new PaymentClient();
-                $payment = $client->get($paymentId);
-
-                $order = \App\Models\Order::where('mp_payment_id', $paymentId)->first();
-
-                if ($order) {
-                    if ($payment->status === 'approved') {
-                        $order->payment_status = 'paid';
-                    } elseif ($payment->status === 'rejected' || $payment->status === 'cancelled') {
-                        $order->payment_status = 'failed';
-                    }
-                    $order->save();
-                    \Illuminate\Support\Facades\Log::info("Order #{$order->id} payment status updated to {$order->payment_status} via webhook");
-                }
-
-            } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('Error processing Mercado Pago webhook: ' . $e->getMessage());
-                return response()->json(['error' => 'Webhook processing failed'], 500);
-            }
+        if (!$paymentId) {
+            return response()->json(['status' => 'ok']);
         }
 
-        return response()->json(['status' => 'success'], 200);
+        try {
+            $client  = new PaymentClient();
+            $payment = $client->get($paymentId);
+
+            if ($payment->status !== 'approved') {
+                return response()->json(['status' => 'ok']);
+            }
+
+            $monto       = $payment->transaction_amount;
+            $descripcion = $payment->description ?? ''; // acá viene el concepto "ECO-0042"
+            $email       = $payment->payer->email ?? null;
+
+            // Buscar por external_reference primero (más exacto)
+            $order = \App\Models\Order::where('payment_status', 'pending')
+                ->where(function ($q) use ($descripcion, $monto, $email) {
+                    // Match por referencia en el concepto
+                    $q->whereRaw("? LIKE CONCAT('%', CAST(id AS CHAR), '%')", [$descripcion])
+                      // O por monto + email como fallback
+                      ->orWhere(function ($q2) use ($monto, $email) {
+                          $q2->where('total', $monto)
+                             ->where(function ($q3) use ($email) {
+                                 $q3->where('transfer_issuer_name', 'like', "%{$email}%")
+                                    ->orWhereHas('user', fn($u) => $u->where('email', $email));
+                             });
+                      });
+                })
+                ->latest()
+                ->first();
+
+            if ($order) {
+                $order->update([
+                    'payment_status' => 'paid',
+                    'mp_payment_id'  => $paymentId,
+                    'paid_at'        => now(),
+                ]);
+
+                \Illuminate\Support\Facades\Log::info("Orden #{$order->id} aprobada automáticamente via webhook MP");
+            } else {
+                \Illuminate\Support\Facades\Log::warning('MP Webhook: no se encontró orden', [
+                    'monto'      => $monto,
+                    'descripcion'=> $descripcion,
+                    'email'      => $email,
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error webhook MP: ' . $e->getMessage());
+            return response()->json(['error' => 'failed'], 500);
+        }
+
+        return response()->json(['status' => 'ok']);
     }
 }
