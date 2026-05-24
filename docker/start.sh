@@ -65,6 +65,12 @@ else
     echo "[start] Ya existen $PRODUCT_COUNT productos, saltando seeder."
 fi
 
+# ── 5.2.5 ROLES Y SUPERADMIN ──────────────────────────────────────────────────
+echo "[start] Asegurando roles y cuenta Super Admin..."
+php artisan db:seed --class=RolePermissionSeeder --force
+php artisan db:seed --class=SuperAdminSeeder --force
+echo "[start] Roles y Super Admin validados."
+
 # ── 5.3 STORAGE LINK ─────────────────────────────────────────────────────────
 echo "[start] Creando storage link..."
 php artisan storage:link --force
