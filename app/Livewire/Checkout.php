@@ -11,14 +11,18 @@ use App\Models\Variant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Gloudemans\Shoppingcart\Facades\Cart;
+use Livewire\WithFileUploads;
 
 class Checkout extends Component
 {
+    use WithFileUploads;
+
     public CreateAddressForm $form;
     
     // Transfer details
     public $transfer_issuer_name;
     public $transfer_issuer_cuit;
+    public $transfer_receipt;
 
     
     // Wizard Steps: 1 = Shipping, 2 = Payment, 3 = Confirmation/Success
@@ -213,8 +217,19 @@ class Checkout extends Component
     public function placeOrder()
     {
         if ($this->paymentMethod === 'bank_transfer') {
-            // Sin validaciones, el webhook hace todo
+            $this->validate([
+                'transfer_issuer_name' => 'required|string|max:255',
+                'transfer_issuer_cuit' => 'required|string|max:255',
+                'transfer_receipt' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
+            ], [
+                'transfer_issuer_name.required' => 'El nombre del titular es obligatorio.',
+                'transfer_issuer_cuit.required' => 'El CUIT/CUIL es obligatorio.',
+                'transfer_receipt.required' => 'Debes adjuntar un comprobante válido.',
+                'transfer_receipt.mimes' => 'El comprobante debe ser una imagen o PDF.',
+                'transfer_receipt.max' => 'El comprobante no debe superar los 5MB.',
+            ]);
         }
+
 
         $tenant = \App\Models\User::getTenant();
         if ($tenant) {
@@ -308,6 +323,7 @@ class Checkout extends Component
                     'total' => $totalVal,
                     'transfer_issuer_name' => $this->transfer_issuer_name,
                     'transfer_issuer_cuit' => $this->transfer_issuer_cuit,
+                    'transfer_receipt_path' => $this->transfer_receipt ? $this->transfer_receipt->store('receipts', 'public') : null,
                 ]);
 
                 // Crear items del pedido y descontar stock atómicamente

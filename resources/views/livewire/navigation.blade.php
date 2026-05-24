@@ -98,10 +98,63 @@
                     </x-dropdown>
             
              
-              <a href="{{ route('cart.index')}}" class="relative">
-                <i class="fas fa-shopping-cart text-white text-xl md:text-3xl"></i>
-                <span id="cart-count"  class="absolute -top-2 -right-2 inline-flex items-center justify-center w-5 h-5 bg-amber-500 rounded-full text-[10px] font-bold text-white"> {{Cart::instance('shopping')->count()}} </span>
-              </a>
+              <div class="relative group" x-data="{ expanded: false }" @mouseleave="expanded = false">
+                  <a href="{{ route('cart.index')}}" class="relative block py-1">
+                    <i class="fas fa-shopping-cart text-white text-xl md:text-3xl"></i>
+                    <span id="cart-count" class="absolute -top-1 -right-2 inline-flex items-center justify-center w-5 h-5 bg-amber-500 rounded-full text-[10px] font-bold text-white"> {{Cart::instance('shopping')->count()}} </span>
+                    
+                    <!-- Leyenda de productos en carrito constante -->
+                    <div id="cart-tooltip" class="absolute top-1/2 -translate-y-1/2 left-full ml-3 mt-4 w-36 bg-white rounded-lg shadow-lg border border-gray-100 p-2 z-[60] transform origin-left transition-all duration-500 {{ Cart::instance('shopping')->count() > 0 ? 'animate-pulse' : 'opacity-0 pointer-events-none' }}">
+                        <div class="absolute top-1/2 -translate-y-1/2 -left-1.5 -mt-4 w-3 h-3 bg-white border-b border-l border-gray-100 transform rotate-45"></div>
+                        <div class="relative z-10 flex flex-col items-center justify-center gap-0.5">
+                            <i class="fas fa-shopping-basket text-amber-500 text-base mb-0.5"></i>
+                            <p class="text-center text-teal-700 text-[11px] font-bold leading-tight">¡Tienes productos en tu carrito!</p>
+                            <span class="text-[9px] text-gray-400">Haz clic para verlos</span>
+                        </div>
+                    </div>
+                  </a>
+
+                  <!-- Dropdown Vista Rápida -->
+                  @if(Cart::instance('shopping')->count() > 0)
+                  <div class="absolute top-full right-0 mt-3 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right">
+                      <!-- Flecha del dropdown -->
+                      <div class="absolute -top-2 right-4 w-4 h-4 bg-white border-t border-l border-gray-100 transform rotate-45"></div>
+                      
+                      @php
+                          $cartItems = Cart::instance('shopping')->content()->values();
+                      @endphp
+                      
+                      <div class="p-4 relative z-10">
+                          <h3 class="text-sm font-bold text-gray-800 mb-3 border-b border-gray-50 pb-2">Vista Rápida</h3>
+                          
+                          <ul class="space-y-3">
+                              @foreach($cartItems->take(4) as $index => $item)
+                                  <li class="{{ $index >= 2 ? 'hidden' : 'flex' }} gap-3 items-center" 
+                                      x-bind:class="{ 'hidden': !expanded && {{ $index }} >= 2, 'flex': expanded || {{ $index }} < 2 }">
+                                      <img src="{{ $item->options->image ?? asset('img/no-image.png') }}" class="w-12 h-12 rounded-lg object-cover border border-gray-100 bg-gray-50">
+                                      <div class="flex-1 overflow-hidden">
+                                          <h4 class="text-xs font-bold text-gray-800 truncate" title="{{ $item->name }}">{{ $item->name }}</h4>
+                                          <p class="text-teal-600 font-bold text-xs mt-0.5">{{ \App\Models\User::formatPrice($item->price) }} <span class="text-gray-400 font-normal ml-1">x{{ $item->qty }}</span></p>
+                                      </div>
+                                  </li>
+                              @endforeach
+                          </ul>
+                          
+                          @if($cartItems->count() > 2)
+                              <div x-show="!expanded" class="pt-2 text-center">
+                                  <button @click.prevent="expanded = true" class="bg-gray-50 hover:bg-teal-50 text-gray-400 hover:text-teal-600 px-4 py-1 rounded-full transition-colors cursor-pointer outline-none">
+                                      <i class="fas fa-ellipsis-h text-lg"></i>
+                                  </button>
+                              </div>
+                          @endif
+                          
+                          <a href="{{ route('cart.index') }}" class="block w-full mt-4 bg-teal-600 hover:bg-teal-700 text-white text-center text-xs font-bold py-2.5 rounded-xl transition-colors shadow-sm">
+                              Ir al carrito
+                          </a>
+                      </div>
+                  </div>
+                  @endif
+              </div>
           </div>
 
         </div>
@@ -229,7 +282,19 @@
    @push('js')
        <script>
            Livewire.on('cartUpdated', (count) => {
-           document.getElementById('cart-count').innerText = count;
+               let cartCount = Array.isArray(count) ? count[0] : count;
+               document.getElementById('cart-count').innerText = cartCount;
+               
+               const tooltip = document.getElementById('cart-tooltip');
+               if(tooltip) {
+                   if(parseInt(cartCount) > 0) {
+                       tooltip.classList.remove('opacity-0', 'pointer-events-none');
+                       tooltip.classList.add('animate-pulse');
+                   } else {
+                       tooltip.classList.add('opacity-0', 'pointer-events-none');
+                       tooltip.classList.remove('animate-pulse');
+                   }
+               }
            });
 
            function search(value) {
