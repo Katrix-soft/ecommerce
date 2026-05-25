@@ -6,9 +6,19 @@
 ]">
 
     <x-slot name="action">
-        <a class="btn btn-blue" href="{{ route('admin.products.create') }}">
-            Nuevo
-        </a>
+        <div class="flex items-center space-x-2">
+            <button class="btn btn-red bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="document.getElementById('importUpload').click()">
+                Cargar documento
+            </button>
+            <a class="btn btn-blue" href="{{ route('admin.products.create') }}">
+                Nuevo
+            </a>
+        </div>
+
+        <form action="{{ route('admin.products.import') }}" method="POST" enctype="multipart/form-data" class="hidden" id="importForm">
+            @csrf
+            <input type="file" name="document" id="importUpload" class="hidden" onchange="document.getElementById('importForm').submit()">
+        </form>
     </x-slot>
 
     @if ($products->count())

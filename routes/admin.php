@@ -35,6 +35,7 @@ Route::middleware('check.module:products')->group(function () {
     Route::resource('products', ProductController::Class);
     Route::post('products/{product}/variants', [ProductController::class, 'Variants'])->name('products.variants')
         ->scopeBindings();
+    Route::post('products/import', [ProductController::class, 'import'])->name('products.import');
 });
 
 Route::middleware('check.module:covers')->group(function () {
