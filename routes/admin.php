@@ -32,6 +32,8 @@ Route::middleware('check.module:subcategories')->group(function () {
 });
 
 Route::middleware('check.module:products')->group(function () {
+    Route::get('products/search-suggestions', [ProductController::class, 'suggestions'])->name('products.suggestions');
+    Route::post('products/parse-document', [ProductController::class, 'parseDocument'])->name('products.parse_document')->middleware('check.module:ai_import');
     Route::resource('products', ProductController::Class);
     Route::post('products/{product}/variants', [ProductController::class, 'Variants'])->name('products.variants')
         ->scopeBindings();

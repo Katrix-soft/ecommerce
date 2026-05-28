@@ -11,7 +11,6 @@ use App\Http\Controllers\SubcategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ShippingController;
-
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome.index');
 
 Route::get('families/{family}', [FamilyController::class, 'show'])->name('families.show');

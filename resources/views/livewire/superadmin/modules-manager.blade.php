@@ -147,6 +147,27 @@
                     <i class="fa-solid fa-crown text-base text-amber-500 animate-pulse"></i>
                     Plan Premium
                 </button>
+
+                @php
+                    $isAiEnabled = false;
+                    if(isset($modules['catalogo'])) {
+                        foreach($modules['catalogo']['items'] as $item) {
+                            if($item['key'] === 'ai_import') {
+                                $isAiEnabled = $item['is_enabled'];
+                                break;
+                            }
+                        }
+                    }
+                @endphp
+                <button
+                    type="button"
+                    wire:click="toggleModule('ai_import')"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-none text-sm font-semibold transition-all duration-200 border {{ $isAiEnabled ? 'bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200' : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-200' }}"
+                >
+                    <i class="fa-solid fa-wand-magic-sparkles text-base {{ $isAiEnabled ? 'text-blue-500 animate-pulse' : 'text-gray-400' }}"></i>
+                    {{ $isAiEnabled ? 'Deshabilitar IA' : 'Habilitar IA' }}
+                </button>
+
                 <button
                     type="button"
                     x-on:click="

@@ -48,6 +48,15 @@ return [
         'routes' => ['admin.products.*'],
         'description' => 'Gestión de productos y variantes',
     ],
+    'ai_import' => [
+        'label' => 'Importación IA',
+        'icon' => 'fa-solid fa-wand-magic-sparkles',
+        'group' => 'catalogo',
+        'group_label' => 'Catálogo',
+        'routes' => ['admin.products.parse_document'],
+        'description' => 'Importar productos con IA desde Excel/PDF',
+        'show_in_sidebar' => false,
+    ],
 
     // ── OPERACIONES ──
     'orders' => [

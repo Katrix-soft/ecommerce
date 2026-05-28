@@ -16,6 +16,11 @@
 
     // Agregar módulos habilitados
     foreach ($allModules as $moduleKey => $moduleConfig) {
+        // Ignorar los módulos que no deben ir en el menú lateral
+        if (isset($moduleConfig['show_in_sidebar']) && $moduleConfig['show_in_sidebar'] === false) {
+            continue;
+        }
+
         if ($isSuperAdmin || $user->hasModule($moduleKey)) {
             // Construir la ruta del módulo
             $routeName = 'admin.' . $moduleKey . '.index';
