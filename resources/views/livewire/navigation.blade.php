@@ -164,9 +164,9 @@
         </x-container>
     </header>
 
-    <div x-show="open" x-on:click="open = false" class="fixed top-0 left-0 inset-0 bg-black bg-opacity-25 z-10" style="display: none;"></div>
+    <div x-show="open" x-on:click="open = false" class="fixed top-0 left-0 inset-0 bg-black bg-opacity-25 z-[60]" style="display: none;"></div>
 
-    <div x-show="open" class="fixed top-0 left-0 z-20" style="display: none;">
+    <div x-show="open" class="fixed top-0 left-0 z-[60]" style="display: none;">
         <div class="flex">
 
            <div class="w-screen md:w-80 h-screen bg-white">

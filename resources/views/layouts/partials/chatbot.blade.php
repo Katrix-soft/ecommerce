@@ -1,5 +1,5 @@
 <style>
-#sply-chatbot-btn{position:fixed;bottom:24px;right:6px;z-index:9999;width:clamp(48px,8vw,60px);height:clamp(48px,8vw,60px);border-radius:50%;background:linear-gradient(135deg,#1a7a5e,#2aa87e);box-shadow:0 4px 20px rgba(26,122,94,.45);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;outline:none;transition:transform .2s ease,box-shadow .2s ease;overflow:hidden;position:fixed}
+#sply-chatbot-btn{position:fixed;bottom:24px;right:6px;z-index:9999;width:clamp(48px,8vw,60px);height:clamp(48px,8vw,60px);border-radius:50%;background:#ffffff;box-shadow:0 4px 20px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;outline:none;transition:transform .2s ease,box-shadow .2s ease;overflow:hidden;position:fixed}
 #sply-chatbot-btn:hover{transform:scale(1.12);box-shadow:0 8px 28px rgba(26,122,94,.6)}
 #sply-chatbot-btn:active{transform:scale(.97)}
 #sply-chatbot-btn .sply-initials{color:#fff;font-size:15px;font-weight:700;letter-spacing:.5px;font-family:'Figtree',sans-serif;user-select:none;line-height:1;position:relative;z-index:1}
@@ -36,7 +36,7 @@
 {{-- Botón flotante --}}
 <button id="sply-chatbot-btn" onclick="splyToggle()" aria-label="Abrir asistente Shoply">
     <span class="sply-pulse-ring"></span>
-    <span class="sply-initials">Sply</span>
+    <img src="{{ asset('img/chatbot-logo.png.png') }}" alt="IA" style="width:52px;height:52px;position:relative;z-index:1;border-radius:50%;object-fit:cover;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1));" />
 </button>
 
 {{-- Panel de chat --}}
