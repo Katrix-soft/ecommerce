@@ -18,3 +18,7 @@ Route::post('mercadopago/process-payment', [\App\Http\Controllers\MercadoPagoCon
 
 // Webhooks
 Route::post('webhooks/mercadopago', [\App\Http\Controllers\MercadoPagoController::class, 'handleWebhook']);
+
+// Chatbot proxy
+Route::get('chatbot/models',  [\App\Http\Controllers\ChatbotController::class, 'models']);
+Route::post('chatbot/chat',   [\App\Http\Controllers\ChatbotController::class, 'chat']);

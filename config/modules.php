@@ -109,5 +109,14 @@ return [
         'routes' => ['admin.users.*'],
         'description' => 'Gestión de usuarios y roles',
     ],
+    'chatbot' => [
+        'label' => 'Chatbot IA',
+        'icon' => 'fa-solid fa-robot',
+        'group' => 'configuracion',
+        'group_label' => 'Configuración',
+        'routes' => [],
+        'description' => 'Asistente virtual de Shoply',
+        'show_in_sidebar' => false,
+    ],
 
 ];

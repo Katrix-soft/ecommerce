@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'openwebui' => [
+        'url'   => env('OPENWEBUI_URL', 'https://apikat.katrix.com.ar'),
+        'token' => env('OPENWEBUI_TOKEN'),
+        'user'  => env('OPENWEBUI_USER', 'apikat'),
+        'pass'  => env('OPENWEBUI_PASS', ''),
+    ],
+
 ];

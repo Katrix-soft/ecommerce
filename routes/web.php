@@ -11,7 +11,13 @@ use App\Http\Controllers\SubcategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ShippingController;
+use App\Http\Controllers\ChatbotController;
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome.index');
+
+// Chatbot proxy (credenciales seguras en el servidor)
+Route::get('chatbot/models', [ChatbotController::class, 'models'])->name('chatbot.models');
+Route::post('chatbot/chat',  [ChatbotController::class, 'chat'])->name('chatbot.chat');
+
 
 Route::get('families/{family}', [FamilyController::class, 'show'])->name('families.show');
 

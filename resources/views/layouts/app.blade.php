@@ -80,5 +80,10 @@
                 });
             }
         </script>
+
+        @if(class_exists('\App\Models\TenantModule') && \App\Models\TenantModule::where('module', 'chatbot')->where('is_enabled', true)->exists())
+            @include('layouts.partials.chatbot')
+        @endif
     </body>
 </html>
+

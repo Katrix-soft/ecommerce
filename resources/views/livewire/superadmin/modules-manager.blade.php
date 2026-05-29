@@ -165,8 +165,30 @@
                     class="inline-flex items-center gap-2 px-4 py-2.5 rounded-none text-sm font-semibold transition-all duration-200 border {{ $isAiEnabled ? 'bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200' : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-200' }}"
                 >
                     <i class="fa-solid fa-wand-magic-sparkles text-base {{ $isAiEnabled ? 'text-blue-500 animate-pulse' : 'text-gray-400' }}"></i>
-                    {{ $isAiEnabled ? 'Deshabilitar IA' : 'Habilitar IA' }}
+                    {{ $isAiEnabled ? 'Deshabilitar Documentación IA' : 'Documentación IA' }}
                 </button>
+
+                @if(auth()->check() && auth()->user()->hasRole('superadmin'))
+                    @php
+                        $isChatbotEnabled = false;
+                        if(isset($modules['configuracion'])) {
+                            foreach($modules['configuracion']['items'] as $item) {
+                                if($item['key'] === 'chatbot') {
+                                    $isChatbotEnabled = $item['is_enabled'];
+                                    break;
+                                }
+                            }
+                        }
+                    @endphp
+                    <button
+                        type="button"
+                        wire:click="toggleModule('chatbot')"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-none text-sm font-semibold transition-all duration-200 border {{ $isChatbotEnabled ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200' : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-200' }}"
+                    >
+                        <i class="fa-solid fa-robot text-base {{ $isChatbotEnabled ? 'text-emerald-500 animate-pulse' : 'text-gray-400' }}"></i>
+                        {{ $isChatbotEnabled ? 'Deshabilitar Chatbot' : 'Habilitar Chatbot' }}
+                    </button>
+                @endif
 
                 <button
                     type="button"
