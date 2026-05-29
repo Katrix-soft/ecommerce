@@ -167,7 +167,6 @@
 
             const el = document.getElementById(id);
             if(el) el.textContent = reply || '(respuesta vacía)';
-            history.push({role:'assistant', content: reply});
             scrollBottom();
         }catch(e){
             const el = document.getElementById(id);
