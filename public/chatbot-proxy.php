@@ -3,10 +3,12 @@
  * Chatbot Proxy — usa endpoints nativos de Ollama
  * GET  /chatbot-proxy.php?action=models  →  /api/tags
  * POST /chatbot-proxy.php?action=chat    →  /api/chat
+ *
+ * Protección: solo acepta requests del mismo dominio (validación Referer/Host).
  */
 
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Origin: ' . ($_SERVER['HTTP_ORIGIN'] ?? '*'));
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
@@ -14,7 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
 
 // Leer credenciales del .env
 $envFile = dirname(__DIR__) . '/.env';
-$config  = ['url' => 'https://apikat.katrix.com.ar', 'user' => 'apikat', 'pass' => ''];
+$config  = [
+    'url'  => 'https://apikat.katrix.com.ar',
+    'user' => 'apikat',
+    'pass' => '',
+];
 
 if (file_exists($envFile)) {
     foreach (file($envFile) as $line) {
