@@ -244,14 +244,13 @@ if ($action === 'chat' || $action === 'chat2') {
     exit;
 }
 
-// ─── TEST ─────────────────────────────────────────────────────────────────────
 if ($action === 'test') {
     $redis       = getRedis($config);
     $redisStatus = $redis ? 'conectado ✅' : 'no disponible ❌';
 
     $endpoints = [
-        'models' => ['GET',  '/api/models'],
-        'tags'   => ['GET',  '/ollama/api/tags'],
+        'tags'   => ['GET',  '/api/tags'],
+        'chat'   => ['GET',  '/api/version'],
     ];
     $results = ['redis' => $redisStatus, 'endpoints' => []];
     foreach ($endpoints as $name => [$method, $ep]) {
