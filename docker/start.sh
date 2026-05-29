@@ -16,6 +16,10 @@ printenv | grep -E "^(APP_|DB_|SESSION_|CACHE_|QUEUE_|MAIL_|REDIS_|LIVEWIRE_|MP_
 grep -q "APP_KEY=base64:" /var/www/html/.env || php artisan key:generate --force
 
 # ── 3. PERMISOS ───────────────────────────────────────────────────────────────
+mkdir -p /var/www/html/storage/app/public
+mkdir -p /var/www/html/storage/logs
+mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
+mkdir -p /var/www/html/bootstrap/cache
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
@@ -74,7 +78,16 @@ echo "[start] Roles y Super Admin validados."
 
 # ── 5.3 STORAGE LINK ─────────────────────────────────────────────────────────
 echo "[start] Creando storage link..."
+# Eliminar el symlink/carpeta existente para evitar que storage:link falle en Docker
+if [ -L /var/www/html/public/storage ]; then
+    echo "[start] Eliminando symlink antiguo..."
+    rm /var/www/html/public/storage
+elif [ -d /var/www/html/public/storage ]; then
+    echo "[start] Eliminando carpeta 'public/storage' residual del build..."
+    rm -rf /var/www/html/public/storage
+fi
 php artisan storage:link --force
+echo "[start] Storage link creado: $(ls -la /var/www/html/public/storage)"
 
 # ── 5.4 LIVEWIRE ASSETS ──────────────────────────────────────────────────────
 echo "[start] Publicando assets de Livewire..."
