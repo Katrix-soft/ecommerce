@@ -62,18 +62,22 @@ echo "[start] Verificando productos..."
 PRODUCT_COUNT=$(php artisan tinker --execute="echo App\Models\Product::count();" 2>/dev/null | tail -1)
 
 if [ "$PRODUCT_COUNT" = "0" ] || [ -z "$PRODUCT_COUNT" ]; then
-    echo "[start] No hay productos, corriendo seeder inicial y luego importando Fake Store..."
-    php artisan db:seed --force
-    php artisan import:fakestore
-    echo "[start] Importación de productos completada."
-else
-    echo "[start] Ya existen $PRODUCT_COUNT productos, saltando seeder e importación."
+    echo "[start] No hay productos, corriendo seeder inicial..."
+    php artisan db:seed --force || echo "[start] ⚠️  Seeder falló, continuando..."
 fi
 
-# ── 5.2.5 ROLES Y SUPERADMIN ──────────────────────────────────────────────────
+# Siempre sincronizar productos e imágenes desde Fake Store API.
+# El comando es idempotente: usa updateOrCreate en DB y salta imágenes ya descargadas.
+# Esto asegura que en cada nuevo deploy las imágenes estén en el volumen de storage.
+# IMPORTANTE: || true para que un fallo externo (API caída) no aborte el contenedor.
+echo "[start] Sincronizando productos e imágenes desde Fake Store API..."
+php artisan import:fakestore || echo "[start] ⚠️  import:fakestore falló (API externa), continuando..."
+echo "[start] Sincronización completada."
+
+# ── 5.2.5 ROLES Y SUPERADMIN ─────────────────────────────────────────────────────────
 echo "[start] Asegurando roles y cuenta Super Admin..."
-php artisan db:seed --class=RolePermissionSeeder --force
-php artisan db:seed --class=SuperAdminSeeder --force
+php artisan db:seed --class=RolePermissionSeeder --force || echo "[start] ⚠️  RolePermissionSeeder falló"
+php artisan db:seed --class=SuperAdminSeeder --force || echo "[start] ⚠️  SuperAdminSeeder falló"
 echo "[start] Roles y Super Admin validados."
 
 # ── 5.3 STORAGE LINK ─────────────────────────────────────────────────────────
