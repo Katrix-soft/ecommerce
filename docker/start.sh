@@ -3,6 +3,67 @@ set -e
 
 echo "[start] Iniciando contenedor Laravel..."
 
+# ══════════════════════════════════════════════════════════════════════════════
+# ⚠️  GUARDRAILS: PROTECCIÓN CONTRA COMANDOS DESTRUCTIVOS
+# ══════════════════════════════════════════════════════════════════════════════
+# Crea un wrapper de 'artisan' que bloquea comandos peligrosos en producción.
+# Para ejecutar un comando destructivo, usá:
+#   ALLOW_DESTRUCTIVE=yes php artisan migrate:fresh --force
+# ──────────────────────────────────────────────────────────────────────────────
+cat > /usr/local/bin/artisan << 'ARTISAN_WRAPPER'
+#!/bin/sh
+
+DANGEROUS_COMMANDS="migrate:fresh migrate:reset migrate:rollback db:wipe tinker"
+COMMAND="$2"
+
+for dangerous in $DANGEROUS_COMMANDS; do
+    if [ "$COMMAND" = "$dangerous" ]; then
+        if [ "$ALLOW_DESTRUCTIVE" != "yes" ]; then
+            echo ""
+            echo "  ╔══════════════════════════════════════════════════════╗"
+            echo "  ║  🚨  COMANDO BLOQUEADO EN PRODUCCIÓN                ║"
+            echo "  ║                                                      ║"
+            echo "  ║  '$COMMAND' puede causar PÉRDIDA DE DATOS.          ║"
+            echo "  ║                                                      ║"
+            echo "  ║  Si sabés lo que hacés, ejecutá:                    ║"
+            echo "  ║  ALLOW_DESTRUCTIVE=yes php artisan $COMMAND          ║"
+            echo "  ╚══════════════════════════════════════════════════════╝"
+            echo ""
+            echo "  Comando abortado. No se realizaron cambios."
+            echo ""
+            exit 1
+        else
+            echo "  ⚠️  ALLOW_DESTRUCTIVE=yes detectado. Ejecutando '$COMMAND'..."
+            echo "  Fecha/hora: $(date)"
+        fi
+    fi
+done
+
+exec php /var/www/html/artisan "$@"
+ARTISAN_WRAPPER
+chmod +x /usr/local/bin/artisan
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Banner de advertencia visible al entrar al contenedor (docker exec -it ...)
+# ──────────────────────────────────────────────────────────────────────────────
+cat > /etc/profile.d/katrix-warning.sh << 'BANNER'
+echo ""
+echo "  ╔══════════════════════════════════════════════════════════════╗"
+echo "  ║  🚀  KATRIX ECOMMERCE — CONTENEDOR DE PRODUCCIÓN           ║"
+echo "  ╠══════════════════════════════════════════════════════════════╣"
+echo "  ║  ⛔  COMANDOS BLOQUEADOS (requieren ALLOW_DESTRUCTIVE=yes): ║"
+echo "  ║      migrate:fresh  •  migrate:reset  •  db:wipe            ║"
+echo "  ║      migrate:rollback  •  tinker                            ║"
+echo "  ║                                                              ║"
+echo "  ║  ✅  Comandos seguros: migrate, db:seed, cache:clear        ║"
+echo "  ║  📁  Storage: /var/www/html/storage/app/public              ║"
+echo "  ║  📋  Logs: tail -f /var/www/html/storage/logs/laravel.log   ║"
+echo "  ╚══════════════════════════════════════════════════════════════╝"
+echo ""
+BANNER
+chmod +x /etc/profile.d/katrix-warning.sh
+# ══════════════════════════════════════════════════════════════════════════════
+
 # ── 1. ENV ───────────────────────────────────────────────────────────────────
 if [ ! -f /var/www/html/.env ]; then
     touch /var/www/html/.env
@@ -79,6 +140,11 @@ echo "[start] Asegurando roles y cuenta Super Admin..."
 php artisan db:seed --class=RolePermissionSeeder --force || echo "[start] ⚠️  RolePermissionSeeder falló"
 php artisan db:seed --class=SuperAdminSeeder --force || echo "[start] ⚠️  SuperAdminSeeder falló"
 echo "[start] Roles y Super Admin validados."
+
+# ── 5.2.6 TENANT ADMIN POR DEFECTO (con módulos y chatbot) ───────────────────
+echo "[start] Asegurando tenant admin y módulos..."
+php artisan db:seed --class=TenantSeeder --force || echo "[start] ⚠️  TenantSeeder falló"
+echo "[start] Tenant admin y módulos validados."
 
 # ── 5.3 STORAGE LINK ─────────────────────────────────────────────────────────
 echo "[start] Creando storage link..."
