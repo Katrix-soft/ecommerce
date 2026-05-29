@@ -50,7 +50,7 @@
         </div>
 
         {{-- Navigation Tabs --}}
-        <div class="flex border-b border-gray-200 mb-8 gap-6">
+        <div class="flex border-b border-gray-200 mb-8 gap-4 overflow-x-auto scrollbar-none">
             <button
                 type="button"
                 wire:click="$set('activeTab', 'modules')"
@@ -90,7 +90,7 @@
 
         @if ($activeTab === 'modules')
             {{-- Acciones Rápidas --}}
-            <div class="flex items-center gap-3 mb-8">
+            <div class="flex flex-wrap items-center gap-2 mb-8">
                 <button
                     type="button"
                     x-on:click="

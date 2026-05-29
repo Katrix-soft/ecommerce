@@ -8,3 +8,12 @@
 [x-cloak] {
     display: none;
 }
+
+/* Ocultar scrollbar manteniendo funcionalidad de scroll */
+.scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
