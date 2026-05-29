@@ -33,24 +33,10 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // 2. Solo generar productos si la tabla está vacía para evitar duplicados y lentitud
-        if (Product::count() > 0) {
-            $this->command->info('Las categorías y opciones fueron verificadas. Ya existen productos en la base de datos, saltando generación de productos de prueba.');
-            return;
-        }
-
-        Storage::deleteDirectory('products');
-        Storage::makeDirectory('products');
-
-        Product::factory(1550)->create()->each(function ($product) {
-            // Crear variantes con características aleatorias para probar filtros
-            $features = \App\Models\Feature::all()->random(rand(1, 3));
-            $variant = $product->variants()->create([
-                'sku' => $product->sku . '-V1',
-                'stock' => 100,
-                'price' => $product->price,
-            ]);
-            $variant->features()->attach($features);
-        });
+        // 2. Comentamos la generación masiva con factory para usar el comando ImportFakeStore
+        // if (Product::count() > 0) {
+        //     $this->command->info('Las categorías y opciones fueron verificadas. Ya existen productos, saltando seeder.');
+        //     return;
+        // }
     }
 }

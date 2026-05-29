@@ -58,11 +58,12 @@ echo "[start] Verificando productos..."
 PRODUCT_COUNT=$(php artisan tinker --execute="echo App\Models\Product::count();" 2>/dev/null | tail -1)
 
 if [ "$PRODUCT_COUNT" = "0" ] || [ -z "$PRODUCT_COUNT" ]; then
-    echo "[start] No hay productos, corriendo seeder..."
+    echo "[start] No hay productos, corriendo seeder inicial y luego importando Fake Store..."
     php artisan db:seed --force
-    echo "[start] Seeder de productos completado."
+    php artisan import:fakestore
+    echo "[start] Importación de productos completada."
 else
-    echo "[start] Ya existen $PRODUCT_COUNT productos, saltando seeder."
+    echo "[start] Ya existen $PRODUCT_COUNT productos, saltando seeder e importación."
 fi
 
 # ── 5.2.5 ROLES Y SUPERADMIN ──────────────────────────────────────────────────
