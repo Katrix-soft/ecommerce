@@ -59,10 +59,17 @@
 <script>
 (function(){
     // Proxy PHP directo — sin Laravel routing, sin caché, sin CSRF
-    const MODELS_URL = '/chatbot-proxy.php?action=models&v=' + Date.now();
-    const CHAT_URL   = '/chatbot-proxy.php?action=chat2&v=' + Date.now();
+    const MODELS_URL   = '/chatbot-proxy.php?action=models&v=' + Date.now();
+    const CHAT_URL     = '/chatbot-proxy.php?action=chat2&v=' + Date.now();
+    const CLEAR_URL    = '/chatbot-proxy.php?action=clear_session';
 
-    let history = [];
+    // Session ID persistente — el historial vive en Redis server-side
+    let sessionId = localStorage.getItem('sply_chat_session');
+    if (!sessionId) {
+        sessionId = 'sess_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+        localStorage.setItem('sply_chat_session', sessionId);
+    }
+
     let isOpen  = false;
     let sending = false;
     let loaded  = false;
@@ -126,7 +133,6 @@
         document.getElementById('sply-send-btn').disabled = true;
         input.value = ''; input.style.height = 'auto';
 
-        history.push({role:'user', content:text});
         appendMsg('user', text);
 
         const id = 'sply-m-' + Date.now();
@@ -136,7 +142,11 @@
             const res = await fetch(CHAT_URL, {
                 method : 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ model: splyModel, messages: history }),
+                body: JSON.stringify({
+                    model     : splyModel,
+                    messages  : [{ role: 'user', content: text }],
+                    session_id: sessionId,
+                }),
             });
 
             const data = await res.json();
