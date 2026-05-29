@@ -68,7 +68,7 @@ chmod +x /etc/profile.d/katrix-warning.sh
 if [ ! -f /var/www/html/.env ]; then
     touch /var/www/html/.env
 fi
-printenv | grep -E "^(APP_|DB_|SESSION_|CACHE_|QUEUE_|MAIL_|REDIS_|LIVEWIRE_|MP_)" \
+printenv | grep -E "^(APP_|DB_|SESSION_|CACHE_|QUEUE_|MAIL_|REDIS_|LIVEWIRE_|MP_|OPENWEBUI_|CHATBOT_)" \
     | while IFS='=' read -r key value; do
         grep -q "^${key}=" /var/www/html/.env || echo "${key}=${value}" >> /var/www/html/.env
     done
