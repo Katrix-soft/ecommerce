@@ -108,16 +108,10 @@ function saveChatHistory(Redis $redis, string $sessionId, array $history): void 
 function doRequest(string $url, array $config, ?array $payload = null): array {
     $ch = curl_init($url);
 
-    if (!empty($config['user']) && !empty($config['pass'])) {
-        $authHeader = 'Authorization: Basic ' . base64_encode($config['user'] . ':' . $config['pass']);
-    } elseif (!empty($config['token'])) {
-        $authHeader = 'Authorization: Bearer ' . $config['token'];
-    } else {
-        $authHeader = '';
-    }
-
     $headers = ['Content-Type: application/json'];
-    if ($authHeader) $headers[] = $authHeader;
+    if (!empty($config['user']) && !empty($config['pass'])) {
+        $headers[] = 'Authorization: Basic ' . base64_encode($config['user'] . ':' . $config['pass']);
+    }
 
     $opts = [
         CURLOPT_RETURNTRANSFER => true,
@@ -156,32 +150,9 @@ if ($action === 'clear_session') {
 
 // ─── GET MODELS ───────────────────────────────────────────────────────────────
 if ($action === 'models') {
-    $r = doRequest("{$apiUrl}/api/models", $config);
-
-    if ($r['error'] || $r['code'] < 200 || $r['code'] >= 300) {
-        // Fallback Ollama nativo
-        $r2 = doRequest("{$apiUrl}/ollama/api/tags", $config);
-        if ($r2['code'] >= 200 && $r2['code'] < 300) {
-            $ollama = json_decode($r2['body'], true);
-            $models = array_map(fn($m) => ['id' => $m['name'], 'name' => $m['name']], $ollama['models'] ?? []);
-            echo json_encode(['models' => $models]);
-            exit;
-        }
-        http_response_code(502);
-        echo json_encode(['error' => "No se pudo conectar con el servidor de IA. HTTP {$r['code']}", 'models' => []]);
-        exit;
-    }
-
+    $r      = doRequest("{$apiUrl}/api/tags", $config);
     $json   = json_decode($r['body'], true);
-    $models = [];
-    if (isset($json['data'])) {
-        foreach ($json['data'] as $m) {
-            $models[] = ['id' => $m['id'], 'name' => $m['id']];
-        }
-    } elseif (isset($json['models'])) {
-        $models = array_map(fn($m) => ['id' => $m['name'], 'name' => $m['name']], $json['models']);
-    }
-
+    $models = array_map(fn($m) => ['id' => $m['name'], 'name' => $m['name']], $json['models'] ?? []);
     echo json_encode(['models' => $models]);
     exit;
 }
@@ -206,15 +177,10 @@ if ($action === 'chat' || $action === 'chat2') {
 
     if ($redis && $sessionId) {
         $history = getChatHistory($redis, $sessionId);
-    } else {
-        // Fallback: historial enviado por el cliente (sin Redis)
-        $history = array_filter($body['messages'], fn($m) => $m['role'] !== 'system');
-        $history = array_values($history);
-        // Solo el último mensaje del usuario si no hay Redis
-        $history = [['role' => 'user', 'content' => $userMsg]];
     }
+    // Sin Redis: $history queda vacío — el push de abajo agrega el mensaje una sola vez
 
-    // Agregar mensaje del usuario al historial
+    // Agregar mensaje del usuario al historial (único punto de inserción)
     $history[] = ['role' => 'user', 'content' => $userMsg];
 
     // Construir mensajes con system prompt al inicio
@@ -231,11 +197,11 @@ if ($action === 'chat' || $action === 'chat2') {
         );
     }
 
-    $r = doRequest("{$apiUrl}/api/chat/completions", $config, [
+    $r = doRequest("{$apiUrl}/v1/chat/completions", $config, [
         'model'       => $model,
         'messages'    => $messages,
         'stream'      => false,
-        'temperature' => 0.3, // Más determinista para respuestas de tienda
+        'temperature' => 0.3,
     ]);
 
     if ($r['error']) {
