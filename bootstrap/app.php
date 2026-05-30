@@ -11,12 +11,22 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
-            Route::middleware(['web', 'auth', \App\Http\Middleware\AdminSecurityHeaders::class])
+            Route::middleware([
+                'web', 
+                'auth', 
+                \App\Http\Middleware\AdminSecurityHeaders::class,
+                \App\Http\Middleware\AdminActivityLog::class
+            ])
                 ->prefix('admin')
                 ->name('admin.')
                 ->group(base_path('routes/admin.php'));
 
-            Route::middleware('web', 'auth', 'superadmin')
+            Route::middleware([
+                'web', 
+                'auth', 
+                'superadmin',
+                \App\Http\Middleware\AdminActivityLog::class
+            ])
                 ->prefix('superadmin')
                 ->name('superadmin.')
                 ->group(base_path('routes/superadmin.php'));
