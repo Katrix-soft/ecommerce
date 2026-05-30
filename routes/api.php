@@ -20,9 +20,12 @@ Route::post('mercadopago/process-payment', [\App\Http\Controllers\MercadoPagoCon
 Route::post('webhooks/mercadopago', [\App\Http\Controllers\MercadoPagoController::class, 'handleWebhook']);
 
 // Chatbot proxy
-Route::get('chatbot/models',  [\App\Http\Controllers\ChatbotController::class, 'models']);
-Route::post('chatbot/chat',   [\App\Http\Controllers\ChatbotController::class, 'chat']);
-Route::post('chatbot/clear-session', [\App\Http\Controllers\ChatbotController::class, 'clearSession']);
+Route::get('chatbot/models',  [\App\Http\Controllers\ChatbotController::class, 'models'])
+    ->middleware('throttle:15,1');
+Route::post('chatbot/chat',   [\App\Http\Controllers\ChatbotController::class, 'chat'])
+    ->middleware('throttle:5,1');
+Route::post('chatbot/clear-session', [\App\Http\Controllers\ChatbotController::class, 'clearSession'])
+    ->middleware('throttle:10,1');
 
 // API v1 Portal Administrativo
 Route::prefix('v1')->name('api.v1.')->middleware('auth:sanctum')->group(function () {

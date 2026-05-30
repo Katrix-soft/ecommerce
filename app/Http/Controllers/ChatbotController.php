@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 
 class ChatbotController extends Controller
 {
@@ -42,8 +43,18 @@ REGLAS ESTRICTAS:
     }
 
     /** GET /chatbot/models */
-    public function models()
+    public function models(Request $request)
     {
+        $ip = $request->ip();
+        if (RateLimiter::tooManyAttempts("chatbot-models:{$ip}", 15)) {
+            Log::warning("Chatbot models rate limit exceeded for IP: {$ip}");
+            return response()->json([
+                'error' => 'Demasiadas consultas. Por favor, intentá de nuevo más tarde.',
+                'models' => []
+            ], 429);
+        }
+        RateLimiter::hit("chatbot-models:{$ip}", 60);
+
         try {
             $response = Http::withBasicAuth($this->user, $this->pass)
                 ->withoutVerifying()
@@ -52,7 +63,7 @@ REGLAS ESTRICTAS:
 
             if ($response->failed()) {
                 Log::error('Chatbot models response failed: ' . $response->body());
-                return response()->json(['error' => 'API response failed', 'models' => []], $response->status());
+                return response()->json(['error' => 'Servicio temporalmente no disponible', 'models' => []], 503);
             }
 
             $json = $response->json();
@@ -69,23 +80,37 @@ REGLAS ESTRICTAS:
             return response()->json(['models' => $models]);
         } catch (\Exception $e) {
             Log::error('Chatbot models exception: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage(), 'models' => []], 500);
+            return response()->json(['error' => 'Servicio temporalmente no disponible', 'models' => []], 500);
         }
     }
 
     /** POST /chatbot/chat */
     public function chat(Request $request)
     {
+        $ip = $request->ip();
+        if (RateLimiter::tooManyAttempts("chatbot-chat:{$ip}", 5)) {
+            Log::warning("Chatbot chat rate limit exceeded for IP: {$ip}");
+            return response()->json([
+                'error' => 'Demasiadas consultas. Por favor, esperá un minuto antes de enviar otro mensaje.'
+            ], 429);
+        }
+        RateLimiter::hit("chatbot-chat:{$ip}", 60);
+
         $request->validate([
-            'model'      => 'required|string',
-            'messages'   => 'required|array',
-            'session_id' => 'nullable|string',
+            'model'              => 'required|string|max:50',
+            'messages'           => 'required|array|size:1',
+            'messages.0.role'    => 'required|string|in:user',
+            'messages.0.content' => 'required|string|max:1000',
+            'session_id'         => 'nullable|string|regex:/^[a-zA-Z0-9_-]+$/|max:100',
         ]);
 
         $model = $request->input('model');
         $messagesPayload = $request->input('messages');
-        $userMsg = end($messagesPayload)['content'] ?? '';
+        $userMsg = strip_tags(end($messagesPayload)['content'] ?? '');
         $sessionId = preg_replace('/[^a-zA-Z0-9_-]/', '', $request->input('session_id') ?? '');
+        if (strlen($sessionId) > 100) {
+            $sessionId = substr($sessionId, 0, 100);
+        }
 
         // 1. Load history from Redis, fallback to Laravel Cache
         $history = [];
@@ -133,19 +158,18 @@ REGLAS ESTRICTAS:
 
             if ($response->failed()) {
                 Log::error('Chatbot API request failed: ' . $response->body());
-                return response()->json(['error' => "HTTP {$response->status()}: " . substr($response->body(), 0, 300)], $response->status());
+                return response()->json(['error' => 'No se pudo obtener respuesta del asistente. Por favor, intentá de nuevo.'], 502);
             }
 
             $json = $response->json();
-            Log::info('Chatbot raw response: ' . json_encode($json));
-
             $content = $json['choices'][0]['message']['content'] ??
                        $json['message']['content'] ??
                        $json['response'] ??
                        null;
 
             if ($content === null) {
-                return response()->json(['error' => 'Sin respuesta del asistente', 'raw' => $json], 500);
+                Log::error('Chatbot response parsed content is null: ' . json_encode($json));
+                return response()->json(['error' => 'Respuesta del asistente no válida.'], 502);
             }
 
             // 6. Save updated history to Redis / Cache
@@ -162,13 +186,23 @@ REGLAS ESTRICTAS:
             return response()->json(['content' => $content]);
         } catch (\Exception $e) {
             Log::error('Chatbot chat exception: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Lo sentimos, ocurrió un error en el servicio del asistente.'], 500);
         }
     }
 
     /** POST /chatbot/clear-session */
     public function clearSession(Request $request)
     {
+        $ip = $request->ip();
+        if (RateLimiter::tooManyAttempts("chatbot-clear:{$ip}", 10)) {
+            return response()->json(['error' => 'Demasiadas consultas.'], 429);
+        }
+        RateLimiter::hit("chatbot-clear:{$ip}", 60);
+
+        $request->validate([
+            'session_id' => 'required|string|regex:/^[a-zA-Z0-9_-]+$/|max:100',
+        ]);
+
         $sessionId = preg_replace('/[^a-zA-Z0-9_-]/', '', $request->input('session_id') ?? '');
         if ($sessionId) {
             $redisKey = "chatbot:history:{$sessionId}";
@@ -182,4 +216,5 @@ REGLAS ESTRICTAS:
         return response()->json(['ok' => true]);
     }
 }
+
 
