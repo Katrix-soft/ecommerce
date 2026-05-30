@@ -24,6 +24,6 @@ Route::get('chatbot/models',  [\App\Http\Controllers\ChatbotController::class, '
 Route::post('chatbot/chat',   [\App\Http\Controllers\ChatbotController::class, 'chat']);
 
 // API v1 Portal Administrativo
-Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
+Route::prefix('v1')->name('api.v1.')->middleware('auth:sanctum')->group(function () {
     Route::apiResource('products', \App\Http\Controllers\Api\ProductController::class);
 });
