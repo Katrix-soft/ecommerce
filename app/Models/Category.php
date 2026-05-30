@@ -26,5 +26,10 @@ class Category extends Model
         return $this->hasMany(Subcategory::class);
     }
 
-    
+    // relacion muchos a muchos
+    public function options()
+    {
+        return $this->belongsToMany(Option::class)
+                    ->withTimestamps();
+    }
 }

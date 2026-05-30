@@ -24,5 +24,11 @@ class Subcategory extends Model
     {
         return $this->hasMany(Product::class);
     }
-    
+
+    // relacion muchos a muchos
+    public function options()
+    {
+        return $this->belongsToMany(Option::class, 'option_subcategory')
+                    ->withTimestamps();
+    }
 }

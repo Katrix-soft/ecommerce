@@ -15,3 +15,22 @@ Dockerfile
 /storage/framework/testing/*
 /storage/framework/views/*
 /storage/logs/*
+
+# Stubs de Laravel Sail (no se usan en producción)
+docker/8.0
+docker/8.1
+docker/8.2
+docker/8.3
+docker/8.4
+docker/8.5
+docker/mariadb
+docker/mysql
+docker/pgsql
+
+# Archivos de desarrollo
+import_productos.py
+productos_exportados.csv
+tests/
+.vscode/
+phpunit.xml
+README.md

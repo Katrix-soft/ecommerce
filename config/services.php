@@ -42,4 +42,8 @@ return [
         'pass'  => env('OPENWEBUI_PASS', ''),
     ],
 
+    'chatbot' => [
+        'secret' => env('CHATBOT_SECRET', ''),
+    ],
+
 ];

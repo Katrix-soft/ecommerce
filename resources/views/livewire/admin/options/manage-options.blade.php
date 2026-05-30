@@ -13,7 +13,21 @@
                 <div class="relative pb-10 border-b border-gray-100 dark:border-gray-800 last:border-0 last:pb-0">
                     {{-- Título de la Opción --}}
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-lg font-medium text-gray-800 dark:text-gray-200">{{ $option->name }}</h3>
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800 dark:text-gray-200">{{ $option->name }}</h3>
+                            <div class="flex flex-wrap gap-1 mt-1">
+                                @if($option->categories->count() == 0 && $option->subcategories->count() == 0)
+                                    <span class="text-xs text-amber-500 font-medium bg-amber-50 dark:bg-amber-950/20 px-2 py-0.5 rounded border border-amber-100 dark:border-amber-900/50">Global (Todas las categorías)</span>
+                                @else
+                                    @foreach($option->categories as $c)
+                                        <span class="text-xs text-indigo-600 font-medium bg-indigo-50 dark:bg-indigo-950/20 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-900/50" title="Categoría: {{ $c->name }}">{{ $c->name }}</span>
+                                    @endforeach
+                                    @foreach($option->subcategories as $s)
+                                        <span class="text-xs text-emerald-600 font-medium bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded border border-emerald-100 dark:border-emerald-900/50" title="Subcategoría: {{ $s->name }}">{{ $s->name }}</span>
+                                    @endforeach
+                                @endif
+                            </div>
+                        </div>
                         
                         {{-- Botones de Control (Sutiles) --}}
                         <div class="flex items-center gap-2">
@@ -52,6 +66,31 @@
                                     <option value="2">Color</option>
                                 </select>
                                 <x-input-error for="type" />
+                            </div>
+                        </div>
+
+                        {{-- Categorías y Subcategorías para Edición --}}
+                        <div class="mb-6 bg-gray-50/50 dark:bg-gray-800/30 p-5 rounded-xl border border-gray-150 dark:border-gray-800">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Categorías y Subcategorías Asociadas (dejar en blanco para Global)</label>
+                            <div class="max-h-60 overflow-y-auto space-y-4 pr-2">
+                                @foreach($this->allCategories as $category)
+                                    <div class="space-y-2">
+                                        <label class="flex items-center gap-2 font-semibold text-gray-800 dark:text-gray-250 cursor-pointer">
+                                            <input type="checkbox" wire:model="category_ids" value="{{ $category->id }}" class="rounded text-indigo-600 focus:ring-indigo-500 border-gray-300">
+                                            {{ $category->name }}
+                                        </label>
+                                        @if($category->subcategories->count() > 0)
+                                            <div class="ml-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                                                @foreach($category->subcategories as $subcategory)
+                                                    <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                                                        <input type="checkbox" wire:model="subcategory_ids" value="{{ $subcategory->id }}" class="rounded text-indigo-600 focus:ring-indigo-500 border-gray-300">
+                                                        {{ $subcategory->name }}
+                                                    </label>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     @endif
@@ -122,6 +161,36 @@
                         <option value="2">Color</option>
                     </select>
                     <x-input-error for="form.type" />
+                </div>
+            </div>
+
+            <div class="relative flex items-center py-4 mb-4">
+                <div class="flex-grow border-t border-gray-100"></div>
+                <span class="flex-shrink mx-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Categorías y Subcategorías</span>
+                <div class="flex-grow border-t border-gray-100"></div>
+            </div>
+
+            <div class="mb-6 bg-gray-50/50 dark:bg-gray-800/30 p-5 rounded-xl border border-gray-150 dark:border-gray-800">
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Asociar a (dejar en blanco para Global)</label>
+                <div class="max-h-60 overflow-y-auto space-y-4 pr-2">
+                    @foreach($this->allCategories as $category)
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-2 font-semibold text-gray-800 dark:text-gray-250 cursor-pointer">
+                                <input type="checkbox" wire:model="form.category_ids" value="{{ $category->id }}" class="rounded text-indigo-600 focus:ring-indigo-500 border-gray-300">
+                                {{ $category->name }}
+                            </label>
+                            @if($category->subcategories->count() > 0)
+                                <div class="ml-6 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    @foreach($category->subcategories as $subcategory)
+                                        <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                                            <input type="checkbox" wire:model="form.subcategory_ids" value="{{ $subcategory->id }}" class="rounded text-indigo-600 focus:ring-indigo-500 border-gray-300">
+                                            {{ $subcategory->name }}
+                                        </label>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
                 </div>
             </div>
 

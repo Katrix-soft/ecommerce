@@ -125,16 +125,33 @@
         </x-slot>
 
         <x-slot name="content">
-            <div class="mt-4">
-                <x-label class="mb-2 text-gray-700 font-medium">Opción</x-label>
-                <x-select class="w-full" wire:model.live="variant.option_id">
-                    <option value="" disabled>Seleccione una opción</option>
-                    @foreach($this->options as $option)
-                        <option value="{{ $option->id }}">{{ $option->name }}</option>
-                    @endforeach
-                </x-select>
-                <x-input-error for="variant.option_id" />
-            </div>
+            @if($this->options->isEmpty())
+                <div class="mt-4 p-4 text-sm text-amber-800 rounded-xl bg-amber-50 dark:bg-amber-950/30 dark:text-amber-300 border border-amber-200 dark:border-amber-900/50" role="alert">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                        <span class="font-medium">No hay opciones disponibles.</span>
+                    </div>
+                    <p class="mt-2 text-xs leading-relaxed">
+                        No se han configurado opciones para la categoría <strong>{{ $product->subcategory->category->name }}</strong> ni para la subcategoría <strong>{{ $product->subcategory->name }}</strong> de este producto.
+                    </p>
+                    <div class="mt-3">
+                        <a href="{{ route('admin.options.index') }}" class="inline-flex items-center px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold rounded-lg uppercase tracking-wider shadow-sm transition-all active:scale-95">
+                            Configurar Opciones
+                        </a>
+                    </div>
+                </div>
+            @else
+                <div class="mt-4">
+                    <x-label class="mb-2 text-gray-700 font-medium">Opción</x-label>
+                    <x-select class="w-full" wire:model.live="variant.option_id">
+                        <option value="" disabled>Seleccione una opción</option>
+                        @foreach($this->options as $option)
+                            <option value="{{ $option->id }}">{{ $option->name }}</option>
+                        @endforeach
+                    </x-select>
+                    <x-input-error for="variant.option_id" />
+                </div>
+            @endif
 
             <div class="flex items-center my-8">
                 <hr class="flex-1 border-gray-100 dark:border-gray-800">

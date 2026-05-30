@@ -43,6 +43,20 @@ class Option extends Model
                     ->withTimestamps();
     }
 
+    // relacion muchos a muchos
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class)
+                    ->withTimestamps();
+    }
+
+    // relacion muchos a muchos
+    public function subcategories()
+    {
+        return $this->belongsToMany(Subcategory::class, 'option_subcategory')
+                    ->withTimestamps();
+    }
+
     // relacion uno a muchos
     public function features()
     {

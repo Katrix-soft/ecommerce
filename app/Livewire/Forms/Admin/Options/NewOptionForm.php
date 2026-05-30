@@ -10,6 +10,8 @@ class NewOptionForm extends Form
     public $name = '';
     public $type = '1';
     public $features = [];
+    public $category_ids = [];
+    public $subcategory_ids = [];
 
     public function rules()
     {
@@ -19,6 +21,10 @@ class NewOptionForm extends Form
             'features' => 'required|array|min:1',
             'features.*.value' => 'required|string|max:255',
             'features.*.description' => 'required|string|max:255',
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'exists:categories,id',
+            'subcategory_ids' => 'nullable|array',
+            'subcategory_ids.*' => 'exists:subcategories,id',
         ];
     }
 
@@ -30,6 +36,8 @@ class NewOptionForm extends Form
             'features' => 'valores',
             'features.*.value' => 'valor',
             'features.*.description' => 'descripción',
+            'category_ids' => 'categorías',
+            'subcategory_ids' => 'subcategorías',
         ];
     }
 
@@ -47,6 +55,13 @@ class NewOptionForm extends Form
                 'value' => $feature['value'],
                 'description' => $feature['description'],
             ]);
+        }
+
+        if (!empty($this->category_ids)) {
+            $option->categories()->attach($this->category_ids);
+        }
+        if (!empty($this->subcategory_ids)) {
+            $option->subcategories()->attach($this->subcategory_ids);
         }
 
         $this->reset();

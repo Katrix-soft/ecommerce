@@ -50,7 +50,24 @@ class ProductVariants extends Component
     #[Computed()]
     public function options()
     {
-        return Option::all();
+        if (!$this->product || !$this->product->subcategory_id) {
+            return collect();
+        }
+
+        $subcategoryId = $this->product->subcategory_id;
+        $categoryId = $this->product->subcategory->category_id;
+
+        return Option::where(function($query) use ($subcategoryId, $categoryId) {
+            $query->whereHas('subcategories', function($q) use ($subcategoryId) {
+                $q->where('subcategories.id', $subcategoryId);
+            })
+            ->orWhereHas('categories', function($q) use ($categoryId) {
+                $q->where('categories.id', $categoryId);
+            })
+            ->orWhere(function($q) {
+                $q->doesntHave('categories')->doesntHave('subcategories');
+            });
+        })->get();
     }
 
     #[Computed()]

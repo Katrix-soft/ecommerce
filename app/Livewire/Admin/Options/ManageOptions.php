@@ -8,6 +8,7 @@ use App\Models\Feature;
 use App\Livewire\Forms\Admin\Options\NewOptionForm;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Computed;
 
 class ManageOptions extends Component
 {
@@ -24,6 +25,8 @@ class ManageOptions extends Component
     // Properties for editing
     public $name = '';
     public $type = '1';
+    public $category_ids = [];
+    public $subcategory_ids = [];
 
     // Temporal fields for adding features to the form
     public $value = '';
@@ -32,7 +35,7 @@ class ManageOptions extends Component
     public function create()
     {
         $this->form->reset();
-        $this->reset(['editing', 'value', 'description']);
+        $this->reset(['editing', 'value', 'description', 'category_ids', 'subcategory_ids']);
         $this->openModal = true;
     }
 
@@ -75,10 +78,12 @@ class ManageOptions extends Component
 
     public function edit($optionId)
     {
-        $option = Option::findOrFail($optionId);
+        $option = Option::with(['categories', 'subcategories'])->findOrFail($optionId);
         $this->editing = $optionId;
         $this->name = $option->name;
         $this->type = $option->type;
+        $this->category_ids = $option->categories->pluck('id')->toArray();
+        $this->subcategory_ids = $option->subcategories->pluck('id')->toArray();
     }
 
     public function update()
@@ -86,6 +91,10 @@ class ManageOptions extends Component
         $this->validate([
             'name' => 'required|string|max:255',
             'type' => 'required|in:1,2',
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'exists:categories,id',
+            'subcategory_ids' => 'nullable|array',
+            'subcategory_ids.*' => 'exists:subcategories,id',
         ]);
 
         $option = Option::findOrFail($this->editing);
@@ -94,7 +103,11 @@ class ManageOptions extends Component
             'type' => $this->type,
         ]);
 
+        $option->categories()->sync($this->category_ids);
+        $option->subcategories()->sync($this->subcategory_ids);
+
         $this->editing = null;
+        $this->reset(['name', 'type', 'category_ids', 'subcategory_ids']);
 
         $this->dispatch('swal', [
             'icon' => 'success',
@@ -106,7 +119,7 @@ class ManageOptions extends Component
     public function cancelEdit()
     {
         $this->editing = null;
-        $this->reset(['name', 'type']);
+        $this->reset(['name', 'type', 'category_ids', 'subcategory_ids']);
     }
 
     public function delete($optionId)
@@ -135,9 +148,15 @@ class ManageOptions extends Component
         }
     }
 
+    #[Computed]
+    public function allCategories()
+    {
+        return \App\Models\Category::with('subcategories')->get();
+    }
+
     public function render()
     {
-        $options = Option::with('features')
+        $options = Option::with(['features', 'categories', 'subcategories'])
             ->orderBy('id', 'desc')
             ->paginate(10);
 
