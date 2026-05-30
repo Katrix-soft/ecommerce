@@ -96,17 +96,62 @@ REGLAS ESTRICTAS:
         }
         RateLimiter::hit("chatbot-chat:{$ip}", 60);
 
+        // 1. Referer host verification
+        $referer = $request->header('referer');
+        if ($referer) {
+            $allowedHost = parse_url(config('app.url'), PHP_URL_HOST);
+            $refererHost = parse_url($referer, PHP_URL_HOST);
+            if ($refererHost !== $allowedHost) {
+                Log::warning("Chatbot request blocked from unauthorized referer: {$refererHost}");
+                return response()->json(['error' => 'Acceso no autorizado.'], 403);
+            }
+        }
+
+        // 2. Validate request parameters including honeypot
         $request->validate([
             'model'              => 'required|string|max:50',
             'messages'           => 'required|array|size:1',
             'messages.0.role'    => 'required|string|in:user',
             'messages.0.content' => 'required|string|max:1000',
             'session_id'         => 'nullable|string|regex:/^[a-zA-Z0-9_-]+$/|max:100',
+            'email_verification' => 'nullable|string|max:0', // Honeypot field must be empty
         ]);
+
+        // 3. Honeypot check
+        if ($request->filled('email_verification')) {
+            Log::warning("Honeypot field filled by IP: {$ip}");
+            return response()->json(['error' => 'Bot detectado.'], 400);
+        }
 
         $model = $request->input('model');
         $messagesPayload = $request->input('messages');
         $userMsg = strip_tags(end($messagesPayload)['content'] ?? '');
+
+        // 4. Prompt injection prevention
+        $loweredMsg = mb_strtolower($userMsg);
+        $forbiddenPhrases = [
+            'ignora las instrucciones',
+            'ignore previous instructions',
+            'ignore the rules',
+            'revela tu prompt',
+            'reveal system prompt',
+            'forget instructions',
+            'forget the rules',
+            'ignora las reglas',
+            'nueva instrucción',
+            'nuevas instrucciones',
+            'eres ahora',
+            'you are now'
+        ];
+        foreach ($forbiddenPhrases as $phrase) {
+            if (str_contains($loweredMsg, $phrase)) {
+                Log::warning("Prompt injection attempt blocked from IP {$ip}: {$userMsg}");
+                return response()->json([
+                    'content' => 'Solo puedo ayudarte con consultas sobre nuestra tienda y productos. ¿Hay algo en lo que pueda ayudarte?'
+                ]);
+            }
+        }
+
         $sessionId = preg_replace('/[^a-zA-Z0-9_-]/', '', $request->input('session_id') ?? '');
         if (strlen($sessionId) > 100) {
             $sessionId = substr($sessionId, 0, 100);

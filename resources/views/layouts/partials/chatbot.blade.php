@@ -58,10 +58,10 @@
 
 <script>
 (function(){
-    // Laravel API routes
-    const MODELS_URL   = '/api/chatbot/models?v=' + Date.now();
-    const CHAT_URL     = '/api/chatbot/chat?v=' + Date.now();
-    const CLEAR_URL    = '/api/chatbot/clear-session';
+    // Laravel web routes con protección CSRF y rate-limiting
+    const MODELS_URL   = '/chatbot/models?v=' + Date.now();
+    const CHAT_URL     = '/chatbot/chat?v=' + Date.now();
+    const CLEAR_URL    = '/chatbot/clear-session';
 
     // Session ID persistente — el historial vive en Redis server-side
     let sessionId = localStorage.getItem('sply_chat_session');
@@ -141,11 +141,15 @@
         try{
             const res = await fetch(CHAT_URL, {
                 method : 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
                 body: JSON.stringify({
                     model     : splyModel,
                     messages  : [{ role: 'user', content: text }],
                     session_id: sessionId,
+                    email_verification: '', // Honeypot field
                 }),
             });
 

@@ -13,6 +13,14 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\ShippingController;
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome.index');
 
+// Chatbot proxy con CSRF y rate limiting
+Route::get('chatbot/models', [\App\Http\Controllers\ChatbotController::class, 'models'])
+    ->middleware('throttle:15,1');
+Route::post('chatbot/chat', [\App\Http\Controllers\ChatbotController::class, 'chat'])
+    ->middleware('throttle:5,1');
+Route::post('chatbot/clear-session', [\App\Http\Controllers\ChatbotController::class, 'clearSession'])
+    ->middleware('throttle:10,1');
+
 
 Route::get('families/{family}', [FamilyController::class, 'show'])->name('families.show');
 
