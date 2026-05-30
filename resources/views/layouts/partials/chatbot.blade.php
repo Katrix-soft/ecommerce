@@ -58,6 +58,21 @@
 
 <script>
 (function(){
+    @php
+        $payload = json_encode([
+            'session' => session()->getId(),
+            'ip' => request()->ip(),
+            'expires' => time() + 7200, // 2 horas de validez
+        ]);
+        $signature = hash_hmac('sha256', $payload, config('app.key'));
+        $chatbotToken = base64_encode(json_encode([
+            'payload' => $payload,
+            'signature' => $signature
+        ]));
+    @endphp
+
+    const CHATBOT_TOKEN = '{{ $chatbotToken }}';
+
     // Laravel web routes con protección CSRF y rate-limiting
     const MODELS_URL   = '/chatbot/models?v=' + Date.now();
     const CHAT_URL     = '/chatbot/chat?v=' + Date.now();
@@ -95,7 +110,9 @@
         if(input) input.placeholder = 'Conectando con el asistente...';
         if(btn)   btn.disabled = true;
         try{
-            const r = await fetch(MODELS_URL);
+            const r = await fetch(MODELS_URL, {
+                headers: { 'X-Chatbot-Token': CHATBOT_TOKEN }
+            });
             if(!r.ok) throw new Error('HTTP ' + r.status);
             const d = await r.json();
             const models = d.models || [];
@@ -143,7 +160,8 @@
                 method : 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Chatbot-Token': CHATBOT_TOKEN
                 },
                 body: JSON.stringify({
                     model     : splyModel,

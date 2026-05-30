@@ -42,9 +42,60 @@ REGLAS ESTRICTAS:
 6. Responde siempre en el mismo idioma que usa el cliente.";
     }
 
+    /**
+     * Valida el token firmado y temporal generado por la página.
+     */
+    private function verifySecurityToken(Request $request): ?\Illuminate\Http\JsonResponse
+    {
+        $token = $request->header('X-Chatbot-Token');
+        if (!$token) {
+            Log::warning("Token de seguridad faltante desde IP: " . $request->ip());
+            return response()->json(['error' => 'Token de seguridad faltante.'], 403);
+        }
+
+        $decoded = json_decode(base64_decode($token), true);
+        if (!$decoded || !isset($decoded['payload']) || !isset($decoded['signature'])) {
+            Log::warning("Token de seguridad malformado desde IP: " . $request->ip());
+            return response()->json(['error' => 'Token de seguridad inválido.'], 403);
+        }
+
+        $expectedSig = hash_hmac('sha256', $decoded['payload'], config('app.key'));
+        if (!hash_equals($expectedSig, $decoded['signature'])) {
+            Log::warning("Firma del token de seguridad corrupta desde IP: " . $request->ip());
+            return response()->json(['error' => 'Token de seguridad inválido.'], 403);
+        }
+
+        $payload = json_decode($decoded['payload'], true);
+        if (!$payload || !isset($payload['session']) || !isset($payload['ip']) || !isset($payload['expires'])) {
+            return response()->json(['error' => 'Token de seguridad inválido.'], 403);
+        }
+
+        if (time() > $payload['expires']) {
+            return response()->json(['error' => 'Sesión de seguridad expirada. Por favor, recargá la página.'], 403);
+        }
+
+        if ($payload['ip'] !== $request->ip()) {
+            Log::warning("Discrepancia de IP en el token: token IP={$payload['ip']}, request IP=" . $request->ip());
+            return response()->json(['error' => 'Token de seguridad inválido para esta IP.'], 403);
+        }
+
+        if ($payload['session'] !== $request->session()->getId()) {
+            Log::warning("Discrepancia de ID de sesión en el token.");
+            return response()->json(['error' => 'Sesión de seguridad inválida.'], 403);
+        }
+
+        return null;
+    }
+
     /** GET /chatbot/models */
     public function models(Request $request)
     {
+        // 1. Validar el token firmado
+        if ($tokenError = $this->verifySecurityToken($request)) {
+            return $tokenError;
+        }
+
+        // 2. Limitar tasa
         $ip = $request->ip();
         if (RateLimiter::tooManyAttempts("chatbot-models:{$ip}", 15)) {
             Log::warning("Chatbot models rate limit exceeded for IP: {$ip}");
@@ -87,6 +138,12 @@ REGLAS ESTRICTAS:
     /** POST /chatbot/chat */
     public function chat(Request $request)
     {
+        // 1. Validar el token firmado
+        if ($tokenError = $this->verifySecurityToken($request)) {
+            return $tokenError;
+        }
+
+        // 2. Limitar tasa
         $ip = $request->ip();
         if (RateLimiter::tooManyAttempts("chatbot-chat:{$ip}", 5)) {
             Log::warning("Chatbot chat rate limit exceeded for IP: {$ip}");
@@ -96,7 +153,7 @@ REGLAS ESTRICTAS:
         }
         RateLimiter::hit("chatbot-chat:{$ip}", 60);
 
-        // 1. Referer host verification
+        // 3. Referer host verification
         $referer = $request->header('referer');
         if ($referer) {
             $allowedHost = parse_url(config('app.url'), PHP_URL_HOST);
@@ -107,7 +164,7 @@ REGLAS ESTRICTAS:
             }
         }
 
-        // 2. Validate request parameters including honeypot
+        // 4. Validate request parameters including honeypot
         $request->validate([
             'model'              => 'required|string|max:50',
             'messages'           => 'required|array|size:1',
@@ -117,7 +174,7 @@ REGLAS ESTRICTAS:
             'email_verification' => 'nullable|string|max:0', // Honeypot field must be empty
         ]);
 
-        // 3. Honeypot check
+        // 5. Honeypot check
         if ($request->filled('email_verification')) {
             Log::warning("Honeypot field filled by IP: {$ip}");
             return response()->json(['error' => 'Bot detectado.'], 400);
@@ -127,7 +184,22 @@ REGLAS ESTRICTAS:
         $messagesPayload = $request->input('messages');
         $userMsg = strip_tags(end($messagesPayload)['content'] ?? '');
 
-        // 4. Prompt injection prevention
+        // 6. Local Keyword / Moderation Filter (SQL Injection, XSS, offensive words)
+        $toxicPatterns = [
+            '/\b(puto|mierda|marica|cabron|cabrón|hijo de puta|chupa|pene|vagina|sexo|porn)\b/i',
+            '/select\s+.*\s+from/i', // SQLi simple
+            '/<script\b[^>]*>(.*?)<\/script>/i', // XSS simple
+        ];
+        foreach ($toxicPatterns as $pattern) {
+            if (preg_match($pattern, $userMsg)) {
+                Log::warning("Local moderation check flagged message from IP {$ip}: {$userMsg}");
+                return response()->json([
+                    'content' => 'Por favor, asegúrate de hacer consultas respetuosas y relacionadas con la tienda.'
+                ]);
+            }
+        }
+
+        // 7. Prompt injection prevention
         $loweredMsg = mb_strtolower($userMsg);
         $forbiddenPhrases = [
             'ignora las instrucciones',
@@ -152,12 +224,34 @@ REGLAS ESTRICTAS:
             }
         }
 
+        // 8. API Moderation Check (Call /v1/moderations if configured/supported)
+        try {
+            $modResponse = Http::withBasicAuth($this->user, $this->pass)
+                ->withoutVerifying()
+                ->timeout(5)
+                ->post("{$this->apiUrl}/v1/moderations", [
+                    'input' => $userMsg
+                ]);
+
+            if ($modResponse->successful()) {
+                $modJson = $modResponse->json();
+                if ($modJson['results'][0]['flagged'] ?? false) {
+                    Log::warning("Message flagged by remote moderation API: {$userMsg}");
+                    return response()->json([
+                        'content' => 'Tu mensaje contiene contenido no permitido por nuestras políticas.'
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::debug("Remote moderation API call skipped/failed: " . $e->getMessage());
+        }
+
         $sessionId = preg_replace('/[^a-zA-Z0-9_-]/', '', $request->input('session_id') ?? '');
         if (strlen($sessionId) > 100) {
             $sessionId = substr($sessionId, 0, 100);
         }
 
-        // 1. Load history from Redis, fallback to Laravel Cache
+        // 9. Load history from Redis, fallback to Laravel Cache
         $history = [];
         $redisKey = "chatbot:history:{$sessionId}";
 
@@ -172,24 +266,32 @@ REGLAS ESTRICTAS:
             }
         }
 
-        // 2. Append new user message
+        // 10. Append new user message
         $history[] = ['role' => 'user', 'content' => $userMsg];
 
-        // 3. Prepend system prompt
+        // 11. Cost / Length Control: Limit accumulated character count of context to 5,000 chars max
+        $sysPromptLength = strlen($this->systemPrompt);
+        $allowedHistoryLength = 5000 - $sysPromptLength;
+        
+        $filteredHistory = [];
+        $accumulatedLength = 0;
+        foreach (array_reverse($history) as $hMsg) {
+            $msgLength = strlen($hMsg['content']);
+            if ($accumulatedLength + $msgLength > $allowedHistoryLength) {
+                break;
+            }
+            $filteredHistory[] = $hMsg;
+            $accumulatedLength += $msgLength;
+        }
+        $filteredHistory = array_reverse($filteredHistory);
+
+        // 12. Prepend system prompt
         $messages = array_merge(
             [['role' => 'system', 'content' => $this->systemPrompt]],
-            $history
+            $filteredHistory
         );
 
-        // 4. Limit history to last 20 messages + system prompt
-        if (count($messages) > 21) {
-            $messages = array_merge(
-                [['role' => 'system', 'content' => $this->systemPrompt]],
-                array_slice($history, -20)
-            );
-        }
-
-        // 5. Query OpenWebUI / Ollama (OpenAI compatible endpoint /v1/chat/completions)
+        // 13. Query OpenWebUI / Ollama (OpenAI compatible endpoint /v1/chat/completions)
         try {
             $response = Http::withBasicAuth($this->user, $this->pass)
                 ->withoutVerifying()
@@ -217,14 +319,14 @@ REGLAS ESTRICTAS:
                 return response()->json(['error' => 'Respuesta del asistente no válida.'], 502);
             }
 
-            // 6. Save updated history to Redis / Cache
+            // 14. Save updated history to Redis / Cache
             if ($sessionId) {
-                $history[] = ['role' => 'assistant', 'content' => $content];
+                $filteredHistory[] = ['role' => 'assistant', 'content' => $content];
                 try {
                     $redis = Redis::connection();
-                    $redis->setex($redisKey, 7200, json_encode($history, JSON_UNESCAPED_UNICODE));
+                    $redis->setex($redisKey, 7200, json_encode($filteredHistory, JSON_UNESCAPED_UNICODE));
                 } catch (\Exception $e) {
-                    Cache::put($redisKey, $history, 7200);
+                    Cache::put($redisKey, $filteredHistory, 7200);
                 }
             }
 
@@ -238,6 +340,12 @@ REGLAS ESTRICTAS:
     /** POST /chatbot/clear-session */
     public function clearSession(Request $request)
     {
+        // 1. Validar el token firmado
+        if ($tokenError = $this->verifySecurityToken($request)) {
+            return $tokenError;
+        }
+
+        // 2. Limitar tasa
         $ip = $request->ip();
         if (RateLimiter::tooManyAttempts("chatbot-clear:{$ip}", 10)) {
             return response()->json(['error' => 'Demasiadas consultas.'], 429);
@@ -261,5 +369,3 @@ REGLAS ESTRICTAS:
         return response()->json(['ok' => true]);
     }
 }
-
-
