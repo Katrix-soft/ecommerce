@@ -22,6 +22,7 @@ Route::post('webhooks/mercadopago', [\App\Http\Controllers\MercadoPagoController
 // Chatbot proxy
 Route::get('chatbot/models',  [\App\Http\Controllers\ChatbotController::class, 'models']);
 Route::post('chatbot/chat',   [\App\Http\Controllers\ChatbotController::class, 'chat']);
+Route::post('chatbot/clear-session', [\App\Http\Controllers\ChatbotController::class, 'clearSession']);
 
 // API v1 Portal Administrativo
 Route::prefix('v1')->name('api.v1.')->middleware('auth:sanctum')->group(function () {

@@ -58,10 +58,10 @@
 
 <script>
 (function(){
-    // Proxy PHP directo — sin Laravel routing, sin caché, sin CSRF
-    const MODELS_URL   = '/chatbot-proxy.php?action=models&v=' + Date.now();
-    const CHAT_URL     = '/chatbot-proxy.php?action=chat2&v=' + Date.now();
-    const CLEAR_URL    = '/chatbot-proxy.php?action=clear_session';
+    // Laravel API routes
+    const MODELS_URL   = '/api/chatbot/models?v=' + Date.now();
+    const CHAT_URL     = '/api/chatbot/chat?v=' + Date.now();
+    const CLEAR_URL    = '/api/chatbot/clear-session';
 
     // Session ID persistente — el historial vive en Redis server-side
     let sessionId = localStorage.getItem('sply_chat_session');
